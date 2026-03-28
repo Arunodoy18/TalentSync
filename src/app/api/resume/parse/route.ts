@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pdf from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase-server";
 
@@ -24,8 +24,10 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const data = await pdf(buffer);
-    const text = data.text;
+    const parser = new PDFParse({ data: new Uint8Array(buffer) });
+    const textResult = await parser.getText();
+    const text = textResult.text;
+    await parser.destroy();
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ 

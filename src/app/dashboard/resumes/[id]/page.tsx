@@ -5,7 +5,7 @@ import ResumeEditor from "@/components/sections/resume-editor";
 export default async function ResumePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const supabase = await createClient();

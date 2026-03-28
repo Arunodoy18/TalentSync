@@ -16,8 +16,9 @@ async function getShareResult(id: string) {
   return data;
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const data = await getShareResult(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getShareResult(id);
 
   if (!data) {
     return {
@@ -45,8 +46,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function AtsSharePage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function AtsSharePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const data = await getShareResult(id);
 
   if (!data) {

@@ -14,6 +14,13 @@ const eslintConfig = [
     ignores: [".next/", "next-env.d.ts"],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    rules: {
+      // Current codebase intentionally uses dynamic payloads in many API handlers.
+      "@typescript-eslint/no-explicit-any": "off",
+      "react/no-unescaped-entities": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

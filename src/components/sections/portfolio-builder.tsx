@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ExternalLink, Github, Monitor, Rocket } from "lucide-react";
+import { Loader2, ExternalLink, Monitor, Rocket } from "lucide-react";
 import { toast } from "sonner";
 
 interface PortfolioProps {
@@ -142,7 +142,7 @@ export function PortfolioBuilder({ resumeId }: PortfolioProps) {
                 </p>
                 <div className="flex gap-4 pt-2 border-t border-border">
                   <a href="#" className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-colors">
-                    <Github className="w-3.5 h-3.5" /> Code
+                    <ExternalLink className="w-3.5 h-3.5" /> Code
                   </a>
                   <a href="#" className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-colors">
                     <ExternalLink className="w-3.5 h-3.5" /> Live Demo

@@ -89,8 +89,6 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
     }
   };
 
-  const feedback = resume.feedback;
-
   useEffect(() => {
     const currentSignature = JSON.stringify({
       title: resume.title,

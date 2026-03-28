@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Rocket, Map, Target, Calendar } from "lucide-react";
+import { Loader2, Rocket, Map, Calendar } from "lucide-react";
 
 interface RoadmapStep {
   title: string;

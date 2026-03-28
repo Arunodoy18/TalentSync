@@ -12,6 +12,7 @@ This document defines recommended GitHub branch protection settings for `main`.
 2. Require status checks to pass before merging
 - `CI / build-and-validate`
 - `Commitlint / commitlint`
+- CI lint is warning-free (`npm run lint -- --max-warnings=0`)
 
 3. Require branches to be up to date before merging
 - Enable this to avoid merging stale branches

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
-import { Plus, FileText, LayoutGrid, List, Briefcase, Sparkles, Rocket } from "lucide-react";
+import { Plus, FileText, LayoutGrid, Briefcase, Sparkles, Rocket } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ResumeUpload from "@/components/sections/resume-upload";

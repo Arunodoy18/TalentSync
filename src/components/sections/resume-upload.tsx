@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from "react";
-import { Upload, FileText, Loader2, AlertCircle } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

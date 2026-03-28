@@ -1,0 +1,20 @@
+# Global owners
+* @Arunodoy18
+
+# Product and architecture docs
+docs/** @Arunodoy18
+README.md @Arunodoy18
+
+# Database and migrations
+database/** @Arunodoy18
+
+# API and backend logic
+src/app/api/** @Arunodoy18
+src/lib/** @Arunodoy18
+
+# Frontend surfaces
+src/app/** @Arunodoy18
+src/components/** @Arunodoy18
+
+# Workflows and repo governance
+.github/** @Arunodoy18

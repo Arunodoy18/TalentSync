@@ -118,6 +118,7 @@ Apply these in order for full feature coverage.
 - `docs/PRODUCTION_ARCHITECTURE.md`
 - `docs/PHASE_STATUS.md`
 - `docs/RELEASE_PROCESS.md`
+- `docs/BRANCH_PROTECTION.md`
 
 ## Operational Notes
 
@@ -147,6 +148,9 @@ npm run lint
 - Security policy: `SECURITY.md`
 - PR template: `.github/pull_request_template.md`
 - Issue templates: `.github/ISSUE_TEMPLATE/`
+- Code owners: `.github/CODEOWNERS`
 - CI workflow: `.github/workflows/ci.yml`
+- Commitlint workflow: `.github/workflows/commitlint.yml`
 - Release workflow: `.github/workflows/release-please.yml`
 - Release config: `release-please-config.json` and `.release-please-manifest.json`
+- Commitlint config: `commitlint.config.cjs`

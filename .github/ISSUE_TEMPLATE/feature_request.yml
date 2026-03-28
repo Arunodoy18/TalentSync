@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest an improvement for TalentSync
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      placeholder: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      placeholder: Describe your preferred solution.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+  - type: textarea
+    id: impact
+    attributes:
+      label: User and Business Impact
+      placeholder: Who benefits and how?

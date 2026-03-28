@@ -1,5 +1,7 @@
 # TalentSync
 
+[![CI](https://github.com/Arunodoy18/TalentSync/actions/workflows/ci.yml/badge.svg)](https://github.com/Arunodoy18/TalentSync/actions/workflows/ci.yml)
+
 AI Career Operating System built with Next.js, Supabase, and OpenAI.
 
 TalentSync helps job seekers move from resume creation to interview pipeline using:
@@ -136,3 +138,12 @@ npm run lint
 - Add CI pipeline for lint, typecheck, and migration validation
 - Add alert delivery sink (email/slack/webhook) for ops alerts
 - Add internal admin UI for protected analytics endpoints
+
+## Repository Standards
+
+- Contribution guide: `CONTRIBUTING.md`
+- Code of conduct: `CODE_OF_CONDUCT.md`
+- Security policy: `SECURITY.md`
+- PR template: `.github/pull_request_template.md`
+- Issue templates: `.github/ISSUE_TEMPLATE/`
+- CI workflow: `.github/workflows/ci.yml`

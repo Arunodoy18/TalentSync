@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible problem in TalentSync
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out all sections so we can reproduce quickly.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Screenshots
+      description: Paste relevant logs or screenshots.
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: OS, browser, node version, app branch

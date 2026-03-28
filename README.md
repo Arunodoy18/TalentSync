@@ -1,6 +1,7 @@
 # TalentSync
 
 [![CI](https://github.com/Arunodoy18/TalentSync/actions/workflows/ci.yml/badge.svg)](https://github.com/Arunodoy18/TalentSync/actions/workflows/ci.yml)
+[![Release](https://github.com/Arunodoy18/TalentSync/actions/workflows/release-please.yml/badge.svg)](https://github.com/Arunodoy18/TalentSync/actions/workflows/release-please.yml)
 
 AI Career Operating System built with Next.js, Supabase, and OpenAI.
 
@@ -116,6 +117,7 @@ Apply these in order for full feature coverage.
 
 - `docs/PRODUCTION_ARCHITECTURE.md`
 - `docs/PHASE_STATUS.md`
+- `docs/RELEASE_PROCESS.md`
 
 ## Operational Notes
 
@@ -135,7 +137,6 @@ npm run lint
 
 ## Recommended Next Steps
 
-- Add CI pipeline for lint, typecheck, and migration validation
 - Add alert delivery sink (email/slack/webhook) for ops alerts
 - Add internal admin UI for protected analytics endpoints
 
@@ -147,3 +148,5 @@ npm run lint
 - PR template: `.github/pull_request_template.md`
 - Issue templates: `.github/ISSUE_TEMPLATE/`
 - CI workflow: `.github/workflows/ci.yml`
+- Release workflow: `.github/workflows/release-please.yml`
+- Release config: `release-please-config.json` and `.release-please-manifest.json`

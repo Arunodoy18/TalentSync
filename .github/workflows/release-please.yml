@@ -16,11 +16,19 @@ jobs:
     steps:
       - name: Run Release Please
         id: release
+        continue-on-error: true
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      - name: Release Please Permission Hint
+        if: ${{ steps.release.outcome == 'failure' }}
+        run: |
+          echo "Release Please could not create a PR with current repository action permissions."
+          echo "Enable Settings > Actions > General > Workflow permissions: Read and write permissions."
+          echo "Also enable: Allow GitHub Actions to create and approve pull requests."
 
       - name: Show Release Outputs
         if: ${{ steps.release.outputs.release_created }}

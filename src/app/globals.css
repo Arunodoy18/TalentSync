@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #1a1a1a;
+
+  --color-card: #e7ecf3;
+  --color-card-foreground: #1a1a1a;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1a1a1a;
+
+  --color-primary: #003893;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #d8dee9;
+  --color-secondary-foreground: #1a1a1a;
+
+  --color-muted: #f3f4f6;
+  --color-muted-foreground: #6b7280;
+
+  --color-accent: #d8dee9;
+  --color-accent-foreground: #003893;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #d1d5db;
+  --color-input: #ffffff;
+  --color-ring: #003893;
+
+  --color-chart-1: #003893;
+  --color-chart-2: #2d8659;
+  --color-chart-3: #1e3a5f;
+  --color-chart-4: #f1c40f;
+  --color-chart-5: #e74c3c;
+
+  --color-sidebar: #f9fafb;
+  --color-sidebar-foreground: #374151;
+  --color-sidebar-primary: #003893;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #e5e7eb;
+  --color-sidebar-accent-foreground: #111827;
+  --color-sidebar-border: #e5e7eb;
+  --color-sidebar-ring: #003893;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 4px;
+  --radius-pill: 50px;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: #d1d5db;
+  }
+
+  :root {
+    --background: #ffffff;
+    --foreground: #1a1a1a;
+    --card: #e7ecf3;
+    --card-foreground: #1a1a1a;
+    --popover: #ffffff;
+    --popover-foreground: #1a1a1a;
+    --primary: #003893;
+    --primary-foreground: #ffffff;
+    --secondary: #d8dee9;
+    --secondary-foreground: #1a1a1a;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --accent: #d8dee9;
+    --accent-foreground: #003893;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #d1d5db;
+    --input: #ffffff;
+    --ring: #003893;
+    --radius: 24px;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  h4 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #1a1a1a;
+  }
+
+  p {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+
+  a {
+    color: #003893;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  a:hover {
+    opacity: 0.8;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    background-color: #ffffff;
+    border-radius: 50px;
+    height: 50px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 14px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #003893;
+  }
+
+  button {
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.2s;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .pill-button {
+    border-radius: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .login-card {
+    background-color: #e7ecf3;
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 440px;
+  }
+}

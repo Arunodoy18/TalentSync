@@ -1,0 +1,151 @@
+"use client"
+
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Loader2, Briefcase, MapPin, ExternalLink, Sparkles, Building2 } from "lucide-react";
+import TailorButton from "./tailor-button";
+
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  salary_range: string;
+  job_type: string;
+  url: string;
+  similarity: number;
+}
+
+interface JobRecommendationsProps {
+  resumeId: string;
+}
+
+const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
+  const [loading, setLoading] = useState(false);
+  const [jobs, setJobs] = useState<Job[] | null>(null);
+
+  const findJobs = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/jobs/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeId }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setJobs(data.jobs);
+    } catch (error) {
+      console.error("Failed to match jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="rounded-[24px] border-[#e5e7eb] shadow-sm overflow-hidden">
+      <CardHeader className="bg-gray-50/50">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-xl font-bold flex items-center gap-2 text-green-700">
+              <Sparkles className="h-5 w-5" />
+              AI Job Recommendations
+            </CardTitle>
+            <CardDescription>Top roles matched to your specific profile.</CardDescription>
+          </div>
+          {!jobs && (
+            <Button 
+              onClick={findJobs} 
+              disabled={loading}
+              className="bg-green-600 text-white hover:opacity-90 rounded-full"
+            >
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Find My Best Match
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {loading && !jobs && (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin mb-4 text-green-600" />
+            <p>Matching your resume with thousands of jobs...</p>
+          </div>
+        )}
+
+        {!loading && !jobs && (
+          <div className="text-center py-12">
+            <div className="h-16 w-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
+              <Briefcase className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">Discover Matching Jobs</h3>
+            <p className="text-muted-foreground max-w-sm mx-auto">
+              Our semantic matching engine finds the best roles for you beyond just keywords.
+            </p>
+          </div>
+        )}
+
+        {jobs && jobs.length > 0 && (
+          <div className="space-y-4">
+            {jobs.map((job) => (
+              <div key={job.id} className="p-4 rounded-2xl border border-gray-100 bg-white hover:shadow-sm transition-all group">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-[#212529] group-hover:text-green-600 transition-colors">{job.title}</h4>
+                    <p className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                       <Building2 className="h-3 w-3" />
+                       {job.company}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-bold bg-green-50 text-green-700 px-2 py-1 rounded-full">
+                       {Math.round(job.similarity * 100)}% Match
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+                   <span className="flex items-center gap-1">
+                     <MapPin className="h-3 w-3" />
+                     {job.location}
+                   </span>
+                   <span>•</span>
+                   <span>{job.job_type}</span>
+                   {job.salary_range && (
+                      <>
+                        <span>•</span>
+                        <span>{job.salary_range}</span>
+                      </>
+                   )}
+                </div>
+
+                <div className="flex gap-2">
+                   <Button variant="outline" size="sm" className="w-full text-xs font-bold rounded-xl border-gray-200" asChild>
+                      <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                        View Details
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                   </Button>
+                   <TailorButton 
+                      resumeId={resumeId}
+                      jobId={job.id}
+                      jobTitle={job.title}
+                   />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {jobs && jobs.length === 0 && (
+           <div className="text-center py-12 text-muted-foreground">
+             <p>No jobs found with a high enough match. Try broadening your profile.</p>
+           </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default JobRecommendations;

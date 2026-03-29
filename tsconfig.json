@@ -37,6 +37,17 @@
     "**/*.mts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "backend",
+    "ai-service",
+    "matching-engine",
+    "scraper",
+    "automation",
+    "notifications",
+    "analytics",
+    "payments",
+    "webhooks",
+    "admin-panel",
+    "infrastructure"
   ]
 }

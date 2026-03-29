@@ -110,12 +110,16 @@ Production and migration files are in:
 - `database/migrations/003_phase4_growth.sql`
 - `database/migrations/004_referral_conversion.sql`
 - `database/migrations/005_ats_shares_and_replay.sql`
+- `database/migrations/006_payments_reconciliation_and_event_outbox.sql`
 
 Apply these in order for full feature coverage.
 
 ## Architecture Docs
 
 - `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/MICROSERVICES_IMPLEMENTATION.md`
+- `docs/EVENT_CATALOG.md`
+- `docs/API_SURFACE.md`
 - `docs/PHASE_STATUS.md`
 - `docs/RELEASE_PROCESS.md`
 - `docs/BRANCH_PROTECTION.md`

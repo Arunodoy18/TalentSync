@@ -41,11 +41,11 @@ Auto-approve mode enabled. Phases are executed sequentially with validation at e
 - Added operational alerting API for webhook replay and payment failure anomalies
 - Added social metadata previews for shared ATS pages
 
-## In Progress (Next)
+## Completed Recently
 ### Phase 4: Growth and Productization
-- Add admin analytics UI screen for protected internal operations view
-- Add alert delivery integrations (email or webhook sinks)
-- Add trend charts for cohorts over rolling windows
+- Added admin operations dashboard at /dashboard/admin for protected internal analytics and alerts.
+- Added alert delivery integration via webhook sink (`OPS_ALERT_WEBHOOK_URL`) for warning/critical ops alerts.
+- Added rolling 14-day and 7-day trend analytics with dashboard chart visualizations.
 
 ## Required Environment Variables
 - NEXT_PUBLIC_SUPABASE_URL
@@ -56,6 +56,7 @@ Auto-approve mode enabled. Phases are executed sequentially with validation at e
 - RAZORPAY_KEY_SECRET
 - RAZORPAY_WEBHOOK_SECRET
 - INTERNAL_ADMIN_TOKEN
+- OPS_ALERT_WEBHOOK_URL (optional, used for alert dispatch)
 
 ## Notes
 - Current workspace is not a git repository, so commit history and diff-based review are unavailable.

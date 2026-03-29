@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, TrendingUp, Users, CircleDollarSign } from "lucide-react";
+import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 
 type BillingStatus = {
   subscription: {
@@ -27,6 +28,10 @@ type ReferralAnalytics = {
   cohorts?: {
     bySource: Array<{ source: string; touches: number; converted: number; conversionRate: number }>;
     byCampaign: Array<{ campaign: string; touches: number; converted: number; conversionRate: number }>;
+  };
+  trends?: {
+    daily: Array<{ day: string; touches: number; converted: number; conversionRate: number }>;
+    rolling7: Array<{ day: string; touches: number; converted: number; conversionRate: number }>;
   };
 };
 
@@ -172,6 +177,41 @@ export default function AnalyticsPage() {
             {(referrals?.cohorts?.byCampaign || []).length === 0 ? (
               <p className="text-sm text-[#6b7280]">No campaign cohort data yet.</p>
             ) : null}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+          <h2 className="text-xl font-bold text-[#212529]">Referral Daily Trend (14d)</h2>
+          <p className="mt-1 text-sm text-[#6b7280]">Touches vs conversions by day.</p>
+          <div className="mt-6 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={referrals?.trends?.daily || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" />
+                <XAxis dataKey="day" tick={{ fill: "#6b7280", fontSize: 12 }} />
+                <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="touches" stroke="#003893" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="converted" stroke="#0f9d58" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+          <h2 className="text-xl font-bold text-[#212529]">Rolling 7-Day Conversion</h2>
+          <p className="mt-1 text-sm text-[#6b7280]">Smoothed conversion trend over a 7-day window.</p>
+          <div className="mt-6 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={referrals?.trends?.rolling7 || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" />
+                <XAxis dataKey="day" tick={{ fill: "#6b7280", fontSize: 12 }} />
+                <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} unit="%" />
+                <Tooltip formatter={(value: number) => [`${value}%`, "Conversion"]} />
+                <Line type="monotone" dataKey="conversionRate" stroke="#f59e0b" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

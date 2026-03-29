@@ -43,6 +43,7 @@ RAZORPAY_KEY_SECRET=
 RAZORPAY_WEBHOOK_SECRET=
 
 INTERNAL_ADMIN_TOKEN=
+OPS_ALERT_WEBHOOK_URL=
 ```
 
 3. Run development server
@@ -127,6 +128,7 @@ Apply these in order for full feature coverage.
 ## Operational Notes
 
 - `INTERNAL_ADMIN_TOKEN` must be set for admin and replay endpoints.
+- `OPS_ALERT_WEBHOOK_URL` can be set to dispatch warning/critical admin ops alerts to an external webhook sink.
 - Webhook verification depends on `RAZORPAY_WEBHOOK_SECRET`.
 - Billing and admin endpoints rely on `SUPABASE_SERVICE_ROLE_KEY`.
 - This workspace currently ignores type and eslint build failures in `next.config.ts`; remove those flags before strict production release.

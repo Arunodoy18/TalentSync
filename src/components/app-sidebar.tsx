@@ -5,6 +5,7 @@ import {
   FileText,
   LayoutDashboard,
   ChartNoAxesColumn,
+  Shield,
   Mail,
   Settings,
   User,
@@ -46,6 +47,11 @@ const items = [
     title: "Analytics",
     url: "/dashboard/analytics",
     icon: ChartNoAxesColumn,
+  },
+  {
+    title: "Admin Ops",
+    url: "/dashboard/admin",
+    icon: Shield,
   },
   {
     title: "Cover Letters",

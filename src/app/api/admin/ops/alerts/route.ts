@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdminRequest } from "@/lib/admin-auth";
+import { dispatchOpsAlerts } from "@/lib/ops-alert-dispatch";
 
 type Alert = {
   id: string;
@@ -82,6 +83,12 @@ export async function GET(req: NextRequest) {
         title: "Operations healthy",
         detail: "No warning thresholds crossed in current monitoring window.",
       });
+    }
+
+    try {
+      await dispatchOpsAlerts(alerts);
+    } catch (dispatchError) {
+      console.error("Ops alert dispatch failure:", dispatchError);
     }
 
     return NextResponse.json({ alerts });

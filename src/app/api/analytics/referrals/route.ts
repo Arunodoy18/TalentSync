@@ -1,6 +1,24 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 
+function isoDay(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function getLastNDays(n: number): string[] {
+  const days: string[] = [];
+  const now = new Date();
+
+  for (let i = n - 1; i >= 0; i -= 1) {
+    const d = new Date(now);
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() - i);
+    days.push(isoDay(d));
+  }
+
+  return days;
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -63,6 +81,49 @@ export async function GET() {
 
     const latest = referrals[0] || null;
 
+    const last14Days = getLastNDays(14);
+    const touchesByDay = new Map<string, number>();
+    const convertedByDay = new Map<string, number>();
+
+    for (const row of referrals) {
+      const createdDay = isoDay(new Date(row.created_at));
+      if (last14Days.includes(createdDay)) {
+        touchesByDay.set(createdDay, (touchesByDay.get(createdDay) || 0) + 1);
+      }
+
+      if (row.converted_at) {
+        const convertedDay = isoDay(new Date(row.converted_at));
+        if (last14Days.includes(convertedDay)) {
+          convertedByDay.set(convertedDay, (convertedByDay.get(convertedDay) || 0) + 1);
+        }
+      }
+    }
+
+    const trendDaily = last14Days.map((day) => {
+      const dayTouches = touchesByDay.get(day) || 0;
+      const dayConverted = convertedByDay.get(day) || 0;
+      return {
+        day,
+        touches: dayTouches,
+        converted: dayConverted,
+        conversionRate: dayTouches > 0 ? Number(((dayConverted / dayTouches) * 100).toFixed(2)) : 0,
+      };
+    });
+
+    const trendRolling7 = trendDaily.map((_, index) => {
+      const windowStart = Math.max(0, index - 6);
+      const windowRows = trendDaily.slice(windowStart, index + 1);
+      const touchesWindow = windowRows.reduce((sum, row) => sum + row.touches, 0);
+      const convertedWindow = windowRows.reduce((sum, row) => sum + row.converted, 0);
+      return {
+        day: trendDaily[index].day,
+        touches: touchesWindow,
+        converted: convertedWindow,
+        conversionRate:
+          touchesWindow > 0 ? Number(((convertedWindow / touchesWindow) * 100).toFixed(2)) : 0,
+      };
+    });
+
     return NextResponse.json({
       summary: {
         touches,
@@ -74,6 +135,10 @@ export async function GET() {
       cohorts: {
         bySource: sourceCohorts,
         byCampaign: campaignCohorts,
+      },
+      trends: {
+        daily: trendDaily,
+        rolling7: trendRolling7,
       },
     });
   } catch (error: unknown) {

@@ -68,14 +68,9 @@ const LoginAuth = () => {
       <div className="w-full max-w-[440px] flex flex-col items-center">
         {/* Logo Section */}
         <div className="mb-[30px] flex justify-center w-full">
-            <Image
-              src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/90d7a352-e88b-418e-99a9-a0f1c8842820-app-resumly-ai/assets/svgs/logo_cd120a9103042b5bfba678e4a2c0af45-1.svg"
-              alt="TalentSync Logo"
-              width={227}
-              height={62}
-              priority
-              className="h-[62px] w-auto"
-            />
+          <div className="flex items-center gap-2 rounded-full border border-[#d1d8e6] bg-white px-5 py-2 shadow-sm">
+            <span className="text-[13px] font-extrabold tracking-[0.16em] text-[#003893] uppercase">TalentSync</span>
+          </div>
         </div>
 
         {/* Card Section */}
@@ -84,7 +79,7 @@ const LoginAuth = () => {
               {isLogin ? "Login" : "Sign Up"}
             </h4>
             <p className="text-center text-[14px] text-[#6b7280] mb-[30px]">
-              Your AI Career Copilot. From skills to job automatically.
+              Your career copilot to build resumes, discover opportunities, and apply faster.
             </p>
 
 

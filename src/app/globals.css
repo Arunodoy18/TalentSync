@@ -2,6 +2,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@theme inline {
+  --color-sparkles-color: var(--sparkles-color);
+  --color-gradient-color: var(--gradient-color);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -87,6 +92,8 @@
   }
 
   :root {
+    --gradient-color: #8350e8;
+    --sparkles-color: #8350e8;
     --background: #ffffff;
     --foreground: #1a1a1a;
     --card: #e7ecf3;
@@ -107,6 +114,11 @@
     --input: #ffffff;
     --ring: #003893;
     --radius: 24px;
+  }
+
+  .dark {
+    --gradient-color: #8350e8;
+    --sparkles-color: #ffffff;
   }
 
   html {

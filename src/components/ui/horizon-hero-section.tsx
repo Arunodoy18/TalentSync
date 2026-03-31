@@ -41,6 +41,7 @@ export const Component = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [currentSection, setCurrentSection] = useState(1);
   const [ready, setReady] = useState(false);
+  const rafScrollRef = useRef<number | null>(null);
 
   const smoothCameraPos = useRef<CameraTarget>({ x: 0, y: 30, z: 180 });
   const baseMountainZ = useRef<number[]>([]);
@@ -83,6 +84,9 @@ export const Component = () => {
     const refs = threeRef.current;
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const isMobile = window.innerWidth < 768;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowMotion = isMobile || prefersReducedMotion;
 
     refs.scene = new THREE.Scene();
     refs.scene.fog = new THREE.FogExp2(0x030712, 0.00035);
@@ -91,7 +95,7 @@ export const Component = () => {
     refs.camera.position.set(0, 20, 160);
 
     refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowMotion ? 1.2 : 2));
     refs.renderer.setSize(window.innerWidth, window.innerHeight);
     refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     refs.renderer.toneMappingExposure = 0.7;
@@ -99,12 +103,12 @@ export const Component = () => {
     refs.composer = new EffectComposer(refs.renderer);
     refs.composer.addPass(new RenderPass(refs.scene, refs.camera));
     refs.composer.addPass(
-      new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.8, 0.35, 0.9)
+      new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), lowMotion ? 0.35 : 0.8, 0.35, 0.9)
     );
 
     const createStars = () => {
       if (!refs.scene) return;
-      const starCount = 2500;
+      const starCount = lowMotion ? 900 : 2500;
 
       for (let layer = 0; layer < 3; layer += 1) {
         const geometry = new THREE.BufferGeometry();
@@ -189,7 +193,7 @@ export const Component = () => {
     const createNebula = () => {
       if (!refs.scene) return;
 
-      const geometry = new THREE.PlaneGeometry(7200, 3500, 60, 60);
+      const geometry = new THREE.PlaneGeometry(7200, 3500, lowMotion ? 28 : 60, lowMotion ? 28 : 60);
       const material = new THREE.ShaderMaterial({
         uniforms: {
           time: { value: 0 },
@@ -251,7 +255,7 @@ export const Component = () => {
 
       layers.forEach((layer, index) => {
         const points: THREE.Vector2[] = [];
-        const segments = 50;
+        const segments = lowMotion ? 28 : 50;
 
         for (let i = 0; i <= segments; i += 1) {
           const x = (i / segments - 0.5) * 1300;
@@ -340,13 +344,13 @@ export const Component = () => {
       }
 
       if (state.camera) {
-        const smoothing = 0.045;
+        const smoothing = lowMotion ? 0.06 : 0.045;
         smoothCameraPos.current.x += (state.target.x - smoothCameraPos.current.x) * smoothing;
         smoothCameraPos.current.y += (state.target.y - smoothCameraPos.current.y) * smoothing;
         smoothCameraPos.current.z += (state.target.z - smoothCameraPos.current.z) * smoothing;
 
-        const floatX = Math.sin(time * 0.17) * 1.5;
-        const floatY = Math.cos(time * 0.21) * 0.8;
+        const floatX = lowMotion ? Math.sin(time * 0.12) * 0.7 : Math.sin(time * 0.17) * 1.5;
+        const floatY = lowMotion ? Math.cos(time * 0.14) * 0.4 : Math.cos(time * 0.21) * 0.8;
 
         state.camera.position.set(
           smoothCameraPos.current.x + floatX,
@@ -358,7 +362,7 @@ export const Component = () => {
 
       state.mountains.forEach((mountain, index) => {
         const factor = 1 + index * 0.45;
-        mountain.position.x = Math.sin(time * 0.09) * factor * 2;
+        mountain.position.x = Math.sin(time * (lowMotion ? 0.06 : 0.09)) * factor * (lowMotion ? 1.2 : 2);
       });
 
       state.composer?.render();
@@ -374,10 +378,12 @@ export const Component = () => {
     const onResize = () => {
       const state = threeRef.current;
       if (!state.camera || !state.renderer || !state.composer) return;
+      const nowLowMotion = window.innerWidth < 768 || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       state.camera.aspect = window.innerWidth / window.innerHeight;
       state.camera.updateProjectionMatrix();
       state.renderer.setSize(window.innerWidth, window.innerHeight);
+      state.renderer.setPixelRatio(Math.min(window.devicePixelRatio, nowLowMotion ? 1.2 : 2));
       state.composer.setSize(window.innerWidth, window.innerHeight);
     };
 
@@ -488,43 +494,56 @@ export const Component = () => {
     ];
 
     const onScroll = () => {
-      const scrolled = window.scrollY;
-      const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-      const progress = Math.min(scrolled / max, 1);
-
-      setScrollProgress(progress);
-
-      const sectionIndex = Math.min(Math.floor(progress * (sections.length - 1)), sections.length - 1);
-      setCurrentSection(sectionIndex + 1);
-
-      const scaled = progress * (sections.length - 1);
-      const base = Math.floor(scaled);
-      const local = scaled - base;
-
-      const current = positions[base] ?? positions[0];
-      const next = positions[base + 1] ?? current;
-
-      threeRef.current.target = {
-        x: current.x + (next.x - current.x) * local,
-        y: current.y + (next.y - current.y) * local,
-        z: current.z + (next.z - current.z) * local,
-      };
-
-      threeRef.current.mountains.forEach((mountain, idx) => {
-        const depthSpeed = 1 + idx * 0.55;
-        const targetZ = baseMountainZ.current[idx] + scrolled * 0.42 * depthSpeed;
-        mountain.position.z = progress > 0.68 ? 500000 : targetZ;
-      });
-
-      if (threeRef.current.nebula && threeRef.current.mountains[threeRef.current.mountains.length - 1]) {
-        threeRef.current.nebula.position.z = threeRef.current.mountains[threeRef.current.mountains.length - 1].position.z;
+      if (rafScrollRef.current) {
+        return;
       }
+
+      rafScrollRef.current = window.requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+        const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+        const progress = Math.min(scrolled / max, 1);
+
+        setScrollProgress(progress);
+
+        const sectionIndex = Math.min(Math.floor(progress * (sections.length - 1)), sections.length - 1);
+        setCurrentSection(sectionIndex + 1);
+
+        const scaled = progress * (sections.length - 1);
+        const base = Math.floor(scaled);
+        const local = scaled - base;
+
+        const current = positions[base] ?? positions[0];
+        const next = positions[base + 1] ?? current;
+
+        threeRef.current.target = {
+          x: current.x + (next.x - current.x) * local,
+          y: current.y + (next.y - current.y) * local,
+          z: current.z + (next.z - current.z) * local,
+        };
+
+        threeRef.current.mountains.forEach((mountain, idx) => {
+          const depthSpeed = 1 + idx * 0.55;
+          const targetZ = baseMountainZ.current[idx] + scrolled * 0.42 * depthSpeed;
+          mountain.position.z = progress > 0.68 ? 500000 : targetZ;
+        });
+
+        if (threeRef.current.nebula && threeRef.current.mountains[threeRef.current.mountains.length - 1]) {
+          threeRef.current.nebula.position.z = threeRef.current.mountains[threeRef.current.mountains.length - 1].position.z;
+        }
+
+        rafScrollRef.current = null;
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
 
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafScrollRef.current) {
+        window.cancelAnimationFrame(rafScrollRef.current);
+      }
+    };
   }, [sections.length]);
 
   const splitTitle = (text: string) => {
@@ -737,9 +756,17 @@ export const Component = () => {
         }
 
         @media (max-width: 768px) {
+          .horizon-hero {
+            min-height: 250vh;
+          }
+
           .horizon-menu {
             top: 0.9rem;
             left: 0.9rem;
+          }
+
+          .horizon-subtitle {
+            max-width: 22rem;
           }
 
           .horizon-scroll-progress {

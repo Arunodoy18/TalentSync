@@ -2,7 +2,7 @@
 
 import NumberFlow from "@number-flow/react";
 import { motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Sparkles as SparklesComp } from "@/components/ui/sparkles";
 import { TimelineContent } from "@/components/ui/timeline-animation";
@@ -145,7 +145,15 @@ const PricingSwitch = ({ onSwitch }: { onSwitch: (value: string) => void }) => {
 
 export default function PricingSection4({ onChoosePlan, loadingPlan = null }: PricingSection4Props) {
   const [isYearly, setIsYearly] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pricingRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkScreen = () => setIsMobile(window.innerWidth < 768);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
 
   const revealVariants = {
     visible: (i: number) => ({
@@ -177,7 +185,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
       >
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff2c_1px,transparent_1px),linear-gradient(to_bottom,#3a3a3a01_1px,transparent_1px)] bg-[size:70px_80px]" />
         <SparklesComp
-          density={1800}
+          density={isMobile ? 700 : 1800}
           direction="bottom"
           speed={1}
           color="#FFFFFF"
@@ -201,8 +209,8 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
         />
       </TimelineContent>
 
-      <article className="relative z-50 mx-auto mb-6 max-w-3xl space-y-2 pt-32 text-center">
-        <h2 className="text-4xl font-medium text-white">
+      <article className="relative z-50 mx-auto mb-6 max-w-3xl space-y-2 px-4 pt-24 text-center sm:pt-32">
+        <h2 className="text-3xl font-medium text-white sm:text-4xl">
           <VerticalCutReveal
             splitBy="words"
             staggerDuration={0.15}
@@ -216,7 +224,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
               delay: 0,
             }}
           >
-            Plans that works best for your
+            Plans that work best for your goals
           </VerticalCutReveal>
         </h2>
 
@@ -227,7 +235,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
           customVariants={revealVariants}
           className="text-gray-300"
         >
-          Trusted by millions, We help teams all around the world, Explore which option is right for you.
+          Explore the option that fits your pace, budget, and hiring journey.
         </TimelineContent>
 
         <TimelineContent
@@ -249,7 +257,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
         }}
       />
 
-      <div className="relative z-20 mx-auto grid max-w-5xl gap-4 py-6 md:grid-cols-3">
+      <div className="relative z-20 mx-auto grid max-w-5xl gap-4 px-4 py-6 md:grid-cols-3">
         {plans.map((plan, index) => (
           <TimelineContent
             key={plan.name}
@@ -267,11 +275,11 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
             >
               <CardHeader className="text-left">
                 <div className="flex justify-between">
-                  <h3 className="mb-2 text-3xl">{plan.name}</h3>
+                  <h3 className="mb-2 text-2xl sm:text-3xl">{plan.name}</h3>
                 </div>
                 <div className="flex items-baseline">
-                  <span className="text-4xl font-semibold">
-                    INR <NumberFlow value={isYearly ? plan.yearlyPrice : plan.price} className="text-4xl font-semibold" />
+                  <span className="text-3xl font-semibold sm:text-4xl">
+                    INR <NumberFlow value={isYearly ? plan.yearlyPrice : plan.price} className="text-3xl font-semibold sm:text-4xl" />
                   </span>
                   <span className="ml-1 text-gray-300">/{plan.billingLabel || (isYearly ? "year" : "month")}</span>
                 </div>
@@ -282,7 +290,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
                 <button
                   onClick={() => onChoosePlan?.(plan.id)}
                   disabled={loadingPlan === plan.id}
-                  className={`mb-6 w-full rounded-xl p-4 text-xl transition-opacity disabled:cursor-not-allowed disabled:opacity-65 ${
+                  className={`mb-6 w-full rounded-xl p-3 text-lg transition-opacity disabled:cursor-not-allowed disabled:opacity-65 sm:p-4 sm:text-xl ${
                     plan.popular
                       ? "border border-blue-500 bg-gradient-to-t from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-800"
                       : plan.buttonVariant === "outline"

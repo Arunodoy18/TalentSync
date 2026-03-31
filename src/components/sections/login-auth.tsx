@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 
@@ -185,13 +184,24 @@ const LoginAuth = () => {
             disabled={loading}
             className="w-full h-[50px] bg-[#d8dee9] border border-[#d1d5db] text-[#212529] rounded-[50px] text-[15px] font-semibold flex items-center justify-center hover:bg-[#ccd4df] active:scale-[0.98] transition-all disabled:opacity-50"
           >
-            <Image
-              src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/90d7a352-e88b-418e-99a9-a0f1c8842820-app-resumly-ai/assets/svgs/google_8ad21dc7208a821ad32c43ca68550dde-3.svg"
-              alt="Google"
-              width={20}
-              height={20}
-              className="mr-3"
-            />
+            <svg className="mr-3" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M21.805 10.023h-9.81v3.955h5.62c-.242 1.271-.967 2.348-2.06 3.07v2.55h3.335c1.953-1.798 3.08-4.45 3.08-7.598 0-.646-.057-1.27-.165-1.877z"
+                fill="#4285F4"
+              />
+              <path
+                d="M11.995 22c2.79 0 5.13-.924 6.84-2.502l-3.335-2.55c-.926.62-2.112.987-3.505.987-2.695 0-4.978-1.82-5.792-4.27h-3.45v2.684A10.005 10.005 0 0 0 11.995 22z"
+                fill="#34A853"
+              />
+              <path
+                d="M6.203 13.666A5.989 5.989 0 0 1 5.88 11.99c0-.581.116-1.143.323-1.676V7.63h-3.45A10.004 10.004 0 0 0 2 11.99c0 1.615.387 3.145 1.073 4.36l3.13-2.684z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M11.995 6.045c1.516 0 2.878.521 3.95 1.544l2.964-2.964C17.12 2.958 14.78 2 11.995 2A10.005 10.005 0 0 0 3.073 7.63l3.45 2.684c.814-2.45 3.097-4.27 5.792-4.27z"
+                fill="#EA4335"
+              />
+            </svg>
             Continue with Google
           </button>
 

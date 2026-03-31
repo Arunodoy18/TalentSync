@@ -94,7 +94,13 @@ export const Component = () => {
     refs.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2500);
     refs.camera.position.set(0, 20, 160);
 
-    refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    try {
+      refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch (error) {
+      console.error("Horizon hero renderer init failed", error);
+      setReady(true);
+      return;
+    }
     refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowMotion ? 1.2 : 2));
     refs.renderer.setSize(window.innerWidth, window.innerHeight);
     refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;

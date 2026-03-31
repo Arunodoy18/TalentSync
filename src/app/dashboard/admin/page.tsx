@@ -90,30 +90,30 @@ export default async function AdminPage() {
   return (
     <div className="flex-1 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#212529]">Admin Operations</h1>
-        <p className="mt-1 text-[#6b7280]">Internal health, monetization, and referral funnel monitor.</p>
+        <h1 className="app-title text-3xl font-bold tracking-tight">Admin Operations</h1>
+        <p className="app-subtitle mt-1">Monitor platform health, revenue quality, and referral efficiency.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Users</p>
           <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.users}</p>
         </div>
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Revenue (INR)</p>
           <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.capturedRevenueInr}</p>
         </div>
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Active Subscriptions</p>
           <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.activeSubscriptions}</p>
         </div>
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Referral Conversion</p>
           <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.referralConversionRate}%</p>
         </div>
       </div>
 
-      <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+      <div className="app-surface p-6">
         <h2 className="text-xl font-bold text-[#212529]">Operational Alerts</h2>
         <div className="mt-4 space-y-3">
           {alerts.map((alert) => (
@@ -126,7 +126,7 @@ export default async function AdminPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <h2 className="text-xl font-bold text-[#212529]">Source Cohorts</h2>
           <div className="mt-4 space-y-2 text-sm">
             {overview.cohorts.bySource.map((row) => (
@@ -139,7 +139,7 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <h2 className="text-xl font-bold text-[#212529]">Campaign Cohorts</h2>
           <div className="mt-4 space-y-2 text-sm">
             {overview.cohorts.byCampaign.map((row) => (
@@ -153,7 +153,7 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+      <div className="app-surface p-6">
         <h2 className="text-xl font-bold text-[#212529]">Payment Event Health (24h)</h2>
         <p className="mt-2 text-sm text-[#4b5563]">
           Events: {overview.ops.paymentEventsLast24h} • Replay Failures: {overview.ops.replayFailuresLast24h}

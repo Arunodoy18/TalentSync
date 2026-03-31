@@ -33,8 +33,8 @@ export default async function JobsPage() {
     <div className="flex-1 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#212529]">Job Recommendations</h1>
-          <p className="text-muted-foreground mt-1">AI-powered job matching based on your profile.</p>
+          <h1 className="app-title text-3xl font-bold tracking-tight">Job Recommendations</h1>
+          <p className="app-subtitle mt-1">Discover curated roles aligned to your profile and goals.</p>
         </div>
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b7280]" />
@@ -46,7 +46,7 @@ export default async function JobsPage() {
       </div>
 
       {!baseResume && (
-        <div className="bg-[#00389305] border border-[#00389320] p-6 rounded-[24px] flex items-center gap-4">
+        <div className="app-surface p-6 flex items-center gap-4">
           <Sparkles className="h-8 w-8 text-[#003893]" />
           <div>
             <h3 className="font-bold text-[#212529]">Upload your resume for better matches</h3>
@@ -71,7 +71,7 @@ export default async function JobsPage() {
             return (
             <div 
               key={job.id}
-              className="bg-white border border-[#e5e7eb] rounded-[24px] p-6 hover:shadow-md transition-all flex flex-col md:flex-row gap-6"
+              className="app-surface p-6 hover:shadow-md transition-all flex flex-col md:flex-row gap-6"
             >
               <div className="h-16 w-16 rounded-2xl bg-[#f3f4f6] flex items-center justify-center flex-shrink-0">
                 <Briefcase className="h-8 w-8 text-[#d1d5db]" />
@@ -120,7 +120,7 @@ export default async function JobsPage() {
             );
           })
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[24px] border border-[#e5e7eb] border-dashed border-2">
+           <div className="app-surface border-dashed border-2 flex flex-col items-center justify-center py-20">
              <Briefcase className="h-16 w-16 text-[#d1d5db] mb-4" />
              <p className="text-lg font-medium text-[#6b7280]">No jobs found yet</p>
              <p className="text-[#6b7280]">We're scanning for new opportunities...</p>

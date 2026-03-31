@@ -93,12 +93,12 @@ export default function AnalyticsPage() {
   return (
     <div className="flex-1 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#212529]">Analytics</h1>
-        <p className="mt-1 text-[#6b7280]">Subscription health and referral conversion performance.</p>
+        <h1 className="app-title text-3xl font-bold tracking-tight">Analytics</h1>
+        <p className="app-subtitle mt-1">Track plan performance, referral outcomes, and growth signals.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Current Plan</p>
           <div className="mt-2 flex items-center gap-2 text-[#003893]">
             <CircleDollarSign className="h-5 w-5" />
@@ -107,7 +107,7 @@ export default function AnalyticsPage() {
           <p className="mt-2 text-xs text-[#6b7280]">Status: {subscriptionStatus}</p>
         </div>
 
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Referral Touches</p>
           <div className="mt-2 flex items-center gap-2 text-[#212529]">
             <Users className="h-5 w-5 text-green-600" />
@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <p className="text-sm font-medium text-[#6b7280]">Referral Conversion</p>
           <div className="mt-2 flex items-center gap-2 text-[#212529]">
             <TrendingUp className="h-5 w-5 text-[#003893]" />
@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+      <div className="app-surface p-6">
         <h2 className="text-xl font-bold text-[#212529]">Latest Referral Attribution</h2>
         {referrals?.latest ? (
           <div className="mt-4 grid gap-2 text-sm text-[#4b5563]">
@@ -144,7 +144,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <h2 className="text-xl font-bold text-[#212529]">Source Cohorts</h2>
           <div className="mt-4 space-y-3">
             {(referrals?.cohorts?.bySource || []).map((row) => (
@@ -162,7 +162,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <h2 className="text-xl font-bold text-[#212529]">Campaign Cohorts</h2>
           <div className="mt-4 space-y-3">
             {(referrals?.cohorts?.byCampaign || []).map((row) => (
@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <h2 className="text-xl font-bold text-[#212529]">Referral Daily Trend (14d)</h2>
           <p className="mt-1 text-sm text-[#6b7280]">Touches vs conversions by day.</p>
           <div className="mt-6 h-72">
@@ -199,7 +199,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6">
+        <div className="app-surface p-6">
           <h2 className="text-xl font-bold text-[#212529]">Rolling 7-Day Conversion</h2>
           <p className="mt-1 text-sm text-[#6b7280]">Smoothed conversion trend over a 7-day window.</p>
           <div className="mt-6 h-72">

@@ -55,12 +55,12 @@ export default async function AtsSharePage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#eef3ff] via-white to-[#f6f7f9] px-6 py-20">
-      <div className="mx-auto max-w-4xl rounded-[28px] border border-[#d6dce8] bg-white p-8 shadow-sm">
+    <main className="app-backdrop min-h-screen px-6 py-20">
+      <div className="app-surface mx-auto max-w-4xl p-8">
         <h1 className="text-4xl font-black text-[#212529]">Shared ATS Report</h1>
         <p className="mt-2 text-[#6b7280]">Generated on {new Date(data.created_at).toLocaleString()}</p>
 
-        <div className="mt-8 rounded-2xl bg-[#f8fafc] p-6">
+        <div className="app-soft-surface mt-8 p-6">
           <p className="text-sm text-[#6b7280]">Overall ATS Score</p>
           <p className="text-5xl font-black text-[#003893]">{Math.round(Number(data.score))}%</p>
         </div>
@@ -100,8 +100,8 @@ export default async function AtsSharePage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="mt-10 rounded-2xl border border-[#d6dce8] bg-[#eef3ff] p-5">
-          <h2 className="text-xl font-bold text-[#212529]">Want a better score?</h2>
-          <p className="mt-1 text-sm text-[#4b5563]">Use TalentSync to auto-tailor resumes, match smarter jobs, and improve ATS compatibility.</p>
+          <h2 className="text-xl font-bold text-[#212529]">Want a stronger result?</h2>
+          <p className="mt-1 text-sm text-[#4b5563]">Use TalentSync to refine your resume faster, match stronger roles, and improve ATS performance.</p>
           <div className="mt-4 flex gap-3">
             <Link href="/?next=/dashboard" className="inline-flex h-11 items-center gap-2 rounded-full bg-[#003893] px-5 font-semibold text-white hover:opacity-90">
               Start Free

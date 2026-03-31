@@ -114,7 +114,7 @@ export default function AtsCheckerPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#eef3ff] via-white to-[#f6f7f9] px-6 py-20">
+    <main className="app-backdrop min-h-screen px-6 py-20">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 lg:grid-cols-2 items-center">
           <div>
@@ -159,7 +159,7 @@ export default function AtsCheckerPage() {
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-[#d6dce8] bg-white p-8 shadow-sm">
+          <div className="app-surface p-8">
             <div className="mb-6 flex items-center gap-2 text-[#003893]">
               <Target className="h-5 w-5" />
               <h2 className="text-xl font-bold">Run Live ATS Check</h2>
@@ -250,7 +250,7 @@ export default function AtsCheckerPage() {
               ) : null}
 
               <p className="text-sm text-[#6b7280]">
-                Upgrade to Pro to auto-tailor resumes and unlock roadmap plus premium matching explainability.
+                Upgrade to Pro to unlock deeper optimization and faster interview-ready improvements.
               </p>
             </div>
           </div>

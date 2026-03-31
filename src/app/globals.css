@@ -284,4 +284,42 @@
     width: 100%;
     max-width: 440px;
   }
+
+  .app-backdrop {
+    background:
+      radial-gradient(circle at 8% 12%, #3f7cff1f 0%, transparent 32%),
+      radial-gradient(circle at 87% 86%, #00a7a91a 0%, transparent 34%),
+      linear-gradient(150deg, #f6f8fb 0%, #eef2f7 55%, #e9edf3 100%);
+  }
+
+  .app-surface {
+    border-radius: 24px;
+    border: 1px solid #dde4ef;
+    background: linear-gradient(150deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 10px 30px rgba(15, 34, 58, 0.08);
+  }
+
+  .app-soft-surface {
+    border-radius: 18px;
+    border: 1px solid #e7edf6;
+    background: #f8fbff;
+  }
+
+  .app-title {
+    font-family: var(--font-display);
+    color: #1a2b3d;
+    letter-spacing: -0.02em;
+  }
+
+  .app-subtitle {
+    color: #5a6c82;
+  }
+
+  .app-pill {
+    border-radius: 999px;
+    border: 1px solid #dbe4f2;
+    background: #ffffff;
+    color: #204873;
+    font-weight: 600;
+  }
 }

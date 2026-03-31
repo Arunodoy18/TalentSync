@@ -12,7 +12,6 @@ import {
   LogOut,
   Briefcase
 } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -77,14 +76,10 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-[#e5e7eb]">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2 px-2">
-          <Image
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/90d7a352-e88b-418e-99a9-a0f1c8842820-app-resumly-ai/assets/svgs/logo_cd120a9103042b5bfba678e4a2c0af45-1.svg"
-            alt="TalentSync"
-            width={120}
-            height={32}
-            className="h-8 w-auto transition-all group-data-[collapsible=icon]:hidden"
-          />
-          <div className="hidden h-8 w-8 items-center justify-center rounded-lg bg-[#003893] text-white group-data-[collapsible=icon]:flex">
+          <div className="app-pill hidden h-8 items-center px-3 text-[11px] tracking-[0.16em] uppercase transition-all group-data-[collapsible=icon]:hidden md:inline-flex">
+            TalentSync
+          </div>
+          <div className="hidden h-8 w-8 items-center justify-center rounded-lg bg-[#003893] text-white group-data-[collapsible=icon]:flex md:flex">
             T
           </div>
         </div>

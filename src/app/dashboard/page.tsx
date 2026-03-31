@@ -39,19 +39,19 @@ export default async function DashboardPage() {
     <div className="flex-1 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#212529]">TalentSync Dashboard</h1>
-          <p className="text-muted-foreground mt-1">AI Career Operating System. From skills to job automatically.</p>
+          <h1 className="app-title text-3xl font-bold tracking-tight">TalentSync Dashboard</h1>
+          <p className="app-subtitle mt-1">Track your resume growth, matches, and career momentum in one place.</p>
         </div>
         <div className="flex items-center gap-4">
           <Link 
             href="/pricing"
-            className="bg-white text-[#003893] border border-[#003893] px-5 h-[50px] rounded-[50px] font-semibold flex items-center gap-2 hover:bg-[#00389308] transition-all"
+            className="app-pill px-5 h-[50px] flex items-center gap-2 hover:bg-[#00389308] transition-all"
           >
             Upgrade Plan
           </Link>
           <Link 
             href="/ats-checker"
-            className="bg-white text-[#003893] border border-[#d1d5db] px-5 h-[50px] rounded-[50px] font-semibold flex items-center gap-2 hover:bg-[#f3f4f6] transition-all"
+            className="app-pill px-5 h-[50px] flex items-center gap-2 hover:bg-[#f3f4f6] transition-all"
           >
             ATS Checker
           </Link>
@@ -68,7 +68,7 @@ export default async function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white p-6 rounded-[24px] border border-[#e5e7eb] flex items-center gap-4">
+          <div key={stat.label} className="app-surface p-6 flex items-center gap-4">
             <div className={`h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center ${stat.color}`}>
               <stat.icon className="h-6 w-6" />
             </div>
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
               {/* New Resume Card */}
               <Link 
                 href="/dashboard/resumes/new"
-                className="group border-2 border-dashed border-[#d1d5db] rounded-[24px] p-6 flex flex-col items-center justify-center gap-4 hover:border-[#003893] hover:bg-[#00389305] transition-all min-h-[300px]"
+                className="group app-surface border-2 border-dashed border-[#d1d5db] p-6 flex flex-col items-center justify-center gap-4 hover:border-[#003893] hover:bg-[#00389305] transition-all min-h-[300px]"
               >
                 <div className="h-14 w-14 rounded-full bg-[#f3f4f6] flex items-center justify-center group-hover:bg-[#00389310] group-hover:text-[#003893] transition-colors">
                   <Plus className="h-7 w-7" />
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
               {resumes?.map((resume) => (
                 <div 
                   key={resume.id}
-                  className="group bg-white border border-[#e5e7eb] rounded-[24px] overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col min-h-[300px]"
+                  className="group app-surface overflow-hidden hover:shadow-md transition-all flex flex-col min-h-[300px]"
                 >
                   <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center p-8 relative">
                     <FileText className="h-20 w-20 text-[#d1d5db] group-hover:text-[#003893] group-hover:scale-110 transition-all duration-300" />
@@ -148,15 +148,15 @@ export default async function DashboardPage() {
            {baseResumeId ? (
               <CareerRoadmap resumeId={baseResumeId} />
            ) : (
-              <div className="bg-white p-8 rounded-[24px] border border-[#e5e7eb] border-dashed text-center">
-                 <p className="text-muted-foreground">Upload a resume to unlock your AI Career Roadmap</p>
+                <div className="app-surface border-dashed p-8 text-center">
+                  <p className="app-subtitle">Upload a resume to unlock your AI Career Roadmap</p>
               </div>
            )}
         </div>
       </div>
 
       {resumes?.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[24px] border border-[#e5e7eb] border-dashed border-2">
+        <div className="app-surface border-dashed border-2 flex flex-col items-center justify-center py-20">
            <FileText className="h-16 w-16 text-[#d1d5db] mb-4" />
            <p className="text-lg font-medium text-[#6b7280]">No resumes found</p>
            <p className="text-[#6b7280]">Start by creating your first resume.</p>

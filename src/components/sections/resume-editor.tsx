@@ -223,10 +223,10 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
   };
 
   return (
-    <div className="flex h-full w-full bg-[#f6f7f9]">
+    <div className="app-backdrop flex h-full w-full flex-col xl:flex-row">
       {/* Sidebar Editor */}
-      <div className="w-[450px] bg-white border-r border-[#e5e7eb] flex flex-col h-full shadow-sm">
-        <div className="p-4 border-b border-[#e5e7eb] flex items-center justify-between bg-white sticky top-0 z-10">
+      <div className="app-surface h-full w-full rounded-none border-x-0 border-b-0 border-t-0 xl:w-[460px] xl:rounded-none xl:border-r xl:border-l-0 xl:border-y-0">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#e5e7eb] bg-white/95 p-4 backdrop-blur">
           <Link href="/dashboard" className="flex items-center gap-2 text-[#6b7280] hover:text-[#212529] transition-colors">
             <ChevronLeft className="h-4 w-4" />
             <span className="text-sm font-medium">Dashboard</span>
@@ -242,7 +242,7 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto p-6 space-y-8 pb-20 custom-scrollbar">
+        <div className="custom-scrollbar flex-1 space-y-8 overflow-auto p-6 pb-20">
           <div>
             <Label htmlFor="resume-title" className="text-xs uppercase tracking-wider text-[#6b7280] font-bold mb-2 block">Resume Title</Label>
             <Input 
@@ -254,42 +254,37 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
             />
           </div>
 
-            <nav className="flex items-center gap-2 border-b border-[#e5e7eb] -mx-6 px-6">
+            <nav className="-mx-6 flex flex-wrap items-center gap-2 border-b border-[#e5e7eb] px-6 pb-3">
               <button 
                 onClick={() => setActiveTab("personal")}
-                className={`pb-3 text-sm font-semibold transition-all relative ${activeTab === "personal" ? "text-[#003893]" : "text-[#6b7280]"}`}
+                className={`relative rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === "personal" ? "bg-[#00389312] text-[#003893]" : "text-[#6b7280] hover:bg-[#00389308]"}`}
               >
                 Personal Info
-                {activeTab === "personal" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003893]" />}
               </button>
               <button 
                 onClick={() => setActiveTab("experience")}
-                className={`pb-3 text-sm font-semibold transition-all relative ${activeTab === "experience" ? "text-[#003893]" : "text-[#6b7280]"}`}
+                className={`relative rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === "experience" ? "bg-[#00389312] text-[#003893]" : "text-[#6b7280] hover:bg-[#00389308]"}`}
               >
                 Experience
-                {activeTab === "experience" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003893]" />}
               </button>
               <button 
                 onClick={() => setActiveTab("education")}
-                className={`pb-3 text-sm font-semibold transition-all relative ${activeTab === "education" ? "text-[#003893]" : "text-[#6b7280]"}`}
+                className={`relative rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === "education" ? "bg-[#00389312] text-[#003893]" : "text-[#6b7280] hover:bg-[#00389308]"}`}
               >
                 Education
-                {activeTab === "education" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003893]" />}
               </button>
               <button 
                 onClick={() => setActiveTab("skills")}
-                className={`pb-3 text-sm font-semibold transition-all relative ${activeTab === "skills" ? "text-[#003893]" : "text-[#6b7280]"}`}
+                className={`relative rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === "skills" ? "bg-[#00389312] text-[#003893]" : "text-[#6b7280] hover:bg-[#00389308]"}`}
               >
                 Skills
-                {activeTab === "skills" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003893]" />}
               </button>
               {resume.ats_score !== undefined && (
                 <button 
                   onClick={() => setActiveTab("score")}
-                  className={`pb-3 text-sm font-semibold transition-all relative ${activeTab === "score" ? "text-[#003893]" : "text-[#6b7280]"}`}
+                  className={`relative rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === "score" ? "bg-[#00389312] text-[#003893]" : "text-[#6b7280] hover:bg-[#00389308]"}`}
                 >
                   ATS Score
-                  {activeTab === "score" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003893]" />}
                 </button>
               )}
             </nav>
@@ -514,8 +509,8 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
       </div>
 
       {/* Preview Pane */}
-      <div className="flex-1 flex flex-col items-center justify-start p-12 overflow-auto bg-[#e5ebf5]">
-        <div className="w-[800px] min-h-[1100px] bg-white shadow-2xl p-[60px] font-serif transition-all duration-300 scale-95 origin-top">
+      <div className="flex flex-1 flex-col items-center justify-start overflow-auto p-4 sm:p-8 xl:p-12">
+        <div className="app-surface w-full max-w-[900px] min-h-[1100px] p-8 sm:p-12 lg:p-[60px] font-serif transition-all duration-300 origin-top">
           <div className="text-center border-b-2 border-[#1a1a1a] pb-6 mb-8">
             <h1 className="text-4xl font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">{resume.content.personal.fullName || "Your Name"}</h1>
             <div className="flex items-center justify-center gap-4 text-sm text-[#4b5563]">

@@ -27,7 +27,7 @@ export default async function ResumePage({
   }
 
   return (
-    <div className="flex-1 -m-8 h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex-1 min-h-[calc(100vh-80px)] overflow-hidden">
       <ResumeEditor resume={resume} />
     </div>
   );

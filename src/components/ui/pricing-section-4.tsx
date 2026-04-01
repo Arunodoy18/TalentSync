@@ -1,12 +1,10 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Sparkles as SparklesComp } from "@/components/ui/sparkles";
-import { TimelineContent } from "@/components/ui/timeline-animation";
-import { VerticalCutReveal } from "@/components/ui/vertical-cut-reveal";
 import { cn } from "@/lib/utils";
 
 export type PricingPlanId = "pro" | "auto_apply" | "lifetime";
@@ -23,7 +21,6 @@ type PricingCardPlan = {
   price: number;
   yearlyPrice: number;
   buttonText: string;
-  buttonVariant: "outline" | "default";
   popular?: boolean;
   includes: string[];
   billingLabel?: string;
@@ -33,68 +30,53 @@ const plans: PricingCardPlan[] = [
   {
     id: "pro",
     name: "Starter",
-    description:
-      "Great for small businesses and startups looking to get started with AI",
+    description: "Great for individuals building a high-signal resume stack.",
     price: 499,
     yearlyPrice: 4990,
-    buttonText: "Get started",
-    buttonVariant: "outline",
+    buttonText: "Start Starter",
     includes: [
-      "Free includes:",
-      "Unlimited cards",
-      "Custom background and stickers",
-      "Two-factor authentication",
-      "Resume tailoring",
+      "Unlimited resume edits",
+      "ATS optimization",
+      "Role-specific tailoring",
       "Career roadmap",
-      "ATS breakdown",
-      "Priority support",
+      "Email support",
     ],
   },
   {
     id: "auto_apply",
     name: "Business",
-    description:
-      "Best value for growing businesses that need more advanced features",
+    description: "Best for active job seekers who want automation and velocity.",
     price: 999,
     yearlyPrice: 9990,
-    buttonText: "Get started",
-    buttonVariant: "default",
+    buttonText: "Start Business",
     popular: true,
     includes: [
-      "Everything in Starter, plus:",
-      "Advanced checklists",
-      "Custom fields",
-      "Serverless functions",
+      "Everything in Starter",
       "Auto-apply queue",
-      "Higher credits",
-      "Automation analytics",
-      "Priority support",
+      "Advanced analytics",
+      "Priority pipeline",
+      "Faster support",
     ],
   },
   {
     id: "lifetime",
     name: "Enterprise",
-    description:
-      "Advanced plan with enhanced security and unlimited access for large teams",
+    description: "One-time premium access with full feature unlock forever.",
     price: 2999,
     yearlyPrice: 2999,
-    buttonText: "Get started",
-    buttonVariant: "outline",
+    buttonText: "Get Lifetime",
     billingLabel: "one-time",
     includes: [
-      "Everything in Business, plus:",
-      "Multi-board management",
-      "Guest access controls",
-      "Attachment permissions",
-      "One-time purchase",
-      "Premium forever",
-      "No monthly renewal",
-      "Best value",
+      "Everything in Business",
+      "Lifetime access",
+      "Unlimited usage",
+      "Premium support",
+      "Early feature access",
     ],
   },
 ];
 
-const PricingSwitch = ({ onSwitch }: { onSwitch: (value: string) => void }) => {
+function PricingSwitch({ onSwitch }: { onSwitch: (value: string) => void }) {
   const [selected, setSelected] = useState("0");
 
   const handleSwitch = (value: string) => {
@@ -104,18 +86,18 @@ const PricingSwitch = ({ onSwitch }: { onSwitch: (value: string) => void }) => {
 
   return (
     <div className="flex justify-center">
-      <div className="relative z-10 mx-auto flex w-fit rounded-full border border-gray-700 bg-neutral-900 p-1">
+      <div className="relative z-10 mx-auto flex w-fit rounded-full border border-[var(--border)] bg-[rgba(255,255,255,0.05)] p-1 backdrop-blur-md">
         <button
           onClick={() => handleSwitch("0")}
           className={cn(
-            "relative z-10 h-10 w-fit rounded-full px-3 py-1 font-medium transition-colors sm:px-6 sm:py-2",
-            selected === "0" ? "text-white" : "text-gray-200"
+            "relative z-10 h-10 w-fit rounded-full px-4 text-sm font-medium transition-colors sm:px-6",
+            selected === "0" ? "text-white" : "text-[var(--text-muted)]"
           )}
         >
           {selected === "0" && (
             <motion.span
               layoutId="switch"
-              className="absolute left-0 top-0 h-10 w-full rounded-full border-4 border-blue-600 bg-gradient-to-t from-blue-500 to-blue-600 shadow-sm shadow-blue-600"
+              className="absolute left-0 top-0 h-10 w-full rounded-full border border-[rgba(129,140,248,0.6)] bg-[var(--primary)] shadow-[0_8px_24px_rgba(79,70,229,0.45)]"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}
@@ -125,196 +107,125 @@ const PricingSwitch = ({ onSwitch }: { onSwitch: (value: string) => void }) => {
         <button
           onClick={() => handleSwitch("1")}
           className={cn(
-            "relative z-10 h-10 w-fit flex-shrink-0 rounded-full px-3 py-1 font-medium transition-colors sm:px-6 sm:py-2",
-            selected === "1" ? "text-white" : "text-gray-200"
+            "relative z-10 h-10 w-fit rounded-full px-4 text-sm font-medium transition-colors sm:px-6",
+            selected === "1" ? "text-white" : "text-[var(--text-muted)]"
           )}
         >
           {selected === "1" && (
             <motion.span
               layoutId="switch"
-              className="absolute left-0 top-0 h-10 w-full rounded-full border-4 border-blue-600 bg-gradient-to-t from-blue-500 to-blue-600 shadow-sm shadow-blue-600"
+              className="absolute left-0 top-0 h-10 w-full rounded-full border border-[rgba(129,140,248,0.6)] bg-[var(--primary)] shadow-[0_8px_24px_rgba(79,70,229,0.45)]"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}
-          <span className="relative flex items-center gap-2">Yearly</span>
+          <span className="relative">Yearly</span>
         </button>
       </div>
     </div>
   );
-};
+}
 
 export default function PricingSection4({ onChoosePlan, loadingPlan = null }: PricingSection4Props) {
   const [isYearly, setIsYearly] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const pricingRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkScreen = () => setIsMobile(window.innerWidth < 768);
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
-
-  const revealVariants = {
-    visible: (i: number) => ({
-      y: 0,
-      opacity: 1,
-      filter: "blur(0px)",
-      transition: {
-        delay: i * 0.4,
-        duration: 0.5,
-      },
-    }),
-    hidden: {
-      filter: "blur(10px)",
-      y: -20,
-      opacity: 0,
-    },
+  const togglePricingPeriod = (value: string) => {
+    setIsYearly(Number.parseInt(value, 10) === 1);
   };
 
-  const togglePricingPeriod = (value: string) =>
-    setIsYearly(Number.parseInt(value, 10) === 1);
-
   return (
-    <div className="relative mx-auto min-h-screen overflow-x-hidden bg-black" ref={pricingRef}>
-      <TimelineContent
-        animationNum={4}
-        timelineRef={pricingRef}
-        customVariants={revealVariants}
-        className="absolute top-0 h-96 w-screen overflow-hidden [mask-image:radial-gradient(50%_50%,white,transparent)]"
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff2c_1px,transparent_1px),linear-gradient(to_bottom,#3a3a3a01_1px,transparent_1px)] bg-[size:70px_80px]" />
-        <SparklesComp
-          density={isMobile ? 700 : 1800}
-          direction="bottom"
-          speed={1}
-          color="#FFFFFF"
-          className="absolute inset-x-0 bottom-0 h-full w-full [mask-image:radial-gradient(50%_50%,white,transparent_85%)]"
-        />
-      </TimelineContent>
+    <div className="relative mx-auto min-h-screen overflow-x-hidden bg-atmosphere">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-24 top-0 h-80 w-80 rounded-full bg-indigo-500/20 blur-[120px]" />
+        <div className="absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-cyan-400/20 blur-[130px]" />
+      </div>
 
-      <TimelineContent
-        animationNum={5}
-        timelineRef={pricingRef}
-        customVariants={revealVariants}
-        className="absolute left-0 top-[-114px] z-0 flex h-[113.625vh] w-full flex-col items-start justify-start gap-2.5 overflow-hidden p-0"
-      >
-        <div
-          className="absolute left-[-568px] right-[-568px] top-0 h-[2053px] rounded-full"
-          style={{
-            border: "200px solid #3131f5",
-            filter: "blur(92px)",
-            WebkitFilter: "blur(92px)",
-          }}
-        />
-      </TimelineContent>
-
-      <article className="relative z-50 mx-auto mb-6 max-w-3xl space-y-2 px-4 pt-24 text-center sm:pt-32">
-        <h2 className="text-3xl font-medium text-white sm:text-4xl">
-          <VerticalCutReveal
-            splitBy="words"
-            staggerDuration={0.15}
-            staggerFrom="first"
-            reverse
-            containerClassName="justify-center"
-            transition={{
-              type: "spring",
-              stiffness: 250,
-              damping: 40,
-              delay: 0,
-            }}
-          >
-            Plans that work best for your goals
-          </VerticalCutReveal>
-        </h2>
-
-        <TimelineContent
-          as="p"
-          animationNum={0}
-          timelineRef={pricingRef}
-          customVariants={revealVariants}
-          className="text-gray-300"
+      <article className="relative z-10 mx-auto mb-8 max-w-3xl space-y-4 px-4 pt-24 text-center sm:pt-28">
+        <motion.h2
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="text-3xl font-semibold text-[var(--text)] sm:text-5xl"
         >
-          Explore the option that fits your pace, budget, and hiring journey.
-        </TimelineContent>
+          Plans that scale your career growth
+        </motion.h2>
 
-        <TimelineContent
-          as="div"
-          animationNum={1}
-          timelineRef={pricingRef}
-          customVariants={revealVariants}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.08 }}
+          className="text-[var(--text-muted)]"
         >
+          Premium glass UI, serious analytics, and automation that feels world-class from day one.
+        </motion.p>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
           <PricingSwitch onSwitch={togglePricingPeriod} />
-        </TimelineContent>
+        </motion.div>
       </article>
 
-      <div
-        className="absolute left-[10%] top-0 z-0 h-full w-[80%]"
-        style={{
-          backgroundImage: "radial-gradient(circle at center, #206ce8 0%, transparent 70%)",
-          opacity: 0.6,
-          mixBlendMode: "multiply",
-        }}
-      />
-
-      <div className="relative z-20 mx-auto grid max-w-5xl gap-4 px-4 py-6 md:grid-cols-3">
+      <div className="relative z-20 mx-auto grid max-w-6xl gap-6 px-4 pb-16 md:grid-cols-3">
         {plans.map((plan, index) => (
-          <TimelineContent
-            key={plan.name}
-            as="div"
-            animationNum={2 + index}
-            timelineRef={pricingRef}
-            customVariants={revealVariants}
+          <motion.div
+            key={plan.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.08 + index * 0.08 }}
+            whileHover={{ y: -8 }}
           >
             <Card
-              className={`relative border-neutral-800 text-white ${
+              className={cn(
+                "h-full text-[var(--text)]",
                 plan.popular
-                  ? "z-20 bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 shadow-[0px_-13px_300px_0px_#0900ff]"
-                  : "z-10 bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900"
-              }`}
+                  ? "border-[rgba(129,140,248,0.55)] bg-[rgba(99,102,241,0.18)] shadow-[0_22px_52px_rgba(79,70,229,0.35)]"
+                  : "border-[var(--border)] bg-[rgba(255,255,255,0.05)]"
+              )}
             >
               <CardHeader className="text-left">
-                <div className="flex justify-between">
-                  <h3 className="mb-2 text-2xl sm:text-3xl">{plan.name}</h3>
+                <div className="mb-1 flex justify-between">
+                  <h3 className="text-2xl font-semibold sm:text-3xl">{plan.name}</h3>
+                  {plan.popular ? (
+                    <span className="rounded-full border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-3 py-1 text-xs font-semibold text-indigo-100">
+                      Most Popular
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex items-baseline">
                   <span className="text-3xl font-semibold sm:text-4xl">
                     INR <NumberFlow value={isYearly ? plan.yearlyPrice : plan.price} className="text-3xl font-semibold sm:text-4xl" />
                   </span>
-                  <span className="ml-1 text-gray-300">/{plan.billingLabel || (isYearly ? "year" : "month")}</span>
+                  <span className="ml-1 text-[var(--text-muted)]">/{plan.billingLabel || (isYearly ? "year" : "month")}</span>
                 </div>
-                <p className="mb-4 text-sm text-gray-300">{plan.description}</p>
+                <p className="text-sm text-[var(--text-muted)]">{plan.description}</p>
               </CardHeader>
 
               <CardContent className="pt-0">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => onChoosePlan?.(plan.id)}
                   disabled={loadingPlan === plan.id}
-                  className={`mb-6 w-full rounded-xl p-3 text-lg transition-opacity disabled:cursor-not-allowed disabled:opacity-65 sm:p-4 sm:text-xl ${
+                  className={cn(
+                    "mb-6 h-[44px] w-full rounded-[14px] text-base font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-65",
                     plan.popular
-                      ? "border border-blue-500 bg-gradient-to-t from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-800"
-                      : plan.buttonVariant === "outline"
-                        ? "border border-neutral-800 bg-gradient-to-t from-neutral-950 to-neutral-600 text-white shadow-lg shadow-neutral-900"
-                        : ""
-                  }`}
+                      ? "border border-[rgba(129,140,248,0.55)] bg-[var(--primary)] text-white shadow-[0_12px_28px_rgba(79,70,229,0.45)]"
+                      : "border border-[var(--border)] bg-[rgba(255,255,255,0.06)] text-[var(--text)] hover:border-[rgba(129,140,248,0.35)] hover:bg-[rgba(99,102,241,0.16)]"
+                  )}
                 >
                   {loadingPlan === plan.id ? "Creating Order..." : plan.buttonText}
-                </button>
+                </motion.button>
 
-                <div className="space-y-3 border-t border-neutral-700 pt-4">
-                  <h4 className="mb-3 text-base font-medium">{plan.includes[0]}</h4>
+                <div className="space-y-3 border-t border-[var(--border)] pt-4">
                   <ul className="space-y-2">
-                    {plan.includes.slice(1).map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center gap-2">
-                        <span className="grid h-2.5 w-2.5 place-content-center rounded-full bg-neutral-500" />
-                        <span className="text-sm text-gray-300">{feature}</span>
+                    {plan.includes.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-[var(--success)]" />
+                        <span className="text-sm text-[var(--text-muted)]">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               </CardContent>
             </Card>
-          </TimelineContent>
+          </motion.div>
         ))}
       </div>
     </div>

@@ -4,31 +4,31 @@ import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 
 export default function Error({
-  error,
-  reset,
+	error,
+	reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+	error: Error & { digest?: string };
+	reset: () => void;
 }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
+	useEffect(() => {
+		console.error(error);
+	}, [error]);
 
-  return (
-    <div className="app-surface flex flex-col items-start gap-4 p-8">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-        <AlertTriangle className="h-6 w-6" />
-      </div>
-      <div>
-        <h2 className="text-xl font-bold text-[#212529]">Something went wrong</h2>
-        <p className="mt-1 text-[#6b7280]">This section hit an unexpected error. Try reloading it.</p>
-      </div>
-      <button
-        onClick={reset}
-        className="rounded-full bg-[#003893] px-5 py-2 font-semibold text-white hover:opacity-90"
-      >
-        Try again
-      </button>
-    </div>
-  );
+	return (
+		<div className="status-error app-surface flex flex-col items-start gap-4 p-8">
+			<div className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.18)] text-red-200">
+				<AlertTriangle className="h-6 w-6" />
+			</div>
+			<div>
+				<h2 className="text-xl font-semibold text-[var(--text)]">Something went wrong</h2>
+				<p className="mt-1 text-[var(--text-muted)]">This section hit an unexpected error. Try reloading it.</p>
+			</div>
+			<button
+				onClick={reset}
+				className="h-[44px] rounded-[14px] border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-5 font-semibold text-indigo-100 hover:bg-[rgba(99,102,241,0.35)]"
+			>
+				Try again
+			</button>
+		</div>
+	);
 }

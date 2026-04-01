@@ -34,12 +34,12 @@ type OpsAlerts = {
 
 function getSeverityClasses(severity: "info" | "warning" | "critical") {
   if (severity === "critical") {
-    return "border-red-200 bg-red-50 text-red-700";
+    return "status-error";
   }
   if (severity === "warning") {
-    return "border-amber-200 bg-amber-50 text-amber-700";
+    return "status-warning";
   }
-  return "border-blue-200 bg-blue-50 text-blue-700";
+  return "rounded-[14px] border border-[rgba(129,140,248,0.35)] bg-[rgba(99,102,241,0.16)] text-indigo-100";
 }
 
 async function getBaseUrl(): Promise<string> {
@@ -54,7 +54,7 @@ export default async function AdminPage() {
 
   if (!adminToken) {
     return (
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-800">
+      <div className="status-warning rounded-[14px] p-6 text-sm">
         INTERNAL_ADMIN_TOKEN is not configured. Admin operations dashboard is disabled.
       </div>
     );
@@ -78,7 +78,7 @@ export default async function AdminPage() {
 
   if (!overviewRes.ok || !alertsRes.ok) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+      <div className="status-error rounded-[14px] p-6 text-sm">
         Failed to load admin telemetry. Ensure admin token and Supabase service credentials are valid.
       </div>
     );
@@ -96,25 +96,25 @@ export default async function AdminPage() {
 
       <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
         <div className="app-surface p-6">
-          <p className="text-sm font-medium text-[#6b7280]">Users</p>
-          <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.users}</p>
+          <p className="text-sm font-medium text-[var(--text-muted)]">Users</p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--text)]">{overview.kpis.users}</p>
         </div>
         <div className="app-surface p-6">
-          <p className="text-sm font-medium text-[#6b7280]">Revenue (INR)</p>
-          <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.capturedRevenueInr}</p>
+          <p className="text-sm font-medium text-[var(--text-muted)]">Revenue (INR)</p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--text)]">{overview.kpis.capturedRevenueInr}</p>
         </div>
         <div className="app-surface p-6">
-          <p className="text-sm font-medium text-[#6b7280]">Active Subscriptions</p>
-          <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.activeSubscriptions}</p>
+          <p className="text-sm font-medium text-[var(--text-muted)]">Active Subscriptions</p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--text)]">{overview.kpis.activeSubscriptions}</p>
         </div>
         <div className="app-surface p-6">
-          <p className="text-sm font-medium text-[#6b7280]">Referral Conversion</p>
-          <p className="mt-2 text-2xl font-bold text-[#212529]">{overview.kpis.referralConversionRate}%</p>
+          <p className="text-sm font-medium text-[var(--text-muted)]">Referral Conversion</p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--text)]">{overview.kpis.referralConversionRate}%</p>
         </div>
       </div>
 
       <div className="app-surface p-6">
-        <h2 className="text-xl font-bold text-[#212529]">Operational Alerts</h2>
+        <h2 className="text-xl font-semibold text-[var(--text)]">Operational Alerts</h2>
         <div className="mt-4 space-y-3">
           {alerts.map((alert) => (
             <div key={alert.id} className={`rounded-xl border p-4 ${getSeverityClasses(alert.severity)}`}>
@@ -127,35 +127,35 @@ export default async function AdminPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="app-surface p-6">
-          <h2 className="text-xl font-bold text-[#212529]">Source Cohorts</h2>
+          <h2 className="text-xl font-semibold text-[var(--text)]">Source Cohorts</h2>
           <div className="mt-4 space-y-2 text-sm">
             {overview.cohorts.bySource.map((row) => (
-              <div key={row.source} className="flex items-center justify-between rounded-lg border border-[#eef1f6] p-3">
-                <span className="font-medium text-[#212529]">{row.source}</span>
-                <span className="text-[#6b7280]">{row.converted}/{row.touches} ({row.conversionRate}%)</span>
+              <div key={row.source} className="flex items-center justify-between rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.03)] p-3">
+                <span className="font-medium text-[var(--text)]">{row.source}</span>
+                <span className="text-[var(--text-muted)]">{row.converted}/{row.touches} ({row.conversionRate}%)</span>
               </div>
             ))}
-            {overview.cohorts.bySource.length === 0 ? <p className="text-[#6b7280]">No source cohorts yet.</p> : null}
+            {overview.cohorts.bySource.length === 0 ? <p className="text-[var(--text-muted)]">No source cohorts yet.</p> : null}
           </div>
         </div>
 
         <div className="app-surface p-6">
-          <h2 className="text-xl font-bold text-[#212529]">Campaign Cohorts</h2>
+          <h2 className="text-xl font-semibold text-[var(--text)]">Campaign Cohorts</h2>
           <div className="mt-4 space-y-2 text-sm">
             {overview.cohorts.byCampaign.map((row) => (
-              <div key={row.campaign} className="flex items-center justify-between rounded-lg border border-[#eef1f6] p-3">
-                <span className="font-medium text-[#212529]">{row.campaign}</span>
-                <span className="text-[#6b7280]">{row.converted}/{row.touches} ({row.conversionRate}%)</span>
+              <div key={row.campaign} className="flex items-center justify-between rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.03)] p-3">
+                <span className="font-medium text-[var(--text)]">{row.campaign}</span>
+                <span className="text-[var(--text-muted)]">{row.converted}/{row.touches} ({row.conversionRate}%)</span>
               </div>
             ))}
-            {overview.cohorts.byCampaign.length === 0 ? <p className="text-[#6b7280]">No campaign cohorts yet.</p> : null}
+            {overview.cohorts.byCampaign.length === 0 ? <p className="text-[var(--text-muted)]">No campaign cohorts yet.</p> : null}
           </div>
         </div>
       </div>
 
       <div className="app-surface p-6">
-        <h2 className="text-xl font-bold text-[#212529]">Payment Event Health (24h)</h2>
-        <p className="mt-2 text-sm text-[#4b5563]">
+        <h2 className="text-xl font-semibold text-[var(--text)]">Payment Event Health (24h)</h2>
+        <p className="mt-2 text-sm text-[var(--text-muted)]">
           Events: {overview.ops.paymentEventsLast24h} • Replay Failures: {overview.ops.replayFailuresLast24h}
         </p>
       </div>

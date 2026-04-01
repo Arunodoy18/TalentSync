@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { Upload, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -61,18 +62,20 @@ const ResumeUpload = () => {
         ref={fileInputRef}
         onChange={handleUpload}
       />
-      <Button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isUploading}
-        className="bg-white text-[#003893] border-2 border-[#003893] px-6 h-[50px] rounded-[50px] font-semibold flex items-center gap-2 hover:bg-[#00389305] transition-all shadow-sm"
-      >
-        {isUploading ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : (
-          <Upload className="h-5 w-5" />
-        )}
-        {isUploading ? "Parsing..." : "Upload & Parse Resume"}
-      </Button>
+      <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="h-[44px] rounded-[14px] border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-5 font-semibold text-indigo-100 shadow-[0_10px_22px_rgba(79,70,229,0.32)] hover:bg-[rgba(99,102,241,0.36)]"
+        >
+          {isUploading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Upload className="h-5 w-5" />
+          )}
+          {isUploading ? "Parsing..." : "Upload Resume"}
+        </Button>
+      </motion.div>
     </div>
   );
 };

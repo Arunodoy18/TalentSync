@@ -44,11 +44,11 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
   };
 
   return (
-    <Card className="rounded-[24px] border-[#e5e7eb] shadow-sm overflow-hidden">
-      <CardHeader className="bg-gray-50/50">
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-[var(--border)] bg-[rgba(255,255,255,0.02)]">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-bold flex items-center gap-2 text-green-700">
+            <CardTitle className="text-xl font-semibold flex items-center gap-2 text-indigo-100">
               <Sparkles className="h-5 w-5" />
               AI Job Recommendations
             </CardTitle>
@@ -58,7 +58,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
             <Button 
               onClick={findJobs} 
               disabled={loading}
-              className="bg-green-600 text-white hover:opacity-90 rounded-full"
+              className="h-[44px] rounded-[14px] border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] text-indigo-100 hover:bg-[rgba(99,102,241,0.35)]"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Find My Best Match
@@ -69,15 +69,15 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
       <CardContent className="pt-6">
         {loading && !jobs && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin mb-4 text-green-600" />
+            <Loader2 className="h-8 w-8 animate-spin mb-4 text-indigo-300" />
             <p>Matching your resume with thousands of jobs...</p>
           </div>
         )}
 
         {!loading && !jobs && (
           <div className="text-center py-12">
-            <div className="h-16 w-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
-              <Briefcase className="h-8 w-8 text-green-600" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)]">
+              <Briefcase className="h-8 w-8 text-indigo-300" />
             </div>
             <h3 className="text-lg font-bold mb-2">Discover Matching Jobs</h3>
             <p className="text-muted-foreground max-w-sm mx-auto">
@@ -89,23 +89,23 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
         {jobs && jobs.length > 0 && (
           <div className="space-y-4">
             {jobs.map((job) => (
-              <div key={job.id} className="p-4 rounded-2xl border border-gray-100 bg-white hover:shadow-sm transition-all group">
+              <div key={job.id} className="group rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] p-4 transition-all hover:-translate-y-1 hover:border-[rgba(129,140,248,0.4)] hover:bg-[rgba(99,102,241,0.12)]">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <h4 className="font-bold text-[#212529] group-hover:text-green-600 transition-colors">{job.title}</h4>
-                    <p className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                    <h4 className="font-semibold text-[var(--text)] transition-colors group-hover:text-indigo-200">{job.title}</h4>
+                    <p className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-1">
                        <Building2 className="h-3 w-3" />
                        {job.company}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-bold bg-green-50 text-green-700 px-2 py-1 rounded-full">
+                    <span className="rounded-full border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-2 py-1 text-xs font-semibold text-indigo-100">
                        {Math.round(job.similarity * 100)}% Match
                     </span>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+                <div className="mb-4 flex items-center gap-4 text-xs text-[var(--text-muted)]">
                    <span className="flex items-center gap-1">
                      <MapPin className="h-3 w-3" />
                      {job.location}
@@ -121,7 +121,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                   <Button variant="outline" size="sm" className="w-full text-xs font-bold rounded-xl border-gray-200" asChild>
+                   <Button variant="outline" size="sm" className="w-full text-xs font-semibold" asChild>
                       <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
                         View Details
                         <ExternalLink className="h-3 w-3" />

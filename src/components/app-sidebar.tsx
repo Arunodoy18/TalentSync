@@ -12,6 +12,7 @@ import {
   LogOut,
   Briefcase
 } from "lucide-react"
+import { motion } from "framer-motion"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -73,26 +74,30 @@ export function AppSidebar() {
   const pathname = usePathname()
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-[#e5e7eb]">
+    <Sidebar collapsible="icon" className="border-r border-[var(--border)]">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2 px-2">
-          <div className="app-pill hidden h-8 items-center px-3 text-[11px] tracking-[0.16em] uppercase transition-all group-data-[collapsible=icon]:hidden md:inline-flex">
+        <motion.div
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-2 px-2"
+        >
+          <div className="app-pill hidden h-9 items-center px-3 text-[11px] tracking-[0.16em] uppercase transition-all group-data-[collapsible=icon]:hidden md:inline-flex">
             TalentSync
           </div>
-          <div className="hidden h-8 w-8 items-center justify-center rounded-lg bg-[#003893] text-white group-data-[collapsible=icon]:flex md:flex">
+          <div className="hidden h-9 w-9 items-center justify-center rounded-[12px] border border-[rgba(99,102,241,0.5)] bg-[rgba(99,102,241,0.26)] text-indigo-100 group-data-[collapsible=icon]:flex md:flex">
             T
           </div>
-        </div>
+        </motion.div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu className="px-2">
+        <SidebarMenu className="space-y-1 px-2">
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
                 isActive={pathname === item.url}
                 tooltip={item.title}
-                className="hover:bg-[#f3f4f6] data-[active=true]:bg-[#e5e7eb] data-[active=true]:text-[#003893]"
+                className="h-11 rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.07)] hover:text-[var(--text)] data-[active=true]:border-[rgba(99,102,241,0.45)] data-[active=true]:bg-[rgba(99,102,241,0.2)] data-[active=true]:text-indigo-100"
               >
                 <Link href={item.url} className="flex items-center gap-3">
                   <item.icon className="h-5 w-5" />
@@ -110,7 +115,7 @@ export function AppSidebar() {
               <SidebarMenuButton
                 type="submit"
                 tooltip="Logout"
-                className="w-full hover:bg-red-50 hover:text-red-600"
+                className="h-11 w-full rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.16)] hover:text-red-200"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="h-5 w-5" />

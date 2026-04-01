@@ -77,7 +77,7 @@ export default function PricingPage() {
           setMessage("Payment verified. Subscription activated successfully.");
         },
         theme: {
-          color: "#003893",
+          color: "#6366F1",
         },
       });
 
@@ -91,11 +91,11 @@ export default function PricingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-atmosphere">
       <PricingSection4 onChoosePlan={startCheckout} loadingPlan={loadingPlan} />
 
       {message ? (
-        <div className="fixed bottom-5 left-1/2 z-50 w-[min(700px,92vw)] -translate-x-1/2 rounded-xl border border-neutral-700 bg-neutral-900/95 p-4 text-sm text-neutral-100 shadow-lg backdrop-blur">
+        <div className="fixed bottom-5 left-1/2 z-50 w-[min(700px,92vw)] -translate-x-1/2 rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.07)] p-4 text-sm text-[var(--text)] shadow-[0_18px_40px_rgba(2,8,20,0.45)] backdrop-blur-[14px]">
           {message}
         </div>
       ) : null}

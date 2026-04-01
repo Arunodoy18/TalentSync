@@ -38,14 +38,14 @@ function extractJobSkills(job: any): string[] {
 
 export async function POST(req: NextRequest) {
   try {
+    const { resumeId } = await req.json();
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { resumeId } = await req.json();
 
     const { data: resume, error: resumeError } = await supabase
       .from("resumes")
@@ -60,11 +60,11 @@ export async function POST(req: NextRequest) {
 
     let queryEmbedding = resume.embedding;
 
-    // If no embedding exists, generate one
+    // If no embedding exists, generate one for the resume text
     if (!queryEmbedding) {
-      const text = JSON.stringify(resume.content);
+      const text = typeof resume.content === 'object' ? JSON.stringify(resume.content) : resume.content;
       queryEmbedding = await generateEmbedding(text);
-      
+
       // Update resume with embedding for future use
       await supabase
         .from("resumes")
@@ -72,10 +72,11 @@ export async function POST(req: NextRequest) {
         .eq("id", resumeId);
     }
 
+    // Use cosine similarity (via match_jobs which uses 1 - (embedding <=> query_embedding))
     const { data: jobs, error: matchError } = await supabase.rpc("match_jobs", {
       query_embedding: queryEmbedding,
-      match_threshold: 0.5,
-      match_count: 5,
+      match_threshold: 0.65,
+      match_count: 20,
     });
 
     if (matchError) throw matchError;
@@ -84,32 +85,24 @@ export async function POST(req: NextRequest) {
 
     const rankedJobs = (jobs || [])
       .map((job: any) => {
-        const semanticScore = Math.max(0, Math.min(1, Number(job.similarity || 0)));
+        const match_score = Math.max(0, Math.min(1, Number(job.similarity || 0)));
+        
+        // Extract skills to figure out what's missing
         const jobSkills = Array.from(new Set(extractJobSkills(job)));
-        const matchingSkills = jobSkills.filter((skill) => resumeSkills.includes(skill));
-        const missingSkills = jobSkills.filter((skill) => !resumeSkills.includes(skill));
-        const skillsScore = jobSkills.length > 0 ? matchingSkills.length / jobSkills.length : semanticScore;
-
-        const finalScore =
-          0.7 * semanticScore +
-          0.3 * skillsScore;
+        const missing_skills = jobSkills.filter((skill) => !resumeSkills.includes(skill));      
 
         return {
           ...job,
-          similarity: semanticScore,
-          match_score: Number((finalScore * 100).toFixed(2)),
+          similarity: match_score,
+          match_score: Number((match_score * 100).toFixed(2)),
           explainability: {
-            semantic_score: Number((semanticScore * 100).toFixed(2)),
-            skills_score: Number((skillsScore * 100).toFixed(2)),
-            matching_skills: matchingSkills,
-            missing_skills: missingSkills.slice(0, 10),
-            formula: "0.7*semantic + 0.3*skills",
+            missing_skills: missing_skills.slice(0, 10),
           },
         };
       })
-      .sort((a: any, b: any) => b.match_score - a.match_score);
-
-    try {
+      .filter((job: any) => job.similarity > 0.65)
+      .sort((a: any, b: any) => b.match_score - a.match_score)
+      .slice(0, 20);
       const matchRows = rankedJobs.map((job: any) => ({
         user_id: user.id,
         job_id: job.id,

@@ -15,6 +15,9 @@ interface Job {
   job_type: string;
   url: string;
   similarity: number;
+  explainability?: {
+    missing_skills: string[];
+  };
 }
 
 interface JobRecommendationsProps {
@@ -120,10 +123,28 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
                    )}
                 </div>
 
+                {job.explainability?.missing_skills && job.explainability.missing_skills.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs font-medium text-[var(--text-muted)] mb-2">Missing Skills:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {job.explainability.missing_skills.slice(0, 5).map((skill, i) => (
+                        <span key={i} className="rounded border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] text-indigo-400 capitalize">
+                          {skill}
+                        </span>
+                      ))}
+                      {job.explainability.missing_skills.length > 5 && (
+                        <span className="rounded border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] text-indigo-500/80">
+                          +{job.explainability.missing_skills.length - 5} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                    <Button variant="outline" size="sm" className="w-full text-xs font-semibold" asChild>
                       <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
-                        View Details
+                        Apply
                         <ExternalLink className="h-3 w-3" />
                       </a>
                    </Button>

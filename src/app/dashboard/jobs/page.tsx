@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase-server";
-import { Search, Briefcase, MapPin, DollarSign, Sparkles } from "lucide-react";
+import { Search, Briefcase, MapPin, DollarSign, Sparkles, Building2 } from "lucide-react";    
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import TailorButton from "@/components/sections/tailor-button";
 
@@ -33,35 +34,35 @@ export default async function JobsPage() {
     <div className="flex-1 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="app-title text-3xl font-bold tracking-tight">Job Recommendations</h1>
-          <p className="app-subtitle mt-1">Discover curated roles aligned to your profile and goals.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-indigo-100">Job Recommendations</h1> 
+          <p className="mt-2 text-lg text-indigo-300/80">Discover curated roles aligned to your profile and goals.</p>
         </div>
-        <div className="relative w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b7280]" />
-          <Input 
-            className="pl-10 h-[50px] rounded-[50px] border-[#e5e7eb]" 
-            placeholder="Search jobs..." 
+        <div className="relative w-80">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-400" />
+          <Input
+            className="pl-11 h-[48px] rounded-[18px] border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.05)] text-indigo-100 placeholder:text-indigo-400/50"
+            placeholder="Search thousands of jobs..."
           />
         </div>
       </div>
 
       {!baseResume && (
-        <div className="app-surface p-6 flex items-center gap-4">
-          <Sparkles className="h-8 w-8 text-[#003893]" />
-          <div>
-            <h3 className="font-bold text-[#212529]">Upload your resume for better matches</h3>
-            <p className="text-[#6b7280] text-sm">We'll use your skills and experience to find the perfect job for you.</p>
-          </div>
-          <Link href="/dashboard" className="ml-auto">
-            <Button variant="outline" className="rounded-[50px] border-[#003893] text-[#003893] font-bold">
-              Set Base Resume
-            </Button>
-          </Link>
-        </div>
-      )}
-
-      <div className="grid gap-6">
-        {jobs && jobs.length > 0 ? (
+        <Card className="p-0 border-[rgba(99,102,241,0.3)] bg-gradient-to-r from-[rgba(99,102,241,0.15)] to-[rgba(11,15,26,0.3)] shadow-[0_0_40px_rgba(99,102,241,0.1)]">
+          <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
+            <div className="h-14 w-14 rounded-2xl bg-[rgba(99,102,241,0.2)] border border-[rgba(99,102,241,0.4)] flex items-center justify-center shadow-inner">
+              <Sparkles className="h-7 w-7 text-indigo-300" />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="font-bold text-xl text-indigo-100">Upload your resume for AI matches</h3>
+              <p className="text-indigo-300/80 text-sm mt-1">Our engine uses your skills and experience to find the perfect job for you instantly.</p>
+            </div>
+            <Link href="/dashboard" className="w-full md:w-auto">
+              <Button variant="outline" className="w-full rounded-[14px] border-[rgba(99,102,241,0.5)] bg-[rgba(99,102,241,0.1)] text-indigo-200 hover:bg-[rgba(99,102,241,0.25)] hover:text-white font-semibold">
+                Set Base Resume
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
           jobs.map((job) => {
             const matchLabel =
               typeof job.similarity === "number"

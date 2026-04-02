@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,9 @@ const sections = [
 ];
 
 export default function ResumeBuilderPage() {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
+
   const [activeSection, setActiveSection] = useState(sections[0].id);
 
   const [basics, setBasics] = useState({ name: "", email: "", phone: "", location: "", summary: "", github: "", linkedin: "" });
@@ -351,22 +354,28 @@ export default function ResumeBuilderPage() {
            </div>
            
            <div className="flex justify-end">
-             <PDFDownloadLink
-                document={
-                  templateFormat === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={skills} /> :
-                  templateFormat === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={skills} /> :
-                  <JakesTemplate basics={basics} experience={experience} education={education} projects={projects.filter(p => p.selected)} skills={skills} />
-                }
-                fileName={`resume-${basics.name.replace(/\s+/g, '-').toLowerCase() || 'draft'}.pdf`}
-             >
-               {/* @ts-ignore */}
-               {({ loading }) => (
-                 <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-md w-full">
-                   {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-                   {loading ? "" : "Export PDF"}
-                 </Button>
-               )}
-             </PDFDownloadLink>
+             {isClient ? (
+               <PDFDownloadLink
+                  document={
+                    templateFormat === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={skills} /> :
+                    templateFormat === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={skills} /> :
+                    <JakesTemplate basics={basics} experience={experience} education={education} projects={projects.filter(p => p.selected)} skills={skills} />
+                  }
+                  fileName={`resume-${basics.name.replace(/\s+/g, '-').toLowerCase() || 'draft'}.pdf`}
+               >
+                 {/* @ts-ignore */}
+                 {({ loading }) => (
+                   <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-md w-full">
+                     {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+                     {loading ? "" : "Export PDF"}
+                   </Button>
+                 )}
+               </PDFDownloadLink>
+             ) : (
+               <Button size="sm" className="bg-indigo-600/50 cursor-not-allowed text-white rounded-full shadow-md w-full">
+                 <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading PDF Engine...
+               </Button>
+             )}
            </div>
          </div>
          

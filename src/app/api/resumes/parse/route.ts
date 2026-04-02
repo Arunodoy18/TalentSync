@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import pdfParse from "pdf-parse";
+
+// Using require since pdf-parse lacks an ES module default export
+const pdfParse = require("pdf-parse");
 
 // We force Node.js runtime because pdf-parse uses Node.js 'fs' and streams under the hood
 export const runtime = "nodejs";

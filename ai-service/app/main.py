@@ -10,6 +10,8 @@ from .schemas import (
     CoverLetterResponse,
     EmbeddingRequest,
     EmbeddingResponse,
+    GenerateBulletRequest,
+    GenerateBulletResponse,
     ResumeParseRequest,
     ResumeParseResponse,
     ResumeTailorRequest,
@@ -41,6 +43,12 @@ def tailor_resume(payload: ResumeTailorRequest) -> ResumeTailorResponse:
 def ats_score(payload: AtsScoreRequest) -> AtsScoreResponse:
     result = pipeline.ats_score(payload.resume_json, payload.job_description)
     return AtsScoreResponse(**result)
+
+
+@app.post("/ai/resume/bullet", response_model=GenerateBulletResponse)
+def generate_bullet(payload: GenerateBulletRequest) -> GenerateBulletResponse:
+    result = pipeline.generate_bullet(payload.action, payload.task, payload.tools, payload.impact)
+    return GenerateBulletResponse(bullet=result)
 
 
 @app.post("/ai/cover-letter", response_model=CoverLetterResponse)

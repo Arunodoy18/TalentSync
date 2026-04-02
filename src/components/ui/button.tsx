@@ -63,7 +63,7 @@ function Button({
         whileTap={{ scale: 0.97 }}
         whileHover={{ y: -1 }}
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+      {...(props as any)}
     />
   )
 }

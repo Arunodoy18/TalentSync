@@ -12,18 +12,47 @@ from .queue import (
     ensure_group,
     get_client,
 )
+from .scrapers.remoteok import RemoteOKScraper
+from .scrapers.greenhouse import GreenhousePlaywrightScraper
+from .scrapers.linkedin import LinkedInScraper
+from .scrapers.indeed import IndeedScraper
+from .database import insert_jobs_bulk
 
 MAX_RETRIES = int(os.getenv("SCRAPE_MAX_RETRIES", "5"))
 BLOCK_MS = int(os.getenv("SCRAPE_BLOCK_MS", "5000"))
 
+# Register scrapers into a dynamic dictionary lookup. 
+# Ex: When Redis triggers an event {"source": "remoteok"}, this map routes it easily.
+REGISTERED_SCRAPERS = {
+    "remoteok": RemoteOKScraper,
+    "greenhouse": GreenhousePlaywrightScraper,
+    "linkedin": LinkedInScraper,
+    "indeed": IndeedScraper,
+}
 
 def process_payload(payload: dict) -> None:
     source = payload.get("source")
     if not source:
         raise ValueError("source is required")
+        
+    normalized_source = source.lower()
+    
+    if normalized_source not in REGISTERED_SCRAPERS:
+        print(f"[!] Scraper '{source}' not registered. Ignoring payload in DLQ.")
+        return
+        
+    ScraperClass = REGISTERED_SCRAPERS[normalized_source]
+    scraper_instance = ScraperClass()
+    
+    location = payload.get("location")
+    
+    print(f"[*] Worker booting up Scraper '{source}' {location or ''}")
+    scraped_data = scraper_instance.scrape(location)
+    
+    print(f"[*] Scraper '{source}' found {len(scraped_data)} jobs.")
+    if scraped_data:
+        insert_jobs_bulk(scraped_data)
 
-    # TODO: Replace with actual Scrapy + Playwright execution pipeline.
-    print("scraper.process", payload)
 
 
 def run_worker() -> None:

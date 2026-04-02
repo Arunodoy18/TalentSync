@@ -113,17 +113,18 @@ export async function POST(req: NextRequest) {
         status: "not_applied",
       }));
 
-      if (matchRows.length > 0) {
-        await supabase.from("job_matches").upsert(matchRows, {
-          onConflict: "user_id,job_id,resume_id",
-        });
+      try {
+        if (matchRows.length > 0) {
+          await supabase.from("job_matches").upsert(matchRows, {
+            onConflict: "user_id,job_id,resume_id",
+          });
+        }
+      } catch (persistError) {
+        console.error("Job match persistence warning:", persistError);
       }
-    } catch (persistError) {
-      console.error("Job match persistence warning:", persistError);
-    }
 
-    return NextResponse.json({ jobs: rankedJobs });
-  } catch (error: unknown) {
+      return NextResponse.json({ jobs: rankedJobs });
+    } catch (error: unknown) {
     console.error("Job match error:", error);
     const message = error instanceof Error ? error.message : "Failed to match jobs";
     return NextResponse.json({ error: message }, { status: 500 });

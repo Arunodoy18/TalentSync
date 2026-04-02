@@ -30,6 +30,18 @@ class AtsScoreResponse(BaseModel):
     score: int = Field(ge=0, le=100)
     breakdown: Dict[str, int]
     recommendations: List[str]
+    missing_skills: List[str]
+
+
+class GenerateBulletRequest(BaseModel):
+    action: str
+    task: str
+    tools: str
+    impact: str
+
+
+class GenerateBulletResponse(BaseModel):
+    bullet: str
 
 
 class CoverLetterRequest(BaseModel):

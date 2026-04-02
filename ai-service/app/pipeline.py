@@ -76,24 +76,97 @@ class AIPipeline:
         return json.loads(response.output_text)
 
     def ats_score(self, resume_json: Dict[str, Any], job_description: str) -> Dict[str, Any]:
-        # Weighted baseline aligned with architecture doc.
-        return {
-            "score": 74,
-            "breakdown": {
-                "keyword_match": 24,
-                "experience_relevance": 18,
-                "skills_alignment": 12,
-                "education_alignment": 8,
-                "formatting_quality": 6,
-                "impact_language": 6,
-            },
-            "recommendations": [
-                "Add quantified outcomes in recent roles.",
-                "Increase exact keyword overlap for must-have skills.",
-                "Improve summary with role-specific positioning.",
-            ],
-        }
+        if not self.client:
+            return {
+                "score": 75,
+                "breakdown": {
+                    "keyword_match": 80,
+                    "skills_match": 70,
+                    "experience_match": 85,
+                    "education_match": 100,
+                    "formatting_score": 100,
+                },
+                "recommendations": ["OpenAI key missing. Please configure for accurate scoring."],
+                "missing_skills": ["Python", "AWS"]
+            }
+        
+        prompt = (
+            "You are an ATS Scoring Engine. Analyze the given resume JSON against the Job Description. "
+            "Calculate pure numbers to support this strict formula:\n"
+            "ATS_SCORE = (keyword_match*0.40 + skills_match*0.20 + experience_match*0.20 + education_match*0.10 + formatting_score*0.10)\n"
+            "Calculate values (0-100) for each. Then find bonus points: 10 for projects, 10 for metrics, 5 for github, 10 for internship, 5 for leadership, 5 open_source, 5 certs.\n"
+            "List 3-4 specific recommendations and missing skills comparing them directly to the JD. "
+            "Output MUST be strict JSON with keys: keyword_match (int), skills_match (int), experience_match (int), education_match (int), formatting_score (int), bonus_score (int), recommendations (list of str), missing_skills (list of str)."
+        )
+        payload = {"resume": resume_json, "job_description": job_description}
+        
+        try:
+            response = self.client.responses.create(
+                model=self.model_parse,
+                input=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": json.dumps(payload)},
+                ],
+            )
+            data = json.loads(response.output_text)
+            
+            k = data.get("keyword_match", 70)
+            s = data.get("skills_match", 70)
+            exp = data.get("experience_match", 70)
+            edu = data.get("education_match", 100)
+            form = data.get("formatting_score", 100)
+            bonus = data.get("bonus_score", 0)
+            
+            raw_score = (k*0.40) + (s*0.20) + (exp*0.20) + (edu*0.10) + (form*0.10)
+            final_score = int(min(raw_score + bonus, 100))
+            
+            return {
+                "score": final_score,
+                "breakdown": {
+                    "keyword_match": k,
+                    "skills_match": s,
+                    "experience_match": exp,
+                    "education_match": edu,
+                    "formatting_score": form,
+                },
+                "recommendations": data.get("recommendations", []),
+                "missing_skills": data.get("missing_skills", [])
+            }
+        except Exception as e:
+            # Fallback algorithm
+            return {
+                "score": 60,
+                "breakdown": {
+                    "keyword_match": 50,
+                    "skills_match": 50,
+                    "experience_match": 50,
+                    "education_match": 50,
+                    "formatting_score": 100,
+                },
+                "recommendations": [f"Error calculating score: {str(e)}"],
+                "missing_skills": []
+            }
 
+    def generate_bullet(self, action: str, task: str, tools: str, impact: str) -> str:
+        if not self.client:
+            return f"{action} {task} using {tools}, resulting in {impact}"
+            
+        prompt = (
+            "You are a FAANG-level resume writer. Create exactly ONE bullet point "
+            "following this strict formula: Action Verb + What You Built + Tools Used + Measurable Impact. "
+            "Make it sound highly impressive and professional."
+        )
+        payload = f"Action: {action}\nTask: {task}\nTools: {tools}\nImpact: {impact}"
+        
+        response = self.client.responses.create(
+            model=self.model_parse,
+            input=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": payload},
+            ],
+        )
+        return response.output_text.strip("- ")
+        
     def cover_letter(self, resume_json: Dict[str, Any], job_description: str) -> Dict[str, Any]:
         if not self.client:
             return {

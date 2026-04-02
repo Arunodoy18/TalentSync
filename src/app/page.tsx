@@ -19,32 +19,31 @@ export default async function Home() {
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 lg:grid-cols-2">
           <section className="glass-panel reveal-up p-8 sm:p-10 lg:p-12">
             <p className="mb-4 inline-flex rounded-full border border-white/40 bg-white/35 px-4 py-1 text-xs font-semibold tracking-[0.12em] text-[#284b63] uppercase">
-              TalentSync Career OS
+              Stop Rewriting Resumes.
             </p>
             <h1 className="font-display text-balance text-4xl leading-tight text-[#153243] sm:text-5xl lg:text-6xl">
-              Build Your Interview Pipeline, Not Just a Resume.
+              Your AI Auto-Apply Engine.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-[#284b63] sm:text-lg">
-              Build polished resumes, discover relevant roles, tailor applications, and track your progress in one place.
-              Stay consistent, save time, and move faster toward your next offer.
+              Drop your PDF once into our Master Vault. Our AI perfectly tailors it to the highest-scoring FAANG or IIT Bombay templates, scores it live against job descriptions, and auto-applies while you sleep.
             </p>
 
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="metric-card">
-                <p className="metric-label">Resume</p>
-                <p className="metric-value">Smart Editing</p>
+                <p className="metric-label">Extract</p>
+                <p className="metric-value">Magic PDF Import</p>
               </div>
               <div className="metric-card">
-                <p className="metric-label">Jobs</p>
-                <p className="metric-value">Role Matching</p>
+                <p className="metric-label">Match</p>
+                <p className="metric-value">Vector AI Scoring</p>
               </div>
               <div className="metric-card">
-                <p className="metric-label">Applications</p>
-                <p className="metric-value">Guided Workflow</p>
+                <p className="metric-label">Format</p>
+                <p className="metric-value">IIT & Jake's Resumes</p>
               </div>
               <div className="metric-card">
-                <p className="metric-label">Progress</p>
-                <p className="metric-value">Clear Tracking</p>
+                <p className="metric-label">Deploy</p>
+                <p className="metric-value">Robotic Auto-Applier</p>
               </div>
             </div>
           </section>

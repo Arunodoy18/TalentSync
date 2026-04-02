@@ -63,6 +63,10 @@ export default async function JobsPage() {
             </Link>
           </CardContent>
         </Card>
+      )}
+
+      <div className="grid gap-6">
+        {jobs && jobs.length > 0 ? (
           jobs.map((job) => {
             const matchLabel =
               typeof job.similarity === "number"

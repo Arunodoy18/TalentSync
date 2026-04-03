@@ -1,11 +1,44 @@
 import { createClient } from "@/lib/supabase-server";
-import { Plus, FileText, LayoutGrid, Briefcase, Sparkles, Rocket } from "lucide-react";
+import { Play, FileText, Briefcase, Zap, Target, BarChart3, Rocket, ChevronRight, CheckCircle2, Circle } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import ResumeUpload from "@/components/sections/resume-upload";
-import CareerRoadmap from "@/components/sections/career-roadmap";
-import SkillGap from "@/components/sections/skill-gap";
-import JobRecommendations from "@/components/sections/job-recommendations";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+
+function ProgressBar() {
+  const steps = [
+    { label: "Profile", completed: true },
+    { label: "Resume", completed: true },
+    { label: "ATS Score", completed: false },
+    { label: "Matches", completed: false },
+    { label: "Applied", completed: false },
+  ];
+
+  return (
+    <div className="w-full bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-8">
+      <div className="flex items-center justify-between w-full relative">
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-[var(--border)] -z-10"></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[40%] h-[2px] bg-[#D4AF37] -z-10 transition-all duration-500"></div>
+        
+        {steps.map((step, idx) => (
+          <div key={step.label} className="flex flex-col items-center gap-3 bg-[var(--card)] px-2">
+            <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center bg-[var(--card)] transition-colors ${
+              step.completed 
+                ? "border-[#D4AF37] text-[#D4AF37]" 
+                : idx === 2 
+                  ? "border-[#D4AF37] text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                  : "border-[var(--border)] text-[var(--text-muted)]"
+            }`}>
+              {step.completed ? <CheckCircle2 className="w-5 h-5 bg-[var(--card)] rounded-full" /> : <Circle className="w-3 h-3 fill-current" />}
+            </div>
+            <span className={`text-xs font-medium ${
+              step.completed || idx === 2 ? "text-[var(--text)]" : "text-[var(--text-muted)]"
+            }`}>{step.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -15,152 +48,124 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  const { data: resumes } = await supabase
+  const { count: resumeCount } = await supabase
     .from("resumes")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("updated_at", { ascending: false });
-
-  const { data: applications } = await supabase
-    .from("job_applications")
-    .select("*")
+    .select("*", { count: 'exact', head: true })
     .eq("user_id", user.id);
 
-  const baseResumeId = resumes?.find(r => r.is_base)?.id || resumes?.[0]?.id;
+  const isNewUser = resumeCount === 0;
 
-  const stats = [
-    { label: "Resumes", value: resumes?.length || 0, icon: FileText, color: "text-blue-600" },
-    { label: "Applications", value: applications?.length || 0, icon: Briefcase, color: "text-green-600" },
-    { label: "Match Rate", value: "92%", icon: Sparkles, color: "text-purple-600" },
-    { label: "Avg. ATS Score", value: "85", icon: LayoutGrid, color: "text-orange-600" },
+  // The new Action-Based Dashboard
+  const actions = [
+    { 
+      title: "Review ATS Score", 
+      metric: "Ready to Scan", 
+      description: "Match your resume against exact FAANG job descriptions.", 
+      href: "/dashboard/ats-score", 
+      cta: "Run Scan",
+      icon: Target,
+      tag: "Next Step",
+      color: "text-[#D4AF37]",
+      bg: "bg-[#D4AF37]/10",
+      border: "border-[#D4AF37]/30"
+    },
+    { 
+      title: "View Matched Jobs", 
+      metric: "12 New Matches", 
+      description: "Based on your latest profile update.", 
+      href: "/dashboard/jobs", 
+      cta: "View Matches",
+      icon: Briefcase,
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+      border: "border-blue-400/30"
+    },
+    { 
+      title: "Start Auto-Apply", 
+      metric: "Engine Idle", 
+      description: "Configure settings to automatically submit applications.", 
+      href: "/dashboard/auto-apply", 
+      cta: "Configure",
+      icon: Rocket,
+      color: "text-emerald-400",
+      bg: "bg-emerald-400/10",
+      border: "border-emerald-400/30"
+    },
+    { 
+      title: "Update Resume", 
+      metric: "Last updated 2d ago", 
+      description: "Edit your core resume using our structured templates.", 
+      href: "/dashboard/resumes", 
+      cta: "Edit Resume",
+      icon: FileText,
+      color: "text-purple-400",
+      bg: "bg-purple-400/10",
+      border: "border-purple-400/30"
+    },
   ];
 
   return (
-    <div className="flex-1 space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="app-title text-3xl font-bold tracking-tight">TalentSync Dashboard</h1>
-          <p className="app-subtitle mt-1">Track your resume growth, matches, and career momentum in one place.</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link 
-            href="/pricing"
-            className="app-pill px-5 h-[50px] flex items-center gap-2 hover:bg-[#00389308] transition-all"
-          >
-            Upgrade Plan
-          </Link>
-          <Link 
-            href="/ats-checker"
-            className="app-pill px-5 h-[50px] flex items-center gap-2 hover:bg-[#f3f4f6] transition-all"
-          >
-            ATS Checker
-          </Link>
-          <ResumeUpload />
-          <Link 
-            href="/dashboard/resumes/new"
-            className="bg-[#003893] text-white px-6 h-[50px] rounded-[50px] font-semibold flex items-center gap-2 hover:opacity-90 transition-all shadow-sm"
-          >
-            <Plus className="h-5 w-5" />
-            Create New Resume
-          </Link>
-        </div>
-      </div>
+    <div className="flex-1 space-y-[32px] max-w-[1400px] mx-auto w-full">
+      <FadeIn delay={0.1}>
+        <ProgressBar />
+      </FadeIn>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="app-surface p-6 flex items-center gap-4">
-            <div className={`h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center ${stat.color}`}>
-              <stat.icon className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#6b7280]">{stat.label}</p>
-              <p className="text-2xl font-bold text-[#212529]">{stat.value}</p>
-            </div>
+      {isNewUser ? (
+        <FadeIn delay={0.2} className="flex-1 flex flex-col items-center justify-center min-h-[400px] text-center w-full">
+          <div className="h-16 w-16 mb-6 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
+            <Target className="h-8 w-8 text-[#D4AF37]" />
           </div>
-        ))}
-      </div>
+          <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)] mb-4">Welcome to TalentSync</h1>
+          <p className="text-[var(--text-muted)] text-base max-w-sm mx-auto leading-relaxed mb-8">
+            Start by creating your resume.<br/>
+            Then we&apos;ll calculate your ATS score and match you with jobs.
+          </p>
+          <Link href="/dashboard/resumes/builder">
+            <button className="h-[44px] px-8 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+              Create Resume
+            </button>
+          </Link>
+        </FadeIn>
+      ) : (
+        <>
+          <FadeIn className="flex flex-col md:flex-row md:items-center justify-between gap-6" delay={0.2}>
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">Action Center</h1>
+              <p className="text-[var(--text-muted)] mt-2">
+                Your next steps for accelerating your job search.
+              </p>
+            </div>
+          </FadeIn>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 space-y-8">
-           <h2 className="text-xl font-bold text-[#212529] flex items-center gap-2">
-             <FileText className="h-5 w-5 text-[#003893]" />
-             My Resumes
-           </h2>
-           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {/* New Resume Card */}
-              <Link 
-                href="/dashboard/resumes/new"
-                className="group app-surface border-2 border-dashed border-[#d1d5db] p-6 flex flex-col items-center justify-center gap-4 hover:border-[#003893] hover:bg-[#00389305] transition-all min-h-[300px]"
-              >
-                <div className="h-14 w-14 rounded-full bg-[#f3f4f6] flex items-center justify-center group-hover:bg-[#00389310] group-hover:text-[#003893] transition-colors">
-                  <Plus className="h-7 w-7" />
-                </div>
-                <span className="text-lg font-bold text-[#6b7280] group-hover:text-[#003893]">Create New Resume</span>
-              </Link>
-
-              {/* Resume Cards */}
-              {resumes?.map((resume) => (
-                <div 
-                  key={resume.id}
-                  className="group app-surface overflow-hidden hover:shadow-md transition-all flex flex-col min-h-[300px]"
-                >
-                  <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center p-8 relative">
-                    <FileText className="h-20 w-20 text-[#d1d5db] group-hover:text-[#003893] group-hover:scale-110 transition-all duration-300" />
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        title="Resume options"
-                        aria-label="Resume options"
-                        className="h-8 w-8 rounded-full bg-white border border-[#e5e7eb] flex items-center justify-center hover:bg-[#f3f4f6]"
-                      >
-                        <LayoutGrid className="h-4 w-4 text-[#6b7280]" />
-                      </button>
+          {/* ACTION-BASED MATRIX */}
+          <StaggerContainer className="grid gap-[24px] sm:grid-cols-2 lg:grid-cols-4">
+            {actions.map((action, idx) => (
+              <StaggerItem key={action.title}>
+                <Link href={action.href} className={`relative p-[24px] h-full rounded-[12px] bg-[var(--card)] border border-[var(--border)] flex flex-col group transition-all hover:-translate-y-1 hover:border-white/20 hover:shadow-xl`}>
+                  {action.tag && (
+                    <div className="absolute top-4 right-4 bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/50 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full">
+                      {action.tag}
                     </div>
-                  </div>
-                  <div className="p-5 flex flex-col gap-1">
-                    <h3 className="font-bold text-[#212529] truncate">{resume.title || "Untitled Resume"}</h3>
-                    <div className="flex items-center justify-between text-xs text-[#6b7280]">
-                      <span>Edited {new Date(resume.updated_at).toLocaleDateString()}</span>
-                      <Link 
-                        href={`/dashboard/resumes/${resume.id}`}
-                        className="text-[#003893] font-bold hover:underline"
-                      >
-                        Edit
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-           </div>
-           
-           {baseResumeId && (
-              <div className="grid gap-8 lg:grid-cols-2">
-                 <SkillGap resumeId={baseResumeId} />
-                 <JobRecommendations resumeId={baseResumeId} />
-              </div>
-           )}
-        </div>
+                  )}
 
-        <div className="space-y-8">
-           <h2 className="text-xl font-bold text-[#212529] flex items-center gap-2">
-             <Rocket className="h-5 w-5 text-[#003893]" />
-             Career Growth
-           </h2>
-           {baseResumeId ? (
-              <CareerRoadmap resumeId={baseResumeId} />
-           ) : (
-                <div className="app-surface border-dashed p-8 text-center">
-                  <p className="app-subtitle">Upload a resume to unlock your AI Career Roadmap</p>
-              </div>
-           )}
-        </div>
-      </div>
+                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} ${action.bg} border ${action.border} mb-6`}>
+                    <action.icon className="h-6 w-6" />
+                  </div>
 
-      {resumes?.length === 0 && (
-        <div className="app-surface border-dashed border-2 flex flex-col items-center justify-center py-20">
-           <FileText className="h-16 w-16 text-[#d1d5db] mb-4" />
-           <p className="text-lg font-medium text-[#6b7280]">No resumes found</p>
-           <p className="text-[#6b7280]">Start by creating your first resume.</p>
-        </div>
+                  <div className="flex-1 space-y-2">
+                    <p className="text-[13px] font-medium text-[var(--text-muted)] uppercase tracking-wide">{action.metric}</p>
+                    <h3 className="text-xl font-semibold text-[var(--text)] leading-tight">{action.title}</h3>
+                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{action.description}</p>
+                  </div>
+
+                  <div className="mt-8 flex items-center text-sm font-semibold text-white/90 group-hover:text-white transition-colors">
+                    {action.cta} <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </>
       )}
     </div>
   );

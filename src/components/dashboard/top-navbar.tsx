@@ -26,7 +26,7 @@ export function TopNavbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="hidden items-center gap-1 rounded-full border border-[rgba(99,102,241,0.35)] bg-[rgba(99,102,241,0.15)] px-3 py-1.5 text-xs font-semibold text-indigo-200 sm:flex">
+        <div className="hidden items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs font-semibold text-[#D4AF37] sm:flex">
           <Sparkles className="h-3.5 w-3.5" />
           Pro Workspace
         </div>
@@ -46,7 +46,7 @@ export function TopNavbar() {
           K
         </div>
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[rgba(99,102,241,0.45)] bg-[rgba(99,102,241,0.22)] text-sm font-semibold text-indigo-100">
+        <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/20 text-sm font-semibold text-[#F5D97E]">
           TS
         </div>
       </div>

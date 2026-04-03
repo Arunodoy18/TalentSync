@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase-server";
-import { Search, Briefcase, MapPin, DollarSign, Sparkles, Building2 } from "lucide-react";    
+import { Search, Briefcase, MapPin, DollarSign, Sparkles, Filter, ChevronRight, Zap } from "lucide-react";    
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import TailorButton from "@/components/sections/tailor-button";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 
 export default async function JobsPage() {
   const supabase = await createClient();
@@ -31,107 +31,136 @@ export default async function JobsPage() {
     .limit(10);
 
   return (
-    <div className="flex-1 space-y-8">
-      <div className="flex items-center justify-between">
+    <StaggerContainer className="flex-1 space-y-[32px] max-w-[1400px] mx-auto w-full">
+      <FadeIn className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-indigo-100">Job Recommendations</h1> 
-          <p className="mt-2 text-lg text-indigo-300/80">Discover curated roles aligned to your profile and goals.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">Job Matches</h1>
+          <p className="text-[var(--text-muted)] mt-2">Curated opportunities based on your skills and experience.</p>
         </div>
-        <div className="relative w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-400" />
-          <Input
-            className="pl-11 h-[48px] rounded-[18px] border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.05)] text-indigo-100 placeholder:text-indigo-400/50"
-            placeholder="Search thousands of jobs..."
-          />
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="relative w-full lg:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
+            <input
+              className="w-full pl-11 h-[44px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 transition-all"
+              placeholder="Search roles, companies..."
+            />
+          </div>
+          <button className="flex items-center justify-center h-[44px] px-4 rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[var(--text)] hover:bg-[#1F2937] transition-colors">
+            <Filter className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline text-sm font-medium">Filters</span>
+          </button>
         </div>
-      </div>
+      </FadeIn>
+
+      {/* FILTER BAR */}
+      <FadeIn delay={0.1} className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+        {['Location', 'Role', 'Salary', 'Remote', 'Experience'].map((filter) => (
+          <button key={filter} className="flex-shrink-0 px-4 h-9 rounded-full border border-[var(--border)] bg-[var(--card)] text-xs font-medium text-[var(--text-muted)] hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-colors">
+            {filter} <ChevronRight className="inline h-3 w-3 ml-1" />
+          </button>
+        ))}
+      </FadeIn>
 
       {!baseResume && (
-        <Card className="p-0 border-[rgba(99,102,241,0.3)] bg-gradient-to-r from-[rgba(99,102,241,0.15)] to-[rgba(11,15,26,0.3)] shadow-[0_0_40px_rgba(99,102,241,0.1)]">
-          <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
-            <div className="h-14 w-14 rounded-2xl bg-[rgba(99,102,241,0.2)] border border-[rgba(99,102,241,0.4)] flex items-center justify-center shadow-inner">
-              <Sparkles className="h-7 w-7 text-indigo-300" />
+        <FadeIn delay={0.2}>
+          <div className="p-[24px] rounded-[12px] bg-gradient-to-r from-[#D4AF37]/10 to-[var(--card)] border border-[#D4AF37]/30 flex flex-col md:flex-row items-center gap-6">
+            <div className="h-12 w-12 rounded-[12px] bg-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-[#D4AF37]" />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <h3 className="font-bold text-xl text-indigo-100">Upload your resume for AI matches</h3>
-              <p className="text-indigo-300/80 text-sm mt-1">Our engine uses your skills and experience to find the perfect job for you instantly.</p>
+              <h3 className="font-semibold text-lg text-[var(--text)]">Upload your Master Resume</h3>
+              <p className="text-[var(--text-muted)] text-sm mt-1">We need your skills and experience to find perfect job matches instantly.</p>
             </div>
-            <Link href="/dashboard" className="w-full md:w-auto">
-              <Button variant="outline" className="w-full rounded-[14px] border-[rgba(99,102,241,0.5)] bg-[rgba(99,102,241,0.1)] text-indigo-200 hover:bg-[rgba(99,102,241,0.25)] hover:text-white font-semibold">
-                Set Base Resume
-              </Button>
+            <Link href="/dashboard/resumes">
+              <button className="h-[44px] px-6 rounded-[12px] bg-[#D4AF37] text-black font-medium hover:scale-105 active:scale-95 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                Go to Vault
+              </button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+        </FadeIn>
       )}
 
-      <div className="grid gap-6">
-        {jobs && jobs.length > 0 ? (
-          jobs.map((job) => {
-            const matchLabel =
-              typeof job.similarity === "number"
-                ? `${Math.round(job.similarity * 100)}% Match`
-                : "AI Match";
-
-            return (
-            <div 
-              key={job.id}
-              className="app-surface p-6 hover:shadow-md transition-all flex flex-col md:flex-row gap-6"
-            >
-              <div className="h-16 w-16 rounded-2xl bg-[#f3f4f6] flex items-center justify-center flex-shrink-0">
-                <Briefcase className="h-8 w-8 text-[#d1d5db]" />
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                  <h3 className="text-xl font-bold text-[#212529]">{job.title}</h3>
-                  <div className="flex items-center gap-2 bg-[#00389310] px-3 py-1 rounded-full">
-                    <Sparkles className="h-3 w-3 text-[#003893]" />
-                    <span className="text-xs font-bold text-[#003893]">{matchLabel}</span>
-                  </div>
-                </div>
-                
-                <p className="font-semibold text-[#003893] mb-4">{job.company}</p>
-                
-                <div className="flex flex-wrap gap-4 text-sm text-[#6b7280] mb-6">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    <span>{job.location || "Remote"}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="h-4 w-4" />
-                    <span>{job.salary_range || "Competitive"}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Briefcase className="h-4 w-4" />
-                    <span>{job.job_type || "Full-time"}</span>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  {baseResume && (
-                    <TailorButton 
-                      resumeId={baseResume.id} 
-                      jobId={job.id} 
-                      jobTitle={job.title} 
-                    />
-                  )}
-                  <Button variant="outline" className="rounded-[50px] px-6 h-10 border-[#e5e7eb] font-bold">
-                    View Details
-                  </Button>
-                </div>
-              </div>
-            </div>
-            );
-          })
-        ) : (
-           <div className="app-surface border-dashed border-2 flex flex-col items-center justify-center py-20">
-             <Briefcase className="h-16 w-16 text-[#d1d5db] mb-4" />
-             <p className="text-lg font-medium text-[#6b7280]">No jobs found yet</p>
-             <p className="text-[#6b7280]">We're scanning for new opportunities...</p>
+      <FadeIn delay={0.3}>
+        <div className="rounded-[12px] bg-[var(--card)] border border-[var(--border)] overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-black/20 border-b border-[var(--border)] text-[11px] uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+                <tr>
+                  <th className="px-6 py-4">Role</th>
+                  <th className="px-6 py-4">Company</th>
+                  <th className="px-6 py-4">Location</th>
+                  <th className="px-6 py-4">Match Score</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border)]">
+                {jobs && jobs.length > 0 ? (
+                  jobs.map((job) => {
+                    const matchLabel = typeof job.similarity === "number" ? Math.round(job.similarity * 100) : 92;
+                    return (
+                      <tr key={job.id} className="hover:bg-white/[0.02] transition-colors group">
+                        <td className="px-6 py-4 font-medium text-[var(--text)]">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-md bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                              <Briefcase className="h-4 w-4 text-[var(--text-muted)]" />
+                            </div>
+                            {job.title}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-[var(--text-muted)] font-medium">{job.company}</td>
+                        <td className="px-6 py-4 text-[var(--text-muted)]">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="h-3.5 w-3.5 opacity-70" />
+                            <span>{job.location || "Remote"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5 w-fit bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                            <Zap className="h-3 w-3 text-emerald-400" />
+                            <span className="text-[11px] font-bold tracking-wide text-emerald-400">{matchLabel}%</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {baseResume && (
+                              <div className="scale-90 origin-right">
+                                <TailorButton 
+                                  resumeId={baseResume.id} 
+                                  jobId={job.id} 
+                                  jobTitle={job.title} 
+                                />
+                              </div>
+                            )}
+                            <button className="h-8 px-4 rounded-md bg-[#D4AF37] text-black text-xs font-semibold hover:scale-105 transition-transform">
+                              Apply
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-24 text-center">
+                       <Briefcase className="h-12 w-12 text-[var(--text-muted)] opacity-30 mx-auto mb-4" />
+                       <p className="text-lg font-semibold text-[var(--text)] mb-2">No Job Matches Yet</p>
+                       <p className="text-sm text-[var(--text-muted)] mb-6 max-w-md mx-auto leading-relaxed">
+                         Upload your resume to start getting AI-matched jobs.<br/>
+                         We&apos;ll scan LinkedIn, Indeed, and Wellfound and show you the best matches.
+                       </p>
+                       <Link href="/dashboard/resumes">
+                         <button className="h-[40px] px-6 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                           Upload Resume
+                         </button>
+                       </Link>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </FadeIn>
+    </StaggerContainer>
   );
 }

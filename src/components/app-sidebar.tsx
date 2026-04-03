@@ -6,16 +6,19 @@ import {
   LayoutDashboard,
   ChartNoAxesColumn,
   Shield,
-  Mail,
   Settings,
-  User,
   LogOut,
-  Briefcase
+  Briefcase,
+  Rocket,
+  Target,
+  Sparkles,
+  Map,
+  FileSignature,
+  CheckSquare
 } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-
 import {
   Sidebar,
   SidebarContent,
@@ -39,29 +42,44 @@ const items = [
     icon: FileText,
   },
   {
+    title: "ATS Score",
+    url: "/dashboard/ats-score",
+    icon: Target,
+  },
+  {
     title: "Jobs",
     url: "/dashboard/jobs",
     icon: Briefcase,
   },
   {
-    title: "Analytics",
-    url: "/dashboard/analytics",
-    icon: ChartNoAxesColumn,
+    title: "Auto Apply",
+    url: "/dashboard/auto-apply",
+    icon: Rocket,
   },
   {
-    title: "Admin Ops",
-    url: "/dashboard/admin",
-    icon: Shield,
+    title: "Applications",
+    url: "/dashboard/applications",
+    icon: CheckSquare,
+  },
+  {
+    title: "Career Roadmap",
+    url: "/dashboard/roadmap",
+    icon: Map,
   },
   {
     title: "Cover Letters",
     url: "/dashboard/cover-letters",
-    icon: Mail,
+    icon: FileSignature,
   },
   {
-    title: "My Profile",
-    url: "/dashboard/profile",
-    icon: User,
+    title: "Insights",
+    url: "/dashboard/analytics",
+    icon: ChartNoAxesColumn,
+  },
+  {
+    title: "Admin",
+    url: "/dashboard/admin",
+    icon: Shield,
   },
   {
     title: "Settings",
@@ -69,6 +87,21 @@ const items = [
     icon: Settings,
   },
 ]
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+    }
+  }
+}
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, x: -10 },
+  show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+}
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -84,46 +117,60 @@ export function AppSidebar() {
           <div className="app-pill hidden h-9 items-center px-3 text-[11px] tracking-[0.16em] uppercase transition-all group-data-[collapsible=icon]:hidden md:inline-flex">
             TalentSync
           </div>
-          <div className="hidden h-9 w-9 items-center justify-center rounded-[12px] border border-[rgba(99,102,241,0.5)] bg-[rgba(99,102,241,0.26)] text-indigo-100 group-data-[collapsible=icon]:flex md:flex">
+          <div className="hidden h-9 w-9 items-center justify-center rounded-[12px] border border-[rgba(212,175,55,0.5)] bg-[rgba(212,175,55,0.15)] text-[#F5D97E] group-data-[collapsible=icon]:flex md:flex font-bold">
             T
           </div>
         </motion.div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu className="space-y-1 px-2">
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.url}
-                tooltip={item.title}
-                className="h-11 rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.07)] hover:text-[var(--text)] data-[active=true]:border-[rgba(99,102,241,0.45)] data-[active=true]:bg-[rgba(99,102,241,0.2)] data-[active=true]:text-indigo-100"
-              >
-                <Link href={item.url} className="flex items-center gap-3">
-                  <item.icon className="h-5 w-5" />
-                  <span className="font-medium">{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          <SidebarMenu className="space-y-1 px-2">
+            {items.map((item) => (
+              <motion.div key={item.title} variants={itemVariants}>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.url}
+                    tooltip={item.title}
+                    className="h-11 rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--card)] hover:text-[var(--text)] data-[active=true]:border-[rgba(212,175,55,0.3)] data-[active=true]:bg-[rgba(212,175,55,0.1)] data-[active=true]:text-[#D4AF37] transition-all"
+                  >
+                    <Link href={item.url} className="flex items-center gap-3">
+                      <item.icon className="h-5 w-5" />
+                      <span className="font-medium">{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </motion.div>
+            ))}
+          </SidebarMenu>
+        </motion.div>
       </SidebarContent>
       <SidebarFooter className="p-4">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <form action="/auth/signout" method="post" className="w-full">
-              <SidebarMenuButton
-                type="submit"
-                tooltip="Logout"
-                className="h-11 w-full rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.16)] hover:text-red-200"
-              >
-                <div className="flex items-center gap-3">
-                  <LogOut className="h-5 w-5" />
-                  <span className="font-medium">Logout</span>
-                </div>
-              </SidebarMenuButton>
-            </form>
-          </SidebarMenuItem>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <SidebarMenuItem>
+              <form action="/auth/signout" method="post" className="w-full">
+                <SidebarMenuButton
+                  type="submit"
+                  tooltip="Logout"
+                  className="h-11 w-full rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.16)] hover:text-red-200 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <LogOut className="h-5 w-5" />
+                    <span className="font-medium">Logout</span>
+                  </div>
+                </SidebarMenuButton>
+              </form>
+            </SidebarMenuItem>
+          </motion.div>
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />

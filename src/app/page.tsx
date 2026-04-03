@@ -22,29 +22,19 @@ export default async function Home() {
               Stop Rewriting Resumes.
             </p>
             <h1 className="font-display text-balance text-4xl leading-tight text-[#153243] sm:text-5xl lg:text-6xl">
-              Your AI Auto-Apply Engine.
+              Build a MAANG-Level Resume. Get Matched to the Right Jobs. Auto-Apply with AI.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-[#284b63] sm:text-lg">
-              Drop your PDF once into our Master Vault. Our AI perfectly tailors it to the highest-scoring FAANG or IIT Bombay templates, scores it live against job descriptions, and auto-applies while you sleep.
+              TalentSync builds ATS-optimized resumes, finds the best matching jobs, and applies for you automatically.
             </p>
 
-            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="metric-card">
-                <p className="metric-label">Extract</p>
-                <p className="metric-value">Magic PDF Import</p>
-              </div>
-              <div className="metric-card">
-                <p className="metric-label">Match</p>
-                <p className="metric-value">Vector AI Scoring</p>
-              </div>
-              <div className="metric-card">
-                <p className="metric-label">Format</p>
-                <p className="metric-value">IIT & Jake's Resumes</p>
-              </div>
-              <div className="metric-card">
-                <p className="metric-label">Deploy</p>
-                <p className="metric-value">Robotic Auto-Applier</p>
-              </div>
+            <div className="mt-8 flex items-center justify-start gap-4">
+              <button className="rounded-xl bg-[#D4AF37] px-6 py-3 font-medium text-black transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                Build Resume
+              </button>
+              <button className="rounded-xl border border-[#1F2937] bg-[#111827] px-6 py-3 font-medium text-[#F9FAFB] transition-colors hover:bg-[#1F2937]">
+                Find Jobs
+              </button>
             </div>
           </section>
 

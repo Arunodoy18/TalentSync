@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 
 // Using require since pdf-parse lacks an ES module default export
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse");
 
 // We force Node.js runtime because pdf-parse uses Node.js 'fs' and streams under the hood

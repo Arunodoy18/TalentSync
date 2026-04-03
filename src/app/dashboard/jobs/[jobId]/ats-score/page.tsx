@@ -15,12 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, ArrowLeft, Target, Award, BookOpen, PenTool, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
+import { use } from "react";
 
 export default function AtsScorePage({
   params,
 }: {
-  params: { jobId: string };
+  params: Promise<{ jobId: string }>;
 }) {
+  const { jobId } = use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
@@ -41,7 +43,7 @@ export default function AtsScorePage({
         .from("job_matches")
         .select("match_score, semantic_score, missing_skills, resume_id, jobs(*)")
         .eq("user_id", user.id)
-        .eq("job_id", params.jobId)
+        .eq("job_id", jobId)
         .single();
 
       if (!match || !match.jobs) {
@@ -57,7 +59,7 @@ export default function AtsScorePage({
         const res = await fetch("/api/ats/score", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ resumeId: match.resume_id, jobId: params.jobId })
+          body: JSON.stringify({ resumeId: match.resume_id, jobId: jobId })
         });
         
         if (res.ok) {
@@ -72,7 +74,7 @@ export default function AtsScorePage({
     }
     
     loadData();
-  }, [params.jobId, router]);
+  }, [jobId, router]);
 
   if (loading || !data) {
     return (

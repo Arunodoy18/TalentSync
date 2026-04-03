@@ -92,37 +92,39 @@
   }
 
   :root {
-    --bg: #0B0F1A;
-    --card: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.08);
-    --primary: #6366F1;
-    --primary-hover: #4F46E5;
-    --text: #E5E7EB;
+    --bg: #0F172A;
+    --card: #111827;
+    --border: #1F2937;
+    --primary: #D4AF37;
+    --primary-light: #F5D97E;
+    --text: #F9FAFB;
     --text-muted: #9CA3AF;
     --success: #22C55E;
-    --warning: #F59E0B;
     --danger: #EF4444;
 
-    --background: #0B0F1A;
-    --foreground: #E5E7EB;
-    --card-foreground: #E5E7EB;
-    --popover: #0f1524;
-    --popover-foreground: #E5E7EB;
-    --primary-foreground: #ffffff;
-    --secondary: rgba(255, 255, 255, 0.08);
-    --secondary-foreground: #E5E7EB;
-    --muted: rgba(255, 255, 255, 0.08);
-    --muted-foreground: #9CA3AF;
-    --accent: rgba(255, 255, 255, 0.1);
-    --accent-foreground: #E5E7EB;
+    /* Theme mappings */
+    --background: var(--bg);
+    --foreground: var(--text);
+    --card-foreground: var(--text);
+    --popover: var(--card);
+    --popover-foreground: var(--text);
+    --primary-foreground: #000000;
+    --secondary: #1F2937;
+    --secondary-foreground: var(--text);
+    --muted: #1F2937;
+    --muted-foreground: var(--text-muted);
+    --accent: #1F2937;
+    --accent-foreground: var(--text);
     --destructive-foreground: #ffffff;
-    --input: rgba(255,255,255,0.05);
-    --ring: #6366F1;
-    --radius: 14px;
-
+    --input: var(--border);
+    --ring: var(--primary);
+    
+    /* Premium Spacing System */
+    --radius: 12px;
     --button-height: 44px;
     --section-spacing: 32px;
     --grid-gap: 24px;
+    --card-padding: 24px;
     --sidebar-width: 240px;
     --content-max-width: 1400px;
   }
@@ -389,4 +391,36 @@
       background-position: -20% 0;
     }
   }
+}
+@layer components {
+  /* Micro-Interactions: Buttons Hover Glow */
+  .btn-interaction {
+    @apply transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:scale-[1.02] active:scale-95;
+  }
+  
+  /* Micro-Interactions: Cards Lift on Hover */
+  .card-interaction {
+    @apply transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-white/20;
+  }
+
+  /* Micro-Interactions: Page Fade Transition */
+  .page-transition {
+    @apply animate-in fade-in-0 slide-in-from-bottom-[10px] duration-500 ease-out;
+  }
+
+  /* Success Check Animation */
+  .animate-check {
+    @apply animate-[check_0.5s_cubic-bezier(0.65,0,0.45,1)_forwards];
+  }
+
+  /* Animated Progress Bar */
+  .progress-fill {
+    @apply transition-[width] duration-1000 ease-in-out;
+  }
+}
+
+@keyframes check {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
 }

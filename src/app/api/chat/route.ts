@@ -9,6 +9,7 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
+  console.log('BACKEND MESSAGES:', JSON.stringify(messages, null, 2));
 
   const result = streamText({
     model: groq("llama-3.3-70b-versatile"),
@@ -16,8 +17,11 @@ export async function POST(req: Request) {
     messages,
   });
 
-  return result.toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
 
 
+
+
+//
 

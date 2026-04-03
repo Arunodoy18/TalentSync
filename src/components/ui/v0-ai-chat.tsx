@@ -133,7 +133,9 @@ export function VercelV0Chat() {
                                         : "bg-[var(--card)] text-[var(--text)] border border-[var(--border)] rounded-r-2xl rounded-tl-2xl"
                                 )}
                             >
-                                <p className="whitespace-pre-wrap">{m.content || m.text}</p>
+                                <p className="whitespace-pre-wrap">
+                                    {m.content || m.text || (m.parts && m.parts.map((p: any) => p.text).join(''))}
+                                </p>
                             </div>
                             <span className="text-[10px] text-[var(--text-muted)] mt-1 px-1">
                                 {m.role === "user" ? "You" : "TalentSync Assistant"}

@@ -11,6 +11,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@ai-sdk/groq@^3.0.33",
+        "npm:@ai-sdk/react@^3.0.147",
         "npm:@eslint/eslintrc@^3.3.3",
         "npm:@hookform/resolvers@^5.2.2",
         "npm:@number-flow/react@0.6",
@@ -51,6 +53,7 @@
         "npm:@types/react-dom@19",
         "npm:@types/react@19",
         "npm:@types/three@~0.183.1",
+        "npm:ai@^6.0.145",
         "npm:class-variance-authority@~0.7.1",
         "npm:clsx@^2.1.1",
         "npm:cmdk@^1.1.1",

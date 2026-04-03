@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import {
@@ -62,8 +62,8 @@ const items = [
     icon: CheckSquare,
   },
   {
-    title: "Career Roadmap",
-    url: "/dashboard/roadmap",
+    title: "Your Assistant",
+    url: "/dashboard/assistant",
     icon: Map,
   },
   {

@@ -1,5 +1,6 @@
-"use client";
+﻿"use client";
 
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Bell, Command, Search, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { SidebarTrigger } from "@/components/ui/sidebar";

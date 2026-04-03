@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -91,7 +91,8 @@
     border-color: #d1d5db;
   }
 
-  :root {
+  :root, .dark {
+    color-scheme: dark;
     --bg: #0F172A;
     --card: #111827;
     --border: #1F2937;
@@ -423,4 +424,41 @@
   0% { transform: scale(0); opacity: 0; }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); opacity: 1; }
+}
+
+@layer base {
+  .light {
+    color-scheme: light;
+    --bg: #FDFBF7;
+    --card: #FFFFFF;
+    --border: #E8E1D7;
+    --primary: #B29B7F;
+    --primary-light: #D1BA9C;
+    --text: #2C2621;
+    --text-muted: #756C64;
+    --success: #22C55E;
+    --danger: #EF4444;
+
+    /* Theme mappings */
+    --background: var(--bg);
+    --foreground: var(--text);
+    --card-foreground: var(--text);
+    --popover: var(--card);
+    --popover-foreground: var(--text);
+    --primary-foreground: #FFFFFF;
+    --secondary: #F0EAE1;
+    --secondary-foreground: var(--text);
+    --muted: #F0EAE1;
+    --muted-foreground: var(--text-muted);
+    --accent: #F0EAE1;
+    --accent-foreground: var(--text);
+    --destructive-foreground: #FFFFFF;
+    --input: var(--border);
+    --ring: var(--primary);
+  }
+  
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+  }
 }

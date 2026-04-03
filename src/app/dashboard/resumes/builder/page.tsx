@@ -138,19 +138,19 @@ export default function ResumeBuilderPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Full Name</label>
-                    <Input value={basics.name} onChange={e => setBasics({...basics, name: e.target.value})} className="bg-white/5 border-white/10 text-[var(--text)] focus:border-[#D4AF37]" placeholder="Jane Doe" />
+                    <Input value={basics.name} onChange={e => setBasics({...basics, name: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="Jane Doe" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Email</label>
-                    <Input value={basics.email} onChange={e => setBasics({...basics, email: e.target.value})} className="bg-white/5 border-white/10 text-[var(--text)] focus:border-[#D4AF37]" placeholder="jane@example.com" />
+                    <Input value={basics.email} onChange={e => setBasics({...basics, email: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="jane@example.com" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Phone</label>
-                    <Input value={basics.phone} onChange={e => setBasics({...basics, phone: e.target.value})} className="bg-white/5 border-white/10 text-[var(--text)] focus:border-[#D4AF37]" placeholder="+1 (555) 123-4567" />
+                    <Input value={basics.phone} onChange={e => setBasics({...basics, phone: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="+1 (555) 123-4567" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Location</label>
-                    <Input value={basics.location} onChange={e => setBasics({...basics, location: e.target.value})} className="bg-white/5 border-white/10 text-[var(--text)] focus:border-[#D4AF37]" placeholder="San Francisco, CA" />
+                    <Input value={basics.location} onChange={e => setBasics({...basics, location: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="San Francisco, CA" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -158,7 +158,7 @@ export default function ResumeBuilderPage() {
                   <Textarea 
                     value={basics.summary} 
                     onChange={e => setBasics({...basics, summary: e.target.value})}
-                    className="bg-white/5 border-white/10 text-[var(--text)] focus:border-[#D4AF37] min-h-[120px]" 
+                    className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37] min-h-[120px]" 
                     placeholder="Software engineer with 5+ years..." 
                   />
                 </div>
@@ -182,11 +182,11 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Company</label>
-                              <Input value={exp.company} onChange={e => {const n=[...experience]; n[i].company=e.target.value; setExperience(n);}} className="bg-black/20 border-white/10 text-[var(--text)] focus:border-[#D4AF37]" placeholder="Acme Inc."/>
+                              <Input value={exp.company} onChange={e => {const n=[...experience]; n[i].company=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="Acme Inc."/>
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Role</label>
-                              <Input value={exp.role} onChange={e => {const n=[...experience]; n[i].role=e.target.value; setExperience(n);}} className="bg-black/20 border-white/10 text-[var(--text)] focus:border-[#D4AF37]" placeholder="Senior Engineer"/>
+                              <Input value={exp.role} onChange={e => {const n=[...experience]; n[i].role=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="Senior Engineer"/>
                             </div>
                         </div>
                         
@@ -247,18 +247,18 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Project Name</label>
-                              <Input value={proj.name} onChange={e => {const n=[...projects]; n[i].name=e.target.value; setProjects(n);}} className="bg-black/20 border-transparent focus:border-[#D4AF37] text-[var(--text)]" placeholder="AI Platform"/>
+                              <Input value={proj.name} onChange={e => {const n=[...projects]; n[i].name=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)]" placeholder="AI Platform"/>
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Technologies</label>
-                              <Input value={proj.technologies} onChange={e => {const n=[...projects]; n[i].technologies=e.target.value; setProjects(n);}} className="bg-black/20 border-transparent focus:border-[#D4AF37] text-[var(--text)]" placeholder="React, Python"/>
+                              <Input value={proj.technologies} onChange={e => {const n=[...projects]; n[i].technologies=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)]" placeholder="React, Python"/>
                             </div>
                         </div>
                         
                         <div className="space-y-2 mt-2">
                             <label className="text-sm font-medium text-[var(--text-muted)]">Impact Bullets</label>
                             <Textarea 
-                              className="bg-black/20 border-transparent focus:border-[#D4AF37] text-[var(--text)] min-h-[80px] leading-relaxed" 
+                              className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)] min-h-[80px] leading-relaxed" 
                               placeholder="• Built x using y resulting in z"
                               value={(proj.bullets || []).join('\n')}
                               onChange={e => {
@@ -297,7 +297,7 @@ export default function ResumeBuilderPage() {
                 <Textarea 
                   value={skills} 
                   onChange={e => setSkills(e.target.value)}
-                  className="bg-white/5 border-white/10 focus:border-[#D4AF37] text-[var(--text)] min-h-[120px] leading-relaxed" 
+                  className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)] min-h-[120px] leading-relaxed" 
                   placeholder="React, Node.js, Python, System Design..." 
                 />
               </AccordionContent>

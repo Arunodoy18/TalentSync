@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,7 @@ export default function ResumeBuilderPage() {
         if (data.education) setEducation(data.education);
         if (data.skills) setSkills(data.skills);
       } else {
-        alert("Failed to parse resume.");
+        const errorData = await response.json().catch(() => null); alert(errorData?.error || "Failed to parse resume.");
       }
     } catch (err) {
       console.error(err);
@@ -259,7 +259,7 @@ export default function ResumeBuilderPage() {
                             <label className="text-sm font-medium text-[var(--text-muted)]">Impact Bullets</label>
                             <Textarea 
                               className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)] min-h-[80px] leading-relaxed" 
-                              placeholder="â€¢ Built x using y resulting in z"
+                              placeholder="• Built x using y resulting in z"
                               value={(proj.bullets || []).join('\n')}
                               onChange={e => {
                                   const n=[...projects]; 
@@ -359,7 +359,7 @@ export default function ResumeBuilderPage() {
            <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50 p-6 overflow-y-auto text-gray-900 text-[9px] scrollbar-none">
               <div className="text-center font-bold text-lg uppercase mb-1 tracking-tight">{basics.name || "YOUR NAME"}</div>
               <div className="text-center text-[8px] text-gray-600 mb-5 pb-4 border-b-2 border-gray-900">
-                {basics.email || "email@address.com"} â€¢ {basics.phone || "Phone"} â€¢ {basics.location || "City, State"}
+                {basics.email || "email@address.com"} • {basics.phone || "Phone"} • {basics.location || "City, State"}
               </div>
               
               <div className="uppercase text-[10px] font-bold text-gray-900 mb-2">Summary</div>

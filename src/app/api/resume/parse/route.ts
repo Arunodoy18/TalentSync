@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
-import OpenAI from "openai";
+import PDFParser from "pdf2json";
+import { OpenAI } from "openai";
 import { createClient } from "@/lib/supabase-server";
+
+export const runtime = "nodejs";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -24,15 +26,20 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
-    const textResult = await parser.getText();
-    const text = textResult.text;
-    await parser.destroy();
+
+    const text = await new Promise<string>((resolve, reject) => {
+      const pdfParser = new (PDFParser as any)(null, 1);
+      pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
+      pdfParser.on("pdfParser_dataReady", () => {
+        resolve(pdfParser.getRawTextContent());
+      });
+      pdfParser.parseBuffer(buffer);
+    });
 
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "OpenAI API key not configured. Please add OPENAI_API_KEY to your environment variables.",
-        text: text.substring(0, 1000) // Return some text so the user can see it works partially
+        text: text.substring(0, 1000)
       }, { status: 500 });
     }
 

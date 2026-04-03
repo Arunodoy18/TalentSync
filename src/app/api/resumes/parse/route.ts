@@ -1,11 +1,7 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
+import PDFParser from "pdf2json";
 
-// Using require since pdf-parse lacks an ES module default export
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse");
-
-// We force Node.js runtime because pdf-parse uses Node.js 'fs' and streams under the hood
 export const runtime = "nodejs";
 
 const openai = new OpenAI({
@@ -21,13 +17,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // Convert the uploaded File (Web API) into a Node.js Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Extract text from the PDF
-    const pdfData = await pdfParse(buffer);
-    const rawText = pdfData.text;
+    // Extract text from the PDF using pdf2json
+    const rawText = await new Promise<string>((resolve, reject) => {
+      const pdfParser = new (PDFParser as any)(null, 1);
+      pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
+      pdfParser.on("pdfParser_dataReady", () => {
+        resolve(pdfParser.getRawTextContent());
+      });
+      pdfParser.parseBuffer(buffer);
+    });
 
     if (!rawText || rawText.trim() === "") {
       return NextResponse.json({ error: "Failed to extract text from the PDF" }, { status: 400 });
@@ -73,11 +74,11 @@ export async function POST(req: Request) {
       ],
       "skills": "A single comma-separated string of all technical and soft skills"
     }
-    
+
     If any field is missing from the resume, leave it as an empty string (or empty array). Do not hallucinate information. Ensure the output is valid JSON.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // or "gpt-3.5-turbo" if needed, but 4o is better at rigid JSON extraction
+      model: "gpt-4o",
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
@@ -87,7 +88,6 @@ export async function POST(req: Request) {
     });
 
     const structuredData = JSON.parse(response.choices[0].message.content || "{}");
-
     return NextResponse.json(structuredData);
 
   } catch (error: any) {

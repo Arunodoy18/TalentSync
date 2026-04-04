@@ -2,19 +2,22 @@ import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
-import { isBillingPlan, isPaidPlan } from "@/lib/billing";
+import {
+  addDays,
+  isSubscriptionPlanCode,
+  SUBSCRIPTION_PLANS,
+  SubscriptionPlanCode,
+} from "@/lib/billing";
 
-function verifySignature(orderId: string, paymentId: string, signature: string, secret: string): boolean {
-  const payload = `${orderId}|${paymentId}`;
+function verifySignature(paymentId: string, subscriptionId: string, signature: string, secret: string): boolean {
+  const payload = `${paymentId}|${subscriptionId}`;
   const digest = crypto.createHmac("sha256", secret).update(payload).digest("hex");
   return digest === signature;
 }
 
-function subscriptionEndDateForPlan(plan: string): string | null {
-  const now = new Date();
-  if (plan === "lifetime") return null;
-  now.setMonth(now.getMonth() + 1);
-  return now.toISOString();
+function normalizePlan(planCode: SubscriptionPlanCode): "pro" {
+  if (SUBSCRIPTION_PLANS[planCode]) return "pro";
+  return "pro";
 }
 
 export async function POST(req: NextRequest) {
@@ -29,12 +32,12 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const orderId = body?.razorpay_order_id as string;
     const paymentId = body?.razorpay_payment_id as string;
+    const subscriptionId = body?.razorpay_subscription_id as string;
     const signature = body?.razorpay_signature as string;
     const plan = body?.plan as string;
 
-    if (!orderId || !paymentId || !signature || !plan || !isBillingPlan(plan) || !isPaidPlan(plan)) {
+    if (!paymentId || !subscriptionId || !signature || !plan || !isSubscriptionPlanCode(plan)) {
       return NextResponse.json({ error: "Invalid verification payload" }, { status: 400 });
     }
 
@@ -43,37 +46,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Razorpay secret is not configured" }, { status: 500 });
     }
 
-    const valid = verifySignature(orderId, paymentId, signature, keySecret);
+    const valid = verifySignature(paymentId, subscriptionId, signature, keySecret);
     if (!valid) {
       return NextResponse.json({ error: "Invalid Razorpay signature" }, { status: 400 });
     }
 
     const admin = createAdminClient();
 
-    const paymentUpdate = await admin
-      .from("payments")
-      .update({
-        razorpay_payment_id: paymentId,
-        status: "captured",
-      })
-      .eq("razorpay_order_id", orderId)
-      .eq("user_id", user.id)
-      .select("amount")
-      .single();
-
-    if (paymentUpdate.error) {
-      console.error("Payment update warning:", paymentUpdate.error);
-    }
-
-    const startDate = new Date().toISOString();
-    const endDate = subscriptionEndDateForPlan(plan);
+    const planCode = plan as SubscriptionPlanCode;
+    const trialEnd = addDays(new Date(), 60).toISOString();
+    const planInfo = SUBSCRIPTION_PLANS[planCode];
+    const razorpayPlanId = process.env[planInfo.envPlanIdKey] ?? null;
 
     const subscriptionPayload = {
       user_id: user.id,
-      plan,
-      start_date: startDate,
-      end_date: endDate,
-      status: "active",
+      plan: normalizePlan(planCode),
+      plan_name: planInfo.label,
+      plan_id: razorpayPlanId,
+      subscription_id: subscriptionId,
+      start_date: new Date().toISOString(),
+      trial_end: trialEnd,
+      status: "trial",
     };
 
     const upsertResult = await admin
@@ -82,6 +75,7 @@ export async function POST(req: NextRequest) {
 
     if (upsertResult.error) {
       console.error("Subscription upsert warning:", upsertResult.error);
+      return NextResponse.json({ error: "Failed to store subscription" }, { status: 500 });
     }
 
     const referralResult = await admin
@@ -106,10 +100,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       verified: true,
       subscription: {
-        plan,
-        status: "active",
-        start_date: startDate,
-        end_date: endDate,
+        plan: planInfo.label,
+        status: "trial",
+        trial_end: trialEnd,
+        subscription_id: subscriptionId,
       },
     });
   } catch (error: unknown) {

@@ -2,12 +2,12 @@
 
 import NumberFlow from "@number-flow/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { SUBSCRIPTION_PLANS, SubscriptionPlanCode } from "@/lib/billing";
 
-export type PricingPlanId = "pro" | "auto_apply" | "lifetime";
+export type PricingPlanId = SubscriptionPlanCode;
 
 type PricingSection4Props = {
   onChoosePlan?: (planId: PricingPlanId) => void;
@@ -15,123 +15,95 @@ type PricingSection4Props = {
 };
 
 type PricingCardPlan = {
-  id: PricingPlanId;
+  id: PricingPlanId | "trial";
   name: string;
   description: string;
   price: number;
-  yearlyPrice: number;
   buttonText: string;
   popular?: boolean;
   includes: string[];
   billingLabel?: string;
+  disabled?: boolean;
 };
 
 const plans: PricingCardPlan[] = [
   {
-    id: "pro",
-    name: "Starter",
-    description: "Great for individuals building a high-signal resume stack.",
-    price: 499,
-    yearlyPrice: 4990,
-    buttonText: "Start Starter",
+    id: "trial",
+    name: "Free Trial",
+    description: "Start with full premium access for your first 2 months.",
+    price: 0,
+    buttonText: "Included After Signup",
     includes: [
-      "Unlimited resume edits",
-      "ATS optimization",
-      "Role-specific tailoring",
-      "Career roadmap",
-      "Email support",
+      "2 months full access",
+      "AI Resume Builder",
+      "ATS Score Checker",
+      "Job Matching",
+      "Auto Apply",
+      "AI Career Assistant",
+      "Cover Letter Generator",
+      "Career Roadmap",
+      "Analytics Dashboard",
+      "Application Tracker",
     ],
+    billingLabel: "2 months",
+    disabled: true,
   },
   {
-    id: "auto_apply",
-    name: "Business",
-    description: "Best for active job seekers who want automation and velocity.",
-    price: 999,
-    yearlyPrice: 9990,
-    buttonText: "Start Business",
+    id: "monthly_1",
+    name: "1 Month",
+    description: "Monthly recurring plan for active applicants.",
+    price: SUBSCRIPTION_PLANS.monthly_1.amountInr,
+    buttonText: "Buy Monthly",
+    includes: [
+      "All premium features",
+      "Recurring monthly billing",
+      "Cancel anytime",
+    ],
+    billingLabel: SUBSCRIPTION_PLANS.monthly_1.intervalLabel,
+  },
+  {
+    id: "quarterly_3",
+    name: "3 Months",
+    description: "Best value for consistent interview cycles.",
+    price: SUBSCRIPTION_PLANS.quarterly_3.amountInr,
+    buttonText: "Buy 3 Months",
     popular: true,
     includes: [
-      "Everything in Starter",
-      "Auto-apply queue",
-      "Advanced analytics",
-      "Priority pipeline",
-      "Faster support",
+      "All premium features",
+      "Recurring every 3 months",
+      "Lower monthly cost",
     ],
+    billingLabel: SUBSCRIPTION_PLANS.quarterly_3.intervalLabel,
   },
   {
-    id: "lifetime",
-    name: "Enterprise",
-    description: "One-time premium access with full feature unlock forever.",
-    price: 2999,
-    yearlyPrice: 2999,
-    buttonText: "Get Lifetime",
-    billingLabel: "one-time",
+    id: "half_yearly_6",
+    name: "6 Months",
+    description: "High-conviction plan for long pipelines and role switches.",
+    price: SUBSCRIPTION_PLANS.half_yearly_6.amountInr,
+    buttonText: "Buy 6 Months",
     includes: [
-      "Everything in Business",
-      "Lifetime access",
-      "Unlimited usage",
-      "Premium support",
-      "Early feature access",
+      "All premium features",
+      "Recurring every 6 months",
+      "Lower monthly cost",
     ],
+    billingLabel: SUBSCRIPTION_PLANS.half_yearly_6.intervalLabel,
+  },
+  {
+    id: "yearly_12",
+    name: "12 Months",
+    description: "Best annual savings for serious career growth.",
+    price: SUBSCRIPTION_PLANS.yearly_12.amountInr,
+    buttonText: "Buy Yearly",
+    includes: [
+      "All premium features",
+      "Recurring yearly billing",
+      "Best savings per month",
+    ],
+    billingLabel: SUBSCRIPTION_PLANS.yearly_12.intervalLabel,
   },
 ];
 
-function PricingSwitch({ onSwitch }: { onSwitch: (value: string) => void }) {
-  const [selected, setSelected] = useState("0");
-
-  const handleSwitch = (value: string) => {
-    setSelected(value);
-    onSwitch(value);
-  };
-
-  return (
-    <div className="flex justify-center">
-      <div className="relative z-10 mx-auto flex w-fit rounded-full border border-[var(--border)] bg-[rgba(255,255,255,0.05)] p-1 backdrop-blur-md">
-        <button
-          onClick={() => handleSwitch("0")}
-          className={cn(
-            "relative z-10 h-10 w-fit rounded-full px-4 text-sm font-medium transition-colors sm:px-6",
-            selected === "0" ? "text-white" : "text-[var(--text-muted)]"
-          )}
-        >
-          {selected === "0" && (
-            <motion.span
-              layoutId="switch"
-              className="absolute left-0 top-0 h-10 w-full rounded-full border border-[rgba(129,140,248,0.6)] bg-[var(--primary)] shadow-[0_8px_24px_rgba(79,70,229,0.45)]"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-          <span className="relative">Monthly</span>
-        </button>
-
-        <button
-          onClick={() => handleSwitch("1")}
-          className={cn(
-            "relative z-10 h-10 w-fit rounded-full px-4 text-sm font-medium transition-colors sm:px-6",
-            selected === "1" ? "text-white" : "text-[var(--text-muted)]"
-          )}
-        >
-          {selected === "1" && (
-            <motion.span
-              layoutId="switch"
-              className="absolute left-0 top-0 h-10 w-full rounded-full border border-[rgba(129,140,248,0.6)] bg-[var(--primary)] shadow-[0_8px_24px_rgba(79,70,229,0.45)]"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-          <span className="relative">Yearly</span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function PricingSection4({ onChoosePlan, loadingPlan = null }: PricingSection4Props) {
-  const [isYearly, setIsYearly] = useState(false);
-
-  const togglePricingPeriod = (value: string) => {
-    setIsYearly(Number.parseInt(value, 10) === 1);
-  };
-
   return (
     <div className="relative mx-auto min-h-screen overflow-x-hidden bg-atmosphere">
       <div className="pointer-events-none absolute inset-0">
@@ -155,15 +127,11 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
           transition={{ duration: 0.4, delay: 0.08 }}
           className="text-[var(--text-muted)]"
         >
-          Premium glass UI, serious analytics, and automation that feels world-class from day one.
+          Start with a free 2-month trial. Upgrade when trial ends to continue premium workflows.
         </motion.p>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
-          <PricingSwitch onSwitch={togglePricingPeriod} />
-        </motion.div>
       </article>
 
-      <div className="relative z-20 mx-auto grid max-w-6xl gap-6 px-4 pb-16 md:grid-cols-3">
+      <div className="relative z-20 mx-auto grid max-w-7xl gap-6 px-4 pb-16 md:grid-cols-2 xl:grid-cols-5">
         {plans.map((plan, index) => (
           <motion.div
             key={plan.id}
@@ -191,9 +159,9 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
                 </div>
                 <div className="flex items-baseline">
                   <span className="text-3xl font-semibold sm:text-4xl">
-                    INR <NumberFlow value={isYearly ? plan.yearlyPrice : plan.price} className="text-3xl font-semibold sm:text-4xl" />
+                    INR <NumberFlow value={plan.price} className="text-3xl font-semibold sm:text-4xl" />
                   </span>
-                  <span className="ml-1 text-[var(--text-muted)]">/{plan.billingLabel || (isYearly ? "year" : "month")}</span>
+                  <span className="ml-1 text-[var(--text-muted)]">/{plan.billingLabel || "month"}</span>
                 </div>
                 <p className="text-sm text-[var(--text-muted)]">{plan.description}</p>
               </CardHeader>
@@ -201,16 +169,21 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
               <CardContent className="pt-0">
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => onChoosePlan?.(plan.id)}
-                  disabled={loadingPlan === plan.id}
+                  onClick={() => {
+                    if (plan.id !== "trial") {
+                      onChoosePlan?.(plan.id);
+                    }
+                  }}
+                  disabled={plan.disabled || loadingPlan === plan.id}
                   className={cn(
                     "mb-6 h-[44px] w-full rounded-[14px] text-base font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-65",
                     plan.popular
                       ? "border border-[rgba(129,140,248,0.55)] bg-[var(--primary)] text-white shadow-[0_12px_28px_rgba(79,70,229,0.45)]"
-                      : "border border-[var(--border)] bg-[rgba(255,255,255,0.06)] text-[var(--text)] hover:border-[rgba(129,140,248,0.35)] hover:bg-[rgba(99,102,241,0.16)]"
+                      : "border border-[var(--border)] bg-[rgba(255,255,255,0.06)] text-[var(--text)] hover:border-[rgba(129,140,248,0.35)] hover:bg-[rgba(99,102,241,0.16)]",
+                    plan.disabled && "cursor-not-allowed opacity-70"
                   )}
                 >
-                  {loadingPlan === plan.id ? "Creating Order..." : plan.buttonText}
+                  {loadingPlan === plan.id ? "Creating Subscription..." : plan.buttonText}
                 </motion.button>
 
                 <div className="space-y-3 border-t border-[var(--border)] pt-4">

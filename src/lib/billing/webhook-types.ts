@@ -21,6 +21,15 @@ export type RazorpayWebhookEvent = {
         amount?: number;
       };
     };
+    subscription?: {
+      entity?: {
+        id?: string;
+        plan_id?: string;
+        current_start?: number;
+        current_end?: number;
+        ended_at?: number;
+      };
+    };
   };
 };
 

@@ -35,7 +35,7 @@ export default function PricingPage() {
     setMessage(null);
 
     try {
-      const res = await fetch("/api/billing/razorpay/order", {
+      const res = await fetch("/api/billing/razorpay/subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
@@ -45,25 +45,26 @@ export default function PricingPage() {
       if (!res.ok) throw new Error(data.error || "Failed to start checkout");
 
       if (!window.Razorpay) {
-        setMessage(`Order created (${data.order_id}). Razorpay script not loaded in this page yet.`);
+        setMessage(`Subscription created (${data.subscription_id}). Razorpay script not loaded in this page yet.`);
         return;
       }
 
       const rzp = new window.Razorpay({
         key: data.key_id,
-        amount: data.amount,
-        currency: data.currency,
+        subscription_id: data.subscription_id,
         name: "TalentSync",
         description: `Subscription: ${plan}`,
-        order_id: data.order_id,
+        prefill: {
+          email: data.email,
+        },
         handler: async (response: Record<string, string>) => {
           const verifyRes = await fetch("/api/billing/razorpay/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               plan,
-              razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_subscription_id: response.razorpay_subscription_id,
               razorpay_signature: response.razorpay_signature,
             }),
           });
@@ -74,7 +75,7 @@ export default function PricingPage() {
             return;
           }
 
-          setMessage("Payment verified. Subscription activated successfully.");
+          setMessage("Subscription confirmed. Your 2-month free trial is active.");
         },
         theme: {
           color: "#6366F1",

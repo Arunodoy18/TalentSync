@@ -11,6 +11,18 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  const premiumPaths = [
+    '/dashboard/assistant',
+    '/dashboard/auto-apply',
+    '/api/chat',
+  ]
+  const pathname = request.nextUrl.pathname
+  const shouldEnforcePremium = premiumPaths.some((path) => pathname.startsWith(path))
+  let currentUserId: string | null = null
+  let currentSubscription:
+    | { status?: string | null; end_date?: string | null; trial_end?: string | null }
+    | null = null
+
   // Do not fail every request if runtime env is missing in production.
   if (supabaseUrl && supabaseAnonKey) {
     try {
@@ -37,9 +49,38 @@ export async function middleware(request: NextRequest) {
         }
       )
 
-      await supabase.auth.getUser()
+      const authResult = await supabase.auth.getUser()
+      currentUserId = authResult.data.user?.id ?? null
+
+      if (shouldEnforcePremium && currentUserId) {
+        const subscriptionResult = await supabase
+          .from('subscriptions')
+          .select('status, end_date, trial_end')
+          .eq('user_id', currentUserId)
+          .maybeSingle()
+        currentSubscription = subscriptionResult.data
+      }
     } catch (error) {
       console.error('Middleware Supabase init failed:', error)
+    }
+  }
+
+  if (shouldEnforcePremium) {
+    const now = Date.now()
+    const trialAllowed =
+      currentSubscription?.status === 'trial' &&
+      !!currentSubscription?.trial_end &&
+      new Date(currentSubscription.trial_end).getTime() > now
+
+    const activeAllowed =
+      currentSubscription?.status === 'active' &&
+      (!currentSubscription?.end_date || new Date(currentSubscription.end_date).getTime() > now)
+
+    if (!trialAllowed && !activeAllowed) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/pricing'
+      redirectUrl.searchParams.set('reason', 'subscription_required')
+      return NextResponse.redirect(redirectUrl)
     }
   }
 

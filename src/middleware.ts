@@ -63,6 +63,7 @@ export async function middleware(request: NextRequest) {
 
   if (shouldEnforcePremium) {
     const now = Date.now()
+    const noSubscriptionYet = !currentSubscription
     const trialAllowed =
       currentSubscription?.status === 'trial' &&
       !!currentSubscription?.trial_end &&
@@ -72,7 +73,7 @@ export async function middleware(request: NextRequest) {
       currentSubscription?.status === 'active' &&
       (!currentSubscription?.end_date || new Date(currentSubscription.end_date).getTime() > now)
 
-    if (!trialAllowed && !activeAllowed) {
+    if (!noSubscriptionYet && !trialAllowed && !activeAllowed) {
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/pricing'
       redirectUrl.searchParams.set('reason', 'subscription_required')

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";
 
 export async function GET() {
   try {
@@ -27,8 +28,36 @@ export async function GET() {
         .maybeSingle(),
     ]);
 
+    let subscription = subscriptionResult.data;
+
+    if (!subscription) {
+      const now = new Date();
+      const trialEnd = new Date(now);
+      trialEnd.setDate(trialEnd.getDate() + 60);
+
+      const admin = createAdminClient();
+      const trialPayload = {
+        user_id: user.id,
+        plan: "pro",
+        plan_name: "Free Trial",
+        status: "trial",
+        start_date: now.toISOString(),
+        trial_end: trialEnd.toISOString(),
+      };
+
+      const upsert = await admin
+        .from("subscriptions")
+        .upsert(trialPayload, { onConflict: "user_id" })
+        .select("plan, plan_name, plan_id, subscription_id, status, start_date, end_date, trial_end")
+        .single();
+
+      if (!upsert.error) {
+        subscription = upsert.data;
+      }
+    }
+
     return NextResponse.json({
-      subscription: subscriptionResult.data,
+      subscription,
       latest_payment: paymentResult.data,
     });
   } catch (error: unknown) {

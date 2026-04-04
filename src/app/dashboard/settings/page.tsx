@@ -1,4 +1,5 @@
 import { Settings, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   return (
@@ -22,6 +23,20 @@ export default function SettingsPage() {
               <ShieldCheck className="h-4 w-4" />
               Add security and notification controls next.
             </p>
+            <div className="pt-3 flex flex-wrap items-center gap-3">
+              <Link
+                href="/pricing"
+                className="inline-flex items-center rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-4 py-2 text-sm font-semibold text-[#7a5a00]"
+              >
+                Open Pricing Plans
+              </Link>
+              <Link
+                href="/billing"
+                className="inline-flex items-center rounded-lg border border-[var(--border)] bg-white/70 px-4 py-2 text-sm font-semibold text-[#1f2937]"
+              >
+                Open Billing
+              </Link>
+            </div>
           </div>
         </div>
       </div>

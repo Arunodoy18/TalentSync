@@ -11,10 +11,11 @@ import {
   Briefcase,
   Rocket,
   Target,
-  Sparkles,
   Map,
   FileSignature,
-  CheckSquare
+  CheckSquare,
+  BadgeIndianRupee,
+  Wallet
 } from "lucide-react"
 import { motion, Variants } from "framer-motion"
 import Link from "next/link"
@@ -80,6 +81,16 @@ const items = [
     title: "Admin",
     url: "/dashboard/admin",
     icon: Shield,
+  },
+  {
+    title: "Pricing",
+    url: "/pricing",
+    icon: BadgeIndianRupee,
+  },
+  {
+    title: "Billing",
+    url: "/billing",
+    icon: Wallet,
   },
   {
     title: "Settings",

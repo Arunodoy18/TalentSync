@@ -1,16 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState, useTransition } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import {
     ImageIcon,
     FileUp,
     MonitorIcon,
-    CircleUserRound,
-    ArrowUpIcon,
     Paperclip,
-    PlusIcon,
     SendIcon,
     XIcon,
     LoaderIcon,
@@ -78,6 +75,33 @@ interface CommandSuggestion {
     prefix: string;
 }
 
+const COMMAND_SUGGESTIONS: CommandSuggestion[] = [
+    {
+        icon: <ImageIcon className="w-4 h-4" />,
+        label: "Clone UI",
+        description: "Generate a UI from a screenshot",
+        prefix: "/clone",
+    },
+    {
+        icon: <FileUp className="w-4 h-4" />,
+        label: "Import Figma",
+        description: "Import a design from Figma",
+        prefix: "/figma",
+    },
+    {
+        icon: <MonitorIcon className="w-4 h-4" />,
+        label: "Create Page",
+        description: "Generate a new web page",
+        prefix: "/page",
+    },
+    {
+        icon: <Sparkles className="w-4 h-4" />,
+        label: "Improve",
+        description: "Improve existing UI design",
+        prefix: "/improve",
+    },
+];
+
 interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   containerClassName?: string;
@@ -138,7 +162,6 @@ export function AnimatedAIChat() {
     const [attachments, setAttachments] = useState<string[]>([]);
     const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
     const [showCommandPalette, setShowCommandPalette] = useState(false);
-    const [recentCommand, setRecentCommand] = useState<string | null>(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
@@ -149,36 +172,8 @@ export function AnimatedAIChat() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Wire up standard AI SDK logic
-    const { messages, sendMessage, status } = useChat();
+    const { messages, sendMessage, status, error } = useChat();
     const isLoading = status === "submitted" || status === "streaming";
-    const isTyping = isLoading;
-
-    const commandSuggestions: CommandSuggestion[] = [
-        { 
-            icon: <ImageIcon className="w-4 h-4" />, 
-            label: "Clone UI", 
-            description: "Generate a UI from a screenshot", 
-            prefix: "/clone" 
-        },
-        { 
-            icon: <FileUp className="w-4 h-4" />, 
-            label: "Import Figma", 
-            description: "Import a design from Figma", 
-            prefix: "/figma" 
-        },
-        { 
-            icon: <MonitorIcon className="w-4 h-4" />, 
-            label: "Create Page", 
-            description: "Generate a new web page", 
-            prefix: "/page" 
-        },
-        { 
-            icon: <Sparkles className="w-4 h-4" />, 
-            label: "Improve", 
-            description: "Improve existing UI design", 
-            prefix: "/improve" 
-        },
-    ];
 
     // Auto-scroll when messages change
     useEffect(() => {
@@ -191,7 +186,7 @@ export function AnimatedAIChat() {
         if (value.startsWith('/') && !value.includes(' ')) {
             setShowCommandPalette(true);
             
-            const matchingSuggestionIndex = commandSuggestions.findIndex(
+            const matchingSuggestionIndex = COMMAND_SUGGESTIONS.findIndex(
                 (cmd) => cmd.prefix.startsWith(value)
             );
             
@@ -239,22 +234,19 @@ export function AnimatedAIChat() {
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 setActiveSuggestion(prev => 
-                    prev < commandSuggestions.length - 1 ? prev + 1 : 0
+                    prev < COMMAND_SUGGESTIONS.length - 1 ? prev + 1 : 0
                 );
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 setActiveSuggestion(prev => 
-                    prev > 0 ? prev - 1 : commandSuggestions.length - 1
+                    prev > 0 ? prev - 1 : COMMAND_SUGGESTIONS.length - 1
                 );
             } else if (e.key === 'Tab' || e.key === 'Enter') {
                 e.preventDefault();
                 if (activeSuggestion >= 0) {
-                    const selectedCommand = commandSuggestions[activeSuggestion];
+                    const selectedCommand = COMMAND_SUGGESTIONS[activeSuggestion];
                     setValue(selectedCommand.prefix + ' ');
                     setShowCommandPalette(false);
-                    
-                    setRecentCommand(selectedCommand.label);
-                    setTimeout(() => setRecentCommand(null), 3500);
                 }
             } else if (e.key === 'Escape') {
                 e.preventDefault();
@@ -288,12 +280,32 @@ export function AnimatedAIChat() {
     };
     
     const selectCommandSuggestion = (index: number) => {
-        const selectedCommand = commandSuggestions[index];
+        const selectedCommand = COMMAND_SUGGESTIONS[index];
         setValue(selectedCommand.prefix + ' ');
         setShowCommandPalette(false);
-        
-        setRecentCommand(selectedCommand.label);
-        setTimeout(() => setRecentCommand(null), 2000);
+    };
+
+    const getMessageText = (message: unknown): string => {
+        const m = message as any;
+
+        if (typeof m?.content === "string" && m.content.trim()) return m.content;
+        if (typeof m?.text === "string" && m.text.trim()) return m.text;
+
+        if (Array.isArray(m?.parts)) {
+            const collected = m.parts
+                .map((part: any) => {
+                    if (typeof part?.text === "string") return part.text;
+                    if (part?.type === "text" && typeof part?.content === "string") return part.content;
+                    if (typeof part?.content === "string") return part.content;
+                    return "";
+                })
+                .filter(Boolean)
+                .join("\n");
+
+            if (collected.trim()) return collected;
+        }
+
+        return "";
     };
 
     return (
@@ -367,11 +379,15 @@ export function AnimatedAIChat() {
                                             ? "bg-white/10 text-white shadow-xl backdrop-blur-sm rounded-br-sm border border-white/5" 
                                             : "bg-transparent text-white/80"
                                     )}>
-                                        {/* Fallback to multiple formats of AI payload content resolving */}
-                                        {((m as any).content) || ((m as any).text) || ((m as any).parts && (m as any).parts.map((p: any) => p.text).join(''))}
+                                        {getMessageText(m) || (m.role === "assistant" ? "..." : "")}
                                   </div>
                                 </motion.div>
                             ))}
+                            {error && (
+                                <div className="self-start max-w-[85%] px-5 py-3 rounded-2xl rounded-tl-sm bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
+                                    Assistant error: unable to generate a reply right now. Please try again.
+                                </div>
+                            )}
                             <div ref={messagesEndRef} className="h-4" />
                         </div>
                     )}
@@ -395,7 +411,7 @@ export function AnimatedAIChat() {
                                 transition={{ duration: 0.15 }}
                             >
                                 <div className="py-1 bg-black/95">
-                                    {commandSuggestions.map((suggestion, index) => (
+                                    {COMMAND_SUGGESTIONS.map((suggestion, index) => (
                                         <motion.div
                                             key={suggestion.prefix}
                                             className={cn(
@@ -544,7 +560,7 @@ export function AnimatedAIChat() {
                 {/* Initial suggestion chips */}
                 {messages.length === 0 && (
                   <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-                      {commandSuggestions.map((suggestion, index) => (
+                      {COMMAND_SUGGESTIONS.map((suggestion, index) => (
                           <motion.button
                               key={suggestion.prefix}
                           onClick={() => selectCommandSuggestion(index)}

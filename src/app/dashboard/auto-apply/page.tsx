@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Rocket, Play, Pause, CircleCheck, CircleDot, Activity } from "lucide-react";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+import { SoftPaywallGate } from "@/components/billing/soft-paywall-gate";
 
 export default async function AutoApplyPage() {
   const supabase = await createClient();
@@ -23,6 +24,10 @@ export default async function AutoApplyPage() {
 
   return (
     <StaggerContainer className="flex-1 space-y-[32px] max-w-[1400px] mx-auto w-full">
+      <SoftPaywallGate
+        title="Auto Apply Requires Premium"
+        subtitle="Trial or active subscription is required to run the Auto Apply engine."
+      />
       <FadeIn className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">Auto Apply Engine</h1>

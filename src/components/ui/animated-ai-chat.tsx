@@ -385,7 +385,7 @@ export function AnimatedAIChat() {
                             ))}
                             {error && (
                                 <div className="self-start max-w-[85%] px-5 py-3 rounded-2xl rounded-tl-sm bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
-                                    Assistant error: unable to generate a reply right now. Please try again.
+                                    Assistant error: {error.message || "unable to generate a reply right now. Please try again."}
                                 </div>
                             )}
                             <div ref={messagesEndRef} className="h-4" />

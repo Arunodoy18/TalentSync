@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  const premiumPaths = ['/api/chat']
+  const premiumPaths: string[] = []
   const pathname = request.nextUrl.pathname
   const shouldEnforcePremium = premiumPaths.some((path) => pathname.startsWith(path))
   let currentUserId: string | null = null

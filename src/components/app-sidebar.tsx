@@ -29,6 +29,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 const items = [
@@ -116,9 +117,28 @@ const itemVariants: Variants = {
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { state, isMobile, setOpen } = useSidebar()
+  const hoverExpandedRef = React.useRef(false)
+
+  const handleMouseEnter = React.useCallback(() => {
+    if (isMobile || state !== "collapsed") return
+    hoverExpandedRef.current = true
+    setOpen(true)
+  }, [isMobile, setOpen, state])
+
+  const handleMouseLeave = React.useCallback(() => {
+    if (isMobile || !hoverExpandedRef.current) return
+    hoverExpandedRef.current = false
+    setOpen(false)
+  }, [isMobile, setOpen])
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-[var(--border)]">
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-[var(--border)]"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <SidebarHeader className="p-4">
         <motion.div
           initial={{ opacity: 0, x: -8 }}

@@ -13,8 +13,9 @@ import {
     LoaderIcon,
     Sparkles,
     Command,
+    ChevronDown,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import * as React from "react"
 
 interface UseAutoResizeTextareaProps {
@@ -163,10 +164,12 @@ export function AnimatedAIChat() {
     const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
     const [showCommandPalette, setShowCommandPalette] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [showJumpToBottom, setShowJumpToBottom] = useState(false);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
         maxHeight: 200,
     });
+    const shouldReduceMotion = useReducedMotion();
     const [inputFocused, setInputFocused] = useState(false);
     const commandPaletteRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -189,6 +192,7 @@ export function AnimatedAIChat() {
             const onScroll = () => {
                 const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
                 autoStickToBottomRef.current = distanceFromBottom < 80;
+                setShowJumpToBottom(distanceFromBottom > 160);
             };
 
             container.addEventListener("scroll", onScroll, { passive: true });
@@ -234,15 +238,23 @@ export function AnimatedAIChat() {
     }, [value]);
 
     useEffect(() => {
+        if (!inputFocused || shouldReduceMotion) return;
+
+        let frame = 0;
         const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
+            if (frame) return;
+            frame = window.requestAnimationFrame(() => {
+                setMousePosition({ x: e.clientX, y: e.clientY });
+                frame = 0;
+            });
         };
 
         window.addEventListener('mousemove', handleMouseMove);
         return () => {
+            if (frame) window.cancelAnimationFrame(frame);
             window.removeEventListener('mousemove', handleMouseMove);
         };
-    }, []);
+    }, [inputFocused, shouldReduceMotion]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -302,6 +314,12 @@ export function AnimatedAIChat() {
         adjustHeight(true);
       }
     };
+
+        const scrollToBottom = () => {
+                autoStickToBottomRef.current = true;
+                setShowJumpToBottom(false);
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        };
 
     const handleAttachFile = () => {
         const mockFileName = `file-${Math.floor(Math.random() * 1000)}.pdf`;
@@ -391,8 +409,10 @@ export function AnimatedAIChat() {
                             {messages.map((m) => (
                                 <motion.div 
                                     key={m.id} 
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.24, ease: "easeOut" }}
+                                    layout
                                     className={cn(
                                         "flex flex-col gap-2 max-w-[85%]",
                                         m.role === "user" ? "self-end items-end" : "self-start items-start"
@@ -640,6 +660,22 @@ export function AnimatedAIChat() {
             </div>
 
             <AnimatePresence>
+                {showJumpToBottom && (
+                    <motion.button
+                        type="button"
+                        onClick={scrollToBottom}
+                        className="absolute bottom-32 right-6 z-30 inline-flex h-10 items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--card)]/90 px-3 text-xs font-medium text-[var(--text)] shadow-lg backdrop-blur"
+                        initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                        animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                        exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+                    >
+                        Latest
+                        <ChevronDown className="h-3.5 w-3.5" />
+                    </motion.button>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
                 {isLoading && (
                     <motion.div 
                         className="fixed left-1/2 bottom-36 md:bottom-40 transform -translate-x-1/2 backdrop-blur-2xl bg-black/40 rounded-full px-4 py-2 shadow-lg border border-white/[0.05] z-50"
@@ -660,7 +696,7 @@ export function AnimatedAIChat() {
                 )}
             </AnimatePresence>
 
-            {inputFocused && (
+            {inputFocused && !shouldReduceMotion && (
                 <motion.div 
                     className="fixed w-[50rem] h-[50rem] rounded-full pointer-events-none z-0 opacity-[0.03] bg-gradient-to-r from-[#163832] via-[#235347] to-[#8EB69B] blur-[100px]"
                     animate={{
@@ -713,8 +749,9 @@ const rippleKeyframes = `
 }
 `;
 
-if (typeof document !== 'undefined') {
+if (typeof document !== 'undefined' && !document.getElementById('textarea-ripple-style')) {
     const style = document.createElement('style');
+    style.id = 'textarea-ripple-style';
     style.innerHTML = rippleKeyframes;
     document.head.appendChild(style);
 }

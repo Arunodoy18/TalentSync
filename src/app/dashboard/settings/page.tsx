@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { Settings, ShieldCheck, UserRound, Wallet, Bell, Lock } from "lucide-react";
 import Link from "next/link";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 function formatDate(value?: string | null) {
   if (!value) return "-";
@@ -90,6 +91,27 @@ export default async function SettingsPage() {
             >
               Open Billing
             </Link>
+          </div>
+        </div>
+
+        <div className="app-surface p-6 space-y-4 lg:col-span-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--primary)]">
+              <Settings className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-[var(--text)]">Appearance</h2>
+              <p className="text-sm text-[var(--text-muted)]">Choose your workspace visual style.</p>
+            </div>
+          </div>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-[var(--text)]">Theme</p>
+                <p className="text-xs text-[var(--text-muted)]">Default is Dark. Switch to Gold for the premium warm palette.</p>
+              </div>
+              <ThemeSwitcher variant="segmented" />
+            </div>
           </div>
         </div>
       </div>

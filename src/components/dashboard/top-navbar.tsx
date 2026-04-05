@@ -47,6 +47,8 @@ export function TopNavbar() {
           K
         </div>
 
+        <ThemeSwitcher />
+
         <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--primary)]/40 bg-[var(--primary)]/20 text-sm font-semibold text-[var(--primary-light)]">
           TS
         </div>

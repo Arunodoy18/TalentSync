@@ -12,7 +12,7 @@ export default function DashboardLayout({
     <SidebarProvider style={{ "--sidebar-width": "240px" } as React.CSSProperties}>
       <div className="flex min-h-screen w-full">
         <AppSidebar />
-        <SidebarInset className="app-backdrop overflow-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <SidebarInset className="app-backdrop overflow-y-auto overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <div className="mx-auto flex h-full w-full max-w-[1400px] flex-col">
             <TopNavbar />
             <DashboardPageTransition>

@@ -170,17 +170,46 @@ export function AnimatedAIChat() {
     const [inputFocused, setInputFocused] = useState(false);
     const commandPaletteRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const autoStickToBottomRef = useRef(true);
 
     // Wire up standard AI SDK logic
     const { messages, sendMessage, status, error } = useChat();
     const isLoading = status === "submitted" || status === "streaming";
 
-    // Auto-scroll when messages change
+        // Keep the viewport pinned to the latest assistant response unless the user manually scrolls up.
+        useEffect(() => {
+            const container = scrollContainerRef.current;
+            if (!container) return;
+
+            const onScroll = () => {
+                const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+                autoStickToBottomRef.current = distanceFromBottom < 80;
+            };
+
+            container.addEventListener("scroll", onScroll, { passive: true });
+            return () => container.removeEventListener("scroll", onScroll);
+        }, []);
+
+        // Auto-scroll when messages change.
     useEffect(() => {
-      if (messages.length > 0 && messagesEndRef.current) {
+            if (messages.length > 0 && messagesEndRef.current && autoStickToBottomRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
       }
     }, [messages]);
+
+        // While streaming, continuously keep the latest token in view when user is near the bottom.
+        useEffect(() => {
+            if (status !== "streaming") return;
+
+            const id = window.setInterval(() => {
+                if (messagesEndRef.current && autoStickToBottomRef.current) {
+                    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 120);
+
+            return () => window.clearInterval(id);
+        }, [status]);
 
     useEffect(() => {
         if (value.startsWith('/') && !value.includes(' ')) {
@@ -309,16 +338,16 @@ export function AnimatedAIChat() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col w-full items-center justify-center bg-[#09090b] text-white p-6 relative overflow-hidden">
+        <div className="h-full min-h-0 flex flex-col w-full items-center justify-center bg-[var(--bg)] text-[var(--text)] p-4 sm:p-6 relative overflow-hidden">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
                 <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[rgba(142,182,155,0.1)] rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
                 <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
             </div>
 
-            <div className="w-full max-w-3xl mx-auto flex flex-col h-full z-10">
+            <div className="w-full max-w-3xl mx-auto flex flex-col h-full min-h-0 z-10">
                 {/* Header or chat messages */}
-                <div className="flex-1 flex flex-col pt-8 pb-32 overflow-y-auto">
+                <div ref={scrollContainerRef} className="flex-1 min-h-0 flex flex-col pt-6 pb-28 overflow-y-auto overflow-x-hidden scroll-smooth pr-1">
                     {messages.length === 0 ? (
                         <motion.div 
                             className="relative z-10 space-y-12 flex-1 flex flex-col justify-center mb-12"
@@ -367,8 +396,8 @@ export function AnimatedAIChat() {
                                 >
                                   {m.role !== "user" && (
                                     <div className="flex items-center gap-2 px-2">
-                                      <div className="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center border border-violet-500/30">
-                                        <Sparkles className="w-3 h-3 text-violet-400" />
+                                                                                <div className="w-5 h-5 rounded-full bg-[rgba(142,182,155,0.2)] flex items-center justify-center border border-[rgba(142,182,155,0.45)]">
+                                                                                <Sparkles className="w-3 h-3 text-[var(--primary)]" />
                                       </div>
                                       <span className="text-xs font-medium text-white/60">Zap</span>
                                     </div>
@@ -450,7 +479,7 @@ export function AnimatedAIChat() {
                             onKeyDown={handleKeyDown}
                             onFocus={() => setInputFocused(true)}
                             onBlur={() => setInputFocused(false)}
-                            placeholder="Ask zap a question..."
+                            placeholder="Ask Zap anything about your career..."
                             containerClassName="w-full"
                             className={cn(
                                 "w-full px-4 py-3",
@@ -592,14 +621,14 @@ export function AnimatedAIChat() {
             <AnimatePresence>
                 {isLoading && (
                     <motion.div 
-                        className="fixed bottom-36 md:bottom-40 mx-auto transform -translate-x-1/2 backdrop-blur-2xl bg-black/40 rounded-full px-4 py-2 shadow-lg border border-white/[0.05] z-50"
+                        className="fixed left-1/2 bottom-36 md:bottom-40 transform -translate-x-1/2 backdrop-blur-2xl bg-black/40 rounded-full px-4 py-2 shadow-lg border border-white/[0.05] z-50"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-7 rounded-full bg-white/[0.1] flex items-center justify-center text-center">
-                                <span className="text-xs font-medium text-white/90 mb-0.5">zap</span>
+                                <span className="text-xs font-medium text-white/90 mb-0.5">Zap</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-white/70">
                                 <span>Thinking</span>

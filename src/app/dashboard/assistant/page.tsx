@@ -5,7 +5,7 @@ import { SoftPaywallGate } from "@/components/billing/soft-paywall-gate";
 
 export default function AssistantPage() {
     return (
-        <div className="w-full flex-1 h-full min-h-0 overscroll-none overflow-hidden m-0 p-0">
+        <div data-no-page-scroll="true" className="w-full flex-1 h-full min-h-0 overscroll-none overflow-hidden m-0 p-0">
              <SoftPaywallGate
                 title="AI Assistant Requires Premium"
                 subtitle="Use your trial or upgrade to continue unlimited assistant conversations."

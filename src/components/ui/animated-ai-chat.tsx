@@ -177,6 +177,10 @@ export function AnimatedAIChat() {
     const { messages, sendMessage, status, error } = useChat();
     const isLoading = status === "submitted" || status === "streaming";
 
+    useEffect(() => {
+        textareaRef.current?.focus();
+    }, [textareaRef]);
+
         // Keep the viewport pinned to the latest assistant response unless the user manually scrolls up.
         useEffect(() => {
             const container = scrollContainerRef.current;
@@ -347,7 +351,7 @@ export function AnimatedAIChat() {
 
             <div className="w-full max-w-3xl mx-auto flex flex-col h-full min-h-0 z-10">
                 {/* Header or chat messages */}
-                <div ref={scrollContainerRef} className="flex-1 min-h-0 flex flex-col pt-6 pb-28 overflow-y-auto overflow-x-hidden scroll-smooth pr-1">
+                <div ref={scrollContainerRef} className="flex-1 min-h-0 flex flex-col pt-6 pb-6 overflow-y-auto overflow-x-hidden scroll-smooth pr-1">
                     {messages.length === 0 ? (
                         <motion.div 
                             className="relative z-10 space-y-12 flex-1 flex flex-col justify-center mb-12"
@@ -412,6 +416,23 @@ export function AnimatedAIChat() {
                                   </div>
                                 </motion.div>
                             ))}
+                            {isLoading && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="self-start max-w-[85%] rounded-2xl rounded-tl-sm border border-white/10 bg-white/[0.03] px-5 py-4"
+                                >
+                                    <div className="flex items-center gap-2 text-xs text-white/50">
+                                        <Sparkles className="h-3.5 w-3.5 text-[var(--primary)]" />
+                                        Zap is thinking
+                                    </div>
+                                    <div className="mt-3 space-y-2">
+                                        <div className="h-2.5 w-52 animate-pulse rounded-full bg-white/10" />
+                                        <div className="h-2.5 w-44 animate-pulse rounded-full bg-white/10" />
+                                        <div className="h-2.5 w-32 animate-pulse rounded-full bg-white/10" />
+                                    </div>
+                                </motion.div>
+                            )}
                             {error && (
                                 <div className="self-start max-w-[85%] px-5 py-3 rounded-2xl rounded-tl-sm bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
                                     Assistant error: {error.message || "unable to generate a reply right now. Please try again."}
@@ -424,7 +445,7 @@ export function AnimatedAIChat() {
 
                 {/* Input Area (Pinned to bottom) */}
                 <motion.div 
-                    className="relative w-full backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl mt-auto z-20"
+                    className="sticky bottom-0 relative w-full backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl mt-auto z-20"
                     initial={{ scale: 0.98 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}

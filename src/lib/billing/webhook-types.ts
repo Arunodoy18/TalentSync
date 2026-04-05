@@ -1,4 +1,4 @@
-export type RazorpayWebhookEvent = {
+﻿export type RazorpayWebhookEvent = {
   id: string;
   event: string;
   payload?: {
@@ -45,3 +45,7 @@ export function getEventAmount(event: RazorpayWebhookEvent): number | null {
   const refundAmount = event.payload?.refund?.entity?.amount;
   return paymentAmount ?? orderAmount ?? refundAmount ?? null;
 }
+
+
+
+

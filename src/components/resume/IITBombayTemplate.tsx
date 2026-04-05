@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
@@ -179,13 +179,13 @@ export const IITBombayTemplate = ({ basics, experience, education, skills }: Pro
               <View key={idx} style={styles.entryItem}>
                 <View style={styles.entryHeaderRow}>
                   <Text style={styles.entryTitle}>
-                    • {exp.role || "Role"} | <Text style={{ fontWeight: "normal" }}>{exp.company || "Company"}</Text>
+                    â€¢ {exp.role || "Role"} | <Text style={{ fontWeight: "normal" }}>{exp.company || "Company"}</Text>
                   </Text>
                   <Text style={styles.entryDate}>{exp.location || "Duration/Location"}</Text>
                 </View>
                 {exp.bullets && exp.bullets.map((bullet: string, bIdx: number) => (
                   <View key={bIdx} style={styles.bulletRow}>
-                    <Text style={[styles.bulletDot, { paddingLeft: 8 }]}>◦</Text>
+                    <Text style={[styles.bulletDot, { paddingLeft: 8 }]}>â—¦</Text>
                     <Text style={styles.bulletText}>{bullet}</Text>
                   </View>
                 ))}
@@ -203,7 +203,7 @@ export const IITBombayTemplate = ({ basics, experience, education, skills }: Pro
           </View>
           <View style={styles.bulletList}>
             <View style={styles.bulletRow}>
-              <Text style={styles.bulletDot}>•</Text>
+              <Text style={styles.bulletDot}>â€¢</Text>
               <Text style={styles.bulletText}>
                 <Text style={{ fontWeight: "bold" }}>Core Competencies: </Text>
                 {skills}
@@ -221,7 +221,7 @@ export const IITBombayTemplate = ({ basics, experience, education, skills }: Pro
           </View>
           <View style={styles.bulletList}>
             <View style={styles.bulletRow}>
-              <Text style={styles.bulletDot}>•</Text>
+              <Text style={styles.bulletDot}>â€¢</Text>
               <Text style={styles.bulletText}>{basics.summary}</Text>
             </View>
           </View>
@@ -230,3 +230,6 @@ export const IITBombayTemplate = ({ basics, experience, education, skills }: Pro
     </Page>
   </Document>
 );
+
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ElementType, ReactNode, RefObject } from "react";
 import { motion, Variants } from "framer-motion";
@@ -46,3 +46,7 @@ export function TimelineContent<T extends ElementType = "div">({
     </MotionComponent>
   );
 }
+
+
+
+

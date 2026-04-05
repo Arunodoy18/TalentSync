@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+﻿import { createClient } from "@/lib/supabase-server";
 import { Search, Briefcase, MapPin, DollarSign, Sparkles, Filter, ChevronRight, Zap } from "lucide-react";    
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,7 @@ export default async function JobsPage() {
           <div className="relative w-full lg:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
             <input
-              className="w-full pl-11 h-[44px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 transition-all"
+              className="w-full pl-11 h-[44px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/50 transition-all"
               placeholder="Search roles, companies..."
             />
           </div>
@@ -55,7 +55,7 @@ export default async function JobsPage() {
       {/* FILTER BAR */}
       <FadeIn delay={0.1} className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
         {['Location', 'Role', 'Salary', 'Remote', 'Experience'].map((filter) => (
-          <button key={filter} className="flex-shrink-0 px-4 h-9 rounded-full border border-[var(--border)] bg-[var(--card)] text-xs font-medium text-[var(--text-muted)] hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-colors">
+          <button key={filter} className="flex-shrink-0 px-4 h-9 rounded-full border border-[var(--border)] bg-[var(--card)] text-xs font-medium text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)]/50 transition-colors">
             {filter} <ChevronRight className="inline h-3 w-3 ml-1" />
           </button>
         ))}
@@ -63,16 +63,16 @@ export default async function JobsPage() {
 
       {!baseResume && (
         <FadeIn delay={0.2}>
-          <div className="p-[24px] rounded-[12px] bg-gradient-to-r from-[#D4AF37]/10 to-[var(--card)] border border-[#D4AF37]/30 flex flex-col md:flex-row items-center gap-6">
-            <div className="h-12 w-12 rounded-[12px] bg-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center">
-              <Sparkles className="h-6 w-6 text-[#D4AF37]" />
+          <div className="p-[24px] rounded-[12px] bg-gradient-to-r from-[var(--primary)]/10 to-[var(--card)] border border-[var(--primary)]/30 flex flex-col md:flex-row items-center gap-6">
+            <div className="h-12 w-12 rounded-[12px] bg-[var(--primary)]/20 border border-[var(--primary)]/30 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-[var(--primary)]" />
             </div>
             <div className="flex-1 text-center md:text-left">
               <h3 className="font-semibold text-lg text-[var(--text)]">Upload your Master Resume</h3>
               <p className="text-[var(--text-muted)] text-sm mt-1">We need your skills and experience to find perfect job matches instantly.</p>
             </div>
             <Link href="/dashboard/resumes">
-              <button className="h-[44px] px-6 rounded-[12px] bg-[#D4AF37] text-black font-medium hover:scale-105 active:scale-95 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+              <button className="h-[44px] px-6 rounded-[12px] bg-[var(--primary)] text-black font-medium hover:scale-105 active:scale-95 transition-transform shadow-[0_0_15px_rgba(142,182,155,0.2)]">
                 Go to Vault
               </button>
             </Link>
@@ -131,7 +131,7 @@ export default async function JobsPage() {
                                 />
                               </div>
                             )}
-                            <button className="h-8 px-4 rounded-md bg-[#D4AF37] text-black text-xs font-semibold hover:scale-105 transition-transform">
+                            <button className="h-8 px-4 rounded-md bg-[var(--primary)] text-black text-xs font-semibold hover:scale-105 transition-transform">
                               Apply
                             </button>
                           </div>
@@ -149,7 +149,7 @@ export default async function JobsPage() {
                          We&apos;ll scan LinkedIn, Indeed, and Wellfound and show you the best matches.
                        </p>
                        <Link href="/dashboard/resumes">
-                         <button className="h-[40px] px-6 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                         <button className="h-[40px] px-6 rounded-lg bg-[var(--primary)] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(142,182,155,0.2)]">
                            Upload Resume
                          </button>
                        </Link>
@@ -164,3 +164,7 @@ export default async function JobsPage() {
     </StaggerContainer>
   );
 }
+
+
+
+

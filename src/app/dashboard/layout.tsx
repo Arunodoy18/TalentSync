@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+﻿import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { TopNavbar } from "@/components/dashboard/top-navbar"
 import { DashboardPageTransition } from "@/components/dashboard/page-transition"
@@ -24,3 +24,7 @@ export default function DashboardLayout({
     </SidebarProvider>
   )
 }
+
+
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -312,7 +312,7 @@ export function AnimatedAIChat() {
         <div className="min-h-screen flex flex-col w-full items-center justify-center bg-[#09090b] text-white p-6 relative overflow-hidden">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
+                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[rgba(142,182,155,0.1)] rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
                 <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
             </div>
 
@@ -612,7 +612,7 @@ export function AnimatedAIChat() {
 
             {inputFocused && (
                 <motion.div 
-                    className="fixed w-[50rem] h-[50rem] rounded-full pointer-events-none z-0 opacity-[0.03] bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 blur-[100px]"
+                    className="fixed w-[50rem] h-[50rem] rounded-full pointer-events-none z-0 opacity-[0.03] bg-gradient-to-r from-[#163832] via-[#235347] to-[#8EB69B] blur-[100px]"
                     animate={{
                         x: mousePosition.x - 400,
                         y: mousePosition.y - 400,
@@ -668,3 +668,7 @@ if (typeof document !== 'undefined') {
     style.innerHTML = rippleKeyframes;
     document.head.appendChild(style);
 }
+
+
+
+

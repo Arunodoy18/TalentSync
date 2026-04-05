@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import PricingSection4, { PricingPlanId } from "@/components/ui/pricing-section-4";
@@ -78,7 +78,7 @@ export default function PricingPage() {
           setMessage("Subscription confirmed. Your 2-month free trial is active.");
         },
         theme: {
-          color: "#6366F1",
+          color: "#235347",
         },
       });
 
@@ -103,3 +103,7 @@ export default function PricingPage() {
     </main>
   );
 }
+
+
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export default function JobsLoading() {
   return (
@@ -44,3 +44,7 @@ export default function JobsLoading() {
     </div>
   );
 }
+
+
+
+

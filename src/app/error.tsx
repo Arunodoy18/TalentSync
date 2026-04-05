@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
@@ -34,3 +34,7 @@ export default function ErrorPage({
     </div>
   );
 }
+
+
+
+

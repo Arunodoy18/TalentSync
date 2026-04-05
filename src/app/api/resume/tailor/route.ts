@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase-server";
 import { hasPlanAccess } from "@/lib/entitlements";
@@ -113,3 +113,7 @@ Include a new field "feedback" that contains:
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+
+
+

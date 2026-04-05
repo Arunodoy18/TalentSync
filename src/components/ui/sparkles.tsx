@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useId, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
@@ -99,3 +99,7 @@ export function Sparkles({
     <Particles id={id} options={{ ...defaultOptions, ...options }} className={className} />
   ) : null;
 }
+
+
+
+

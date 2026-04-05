@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useRef } from "react";
 import { Upload, Loader2 } from "lucide-react";
@@ -66,7 +66,7 @@ const ResumeUpload = () => {
         <Button
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className="h-[44px] rounded-[14px] border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-5 font-semibold text-indigo-100 shadow-[0_10px_22px_rgba(79,70,229,0.32)] hover:bg-[rgba(99,102,241,0.36)]"
+          className="h-[44px] rounded-[14px] border border-[rgba(142,182,155,0.5)] bg-[rgba(35,83,71,0.22)] px-5 font-semibold text-[var(--primary-light)] shadow-[0_10px_22px_rgba(11,43,38,0.32)] hover:bg-[rgba(35,83,71,0.36)]"
         >
           {isUploading ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -81,3 +81,7 @@ const ResumeUpload = () => {
 };
 
 export default ResumeUpload;
+
+
+
+

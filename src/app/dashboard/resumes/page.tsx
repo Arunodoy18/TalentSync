@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FileText, Plus, Sparkles, LayoutTemplate, Briefcase, ChevronRight } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
@@ -34,12 +34,12 @@ export default async function ResumesPage() {
         {/* OPTION 1: CHOOSE TEMPLATE */}
         <StaggerItem>
           <Link 
-            href="/dashboard/resumes/builder" 
-            className="group relative flex flex-col justify-between p-[32px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] overflow-hidden transition-all hover:border-[#D4AF37] hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] min-h-[220px]"
+            href="/dashboard/resumes/templates" 
+            className="group relative flex flex-col justify-between p-[32px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] overflow-hidden transition-all hover:border-[var(--primary)] hover:shadow-[0_0_20px_rgba(142,182,155,0.1)] min-h-[220px]"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10">
-              <div className="h-12 w-12 rounded-[12px] bg-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] mb-4">
+              <div className="h-12 w-12 rounded-[12px] bg-[var(--primary)]/20 border border-[var(--primary)]/30 flex items-center justify-center text-[var(--primary)] mb-4">
                 <LayoutTemplate className="h-6 w-6" />
               </div>
               <h2 className="text-2xl font-semibold text-[var(--text)] mb-2">Choose Template</h2>
@@ -47,7 +47,7 @@ export default async function ResumesPage() {
                 Select our IIT Bombay or Jake's FAANG-level layouts. Pick which projects and experiences from your Master Vault to inject.
               </p>
             </div>
-            <div className="relative z-10 flex items-center text-[#D4AF37] text-sm font-medium mt-auto group-hover:translate-x-1 transition-transform">
+            <div className="relative z-10 flex items-center text-[var(--primary)] text-sm font-medium mt-auto group-hover:translate-x-1 transition-transform">
               Start Structuring <ChevronRight className="ml-1 h-4 w-4" />
             </div>
           </Link>
@@ -56,7 +56,7 @@ export default async function ResumesPage() {
         {/* OPTION 2: BUILD WITH AI */}
         <StaggerItem>
           <Link 
-            href="/dashboard/resumes/new" 
+            href="/dashboard/resumes/builder?entry=ai" 
             className="group relative flex flex-col justify-between p-[32px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] overflow-hidden transition-all hover:border-[var(--text)] hover:shadow-lg min-h-[220px]"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -84,14 +84,14 @@ export default async function ResumesPage() {
             <StaggerItem key={resume.id}>
               <Link
                 href={`/dashboard/resumes/${resume.id}`}
-                className="group p-[24px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] transition-all hover:border-[#D4AF37] flex flex-col"
+                className="group p-[24px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] transition-all hover:border-[var(--primary)] flex flex-col"
               >
                 <div className="flex items-center justify-between mb-6">
-                  <div className="h-12 w-12 rounded-[12px] bg-white/5 border border-white/10 flex items-center justify-center text-[var(--text-muted)] group-hover:text-[#D4AF37] transition-colors">
+                  <div className="h-12 w-12 rounded-[12px] bg-white/5 border border-white/10 flex items-center justify-center text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors">
                     <FileText className="h-6 w-6" />
                   </div>
                   {resume.is_base ? (
-                    <span className="rounded-full bg-[#D4AF37]/10 px-3 py-1 text-xs font-semibold text-[#D4AF37] border border-[#D4AF37]/20">
+                    <span className="rounded-full bg-[var(--primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--primary)] border border-[var(--primary)]/20">
                       Master
                     </span>
                   ) : null}
@@ -119,12 +119,12 @@ export default async function ResumesPage() {
                 or build one with AI.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <Link href="/dashboard/resumes/builder">
-                  <button className="h-[44px] px-6 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                <Link href="/dashboard/resumes/templates">
+                  <button className="h-[44px] px-6 rounded-lg bg-[var(--primary)] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(142,182,155,0.2)]">
                     Create Resume
                   </button>
                 </Link>
-                <Link href="/dashboard/resumes/new">
+                <Link href="/dashboard/resumes/builder?entry=ai">
                   <button className="h-[44px] px-6 rounded-lg bg-white/5 border border-[var(--border)] text-[var(--text)] text-sm font-semibold hover:bg-white/10 transition-colors">
                     Build with AI
                   </button>
@@ -137,3 +137,7 @@ export default async function ResumesPage() {
     </StaggerContainer>
   );
 }
+
+
+
+

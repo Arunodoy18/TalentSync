@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+﻿import { headers } from "next/headers";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -44,7 +44,7 @@ function getSeverityClasses(severity: "info" | "warning" | "critical") {
   if (severity === "warning") {
     return "status-warning";
   }
-  return "rounded-[14px] border border-[rgba(129,140,248,0.35)] bg-[rgba(99,102,241,0.16)] text-indigo-100";
+  return "rounded-[14px] border border-[rgba(142,182,155,0.35)] bg-[rgba(35,83,71,0.16)] text-[var(--primary-light)]";
 }
 
 async function getBaseUrl(): Promise<string> {
@@ -158,20 +158,20 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      <Card className="px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between border-[rgba(255,255,255,0.08)] bg-gradient-to-r from-[rgba(99,102,241,0.08)] to-[rgba(255,255,255,0.02)] shadow-lg gap-4">
+      <Card className="px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between border-[rgba(255,255,255,0.08)] bg-gradient-to-r from-[rgba(35,83,71,0.08)] to-[rgba(255,255,255,0.02)] shadow-lg gap-4">
         <div>
-          <h2 className="text-xl font-bold flex items-center gap-2 text-indigo-100">
+          <h2 className="text-xl font-bold flex items-center gap-2 text-[var(--primary-light)]">
             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
             Payment Event Health (24h)
           </h2>
-          <p className="mt-1 text-sm text-indigo-200/70 tracking-wide max-w-lg">
+          <p className="mt-1 text-sm text-[var(--primary-light)]/70 tracking-wide max-w-lg">
             Realtime monitoring of captured billing webhooks and reconciliation engine state.
           </p>
         </div>
         <div className="flex items-center gap-6 self-end md:self-center bg-[rgba(11,15,26,0.4)] px-6 py-3 rounded-2xl border border-[rgba(255,255,255,0.05)]">
            <div className="text-right">
-             <p className="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold mb-1">Events Handled</p>
-             <p className="text-2xl font-black text-indigo-100 leading-none">{overview.ops.paymentEventsLast24h}</p>
+             <p className="text-[11px] uppercase tracking-wider text-[var(--primary)] font-semibold mb-1">Events Handled</p>
+             <p className="text-2xl font-black text-[var(--primary-light)] leading-none">{overview.ops.paymentEventsLast24h}</p>
            </div>
            <div className="w-px h-10 bg-[rgba(255,255,255,0.1)]" />
            <div className="text-right">
@@ -183,3 +183,7 @@ export default async function AdminPage() {
     </div>
   );
 }
+
+
+
+

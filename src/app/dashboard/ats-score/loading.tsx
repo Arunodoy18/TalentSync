@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export default function AtsScoreLoading() {
   return (
@@ -37,3 +37,7 @@ export default function AtsScoreLoading() {
     </div>
   );
 }
+
+
+
+

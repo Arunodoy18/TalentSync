@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import OpenAI from "openai";
 
@@ -110,3 +110,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ portfolio: fallbackPortfolio });
   }
 }
+
+
+
+

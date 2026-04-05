@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import NumberFlow from "@number-flow/react";
 import { motion } from "framer-motion";
@@ -107,7 +107,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
   return (
     <div className="relative mx-auto min-h-screen overflow-x-hidden bg-atmosphere">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-24 top-0 h-80 w-80 rounded-full bg-indigo-500/20 blur-[120px]" />
+        <div className="absolute -left-24 top-0 h-80 w-80 rounded-full bg-[rgba(142,182,155,0.2)] blur-[120px]" />
         <div className="absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-cyan-400/20 blur-[130px]" />
       </div>
 
@@ -144,7 +144,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
               className={cn(
                 "h-full text-[var(--text)]",
                 plan.popular
-                  ? "border-[rgba(129,140,248,0.55)] bg-[rgba(99,102,241,0.18)] shadow-[0_22px_52px_rgba(79,70,229,0.35)]"
+                  ? "border-[rgba(142,182,155,0.55)] bg-[rgba(35,83,71,0.18)] shadow-[0_22px_52px_rgba(11,43,38,0.35)]"
                   : "border-[var(--border)] bg-[rgba(255,255,255,0.05)]"
               )}
             >
@@ -152,7 +152,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
                 <div className="mb-1 flex justify-between">
                   <h3 className="text-2xl font-semibold sm:text-3xl">{plan.name}</h3>
                   {plan.popular ? (
-                    <span className="rounded-full border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-3 py-1 text-xs font-semibold text-indigo-100">
+                    <span className="rounded-full border border-[rgba(142,182,155,0.5)] bg-[rgba(35,83,71,0.22)] px-3 py-1 text-xs font-semibold text-[var(--primary-light)]">
                       Most Popular
                     </span>
                   ) : null}
@@ -178,8 +178,8 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
                   className={cn(
                     "mb-6 h-[44px] w-full rounded-[14px] text-base font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-65",
                     plan.popular
-                      ? "border border-[rgba(129,140,248,0.55)] bg-[var(--primary)] text-white shadow-[0_12px_28px_rgba(79,70,229,0.45)]"
-                      : "border border-[var(--border)] bg-[rgba(255,255,255,0.06)] text-[var(--text)] hover:border-[rgba(129,140,248,0.35)] hover:bg-[rgba(99,102,241,0.16)]",
+                      ? "border border-[rgba(142,182,155,0.55)] bg-[var(--primary)] text-white shadow-[0_12px_28px_rgba(11,43,38,0.45)]"
+                      : "border border-[var(--border)] bg-[rgba(255,255,255,0.06)] text-[var(--text)] hover:border-[rgba(142,182,155,0.35)] hover:bg-[rgba(35,83,71,0.16)]",
                     plan.disabled && "cursor-not-allowed opacity-70"
                   )}
                 >
@@ -204,3 +204,7 @@ export default function PricingSection4({ onChoosePlan, loadingPlan = null }: Pr
     </div>
   );
 }
+
+
+
+

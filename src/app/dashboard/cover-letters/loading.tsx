@@ -1,4 +1,4 @@
-export default function Loading() {
+﻿export default function Loading() {
   return (
     <div className="flex-1 space-y-6">
       <div className="skeleton-glass h-9 w-64" />
@@ -10,3 +10,6 @@ export default function Loading() {
     </div>
   );
 }
+
+
+

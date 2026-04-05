@@ -1,4 +1,4 @@
-export type BillingPlan = "free" | "pro" | "auto_apply" | "lifetime";
+﻿export type BillingPlan = "free" | "pro" | "auto_apply" | "lifetime";
 
 export type SubscriptionPlanCode = "monthly_1" | "quarterly_3" | "half_yearly_6" | "yearly_12";
 
@@ -75,3 +75,7 @@ export function addDays(date: Date, days: number): Date {
   next.setDate(next.getDate() + days);
   return next;
 }
+
+
+
+

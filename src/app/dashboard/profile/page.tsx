@@ -1,4 +1,4 @@
-import { UserRound, BadgeCheck } from "lucide-react";
+﻿import { UserRound, BadgeCheck } from "lucide-react";
 
 export default function ProfilePage() {
   return (
@@ -28,3 +28,7 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+
+
+

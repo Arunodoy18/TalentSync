@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+﻿import { createClient } from "@/lib/supabase-server";
 import { Play, FileText, Briefcase, Zap, Target, BarChart3, Rocket, ChevronRight, CheckCircle2, Circle } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -17,15 +17,15 @@ function ProgressBar() {
     <div className="w-full bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-8">
       <div className="flex items-center justify-between w-full relative">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-[var(--border)] -z-10"></div>
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[40%] h-[2px] bg-[#D4AF37] -z-10 transition-all duration-500"></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[40%] h-[2px] bg-[var(--primary)] -z-10 transition-all duration-500"></div>
         
         {steps.map((step, idx) => (
           <div key={step.label} className="flex flex-col items-center gap-3 bg-[var(--card)] px-2">
             <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center bg-[var(--card)] transition-colors ${
               step.completed 
-                ? "border-[#D4AF37] text-[#D4AF37]" 
+                ? "border-[var(--primary)] text-[var(--primary)]" 
                 : idx === 2 
-                  ? "border-[#D4AF37] text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                  ? "border-[var(--primary)] text-[var(--primary)] shadow-[0_0_15px_rgba(142,182,155,0.3)]"
                   : "border-[var(--border)] text-[var(--text-muted)]"
             }`}>
               {step.completed ? <CheckCircle2 className="w-5 h-5 bg-[var(--card)] rounded-full" /> : <Circle className="w-3 h-3 fill-current" />}
@@ -65,9 +65,9 @@ export default async function DashboardPage() {
       cta: "Run Scan",
       icon: Target,
       tag: "Next Step",
-      color: "text-[#D4AF37]",
-      bg: "bg-[#D4AF37]/10",
-      border: "border-[#D4AF37]/30"
+      color: "text-[var(--primary)]",
+      bg: "bg-[var(--primary)]/10",
+      border: "border-[var(--primary)]/30"
     },
     { 
       title: "View Matched Jobs", 
@@ -112,8 +112,8 @@ export default async function DashboardPage() {
 
       {isNewUser ? (
         <FadeIn delay={0.2} className="flex-1 flex flex-col items-center justify-center min-h-[400px] text-center w-full">
-          <div className="h-16 w-16 mb-6 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
-            <Target className="h-8 w-8 text-[#D4AF37]" />
+          <div className="h-16 w-16 mb-6 rounded-2xl bg-[var(--primary)]/10 flex items-center justify-center border border-[var(--primary)]/30">
+            <Target className="h-8 w-8 text-[var(--primary)]" />
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)] mb-4">Welcome to TalentSync</h1>
           <p className="text-[var(--text-muted)] text-base max-w-sm mx-auto leading-relaxed mb-8">
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
             Then we&apos;ll calculate your ATS score and match you with jobs.
           </p>
           <Link href="/dashboard/resumes/builder">
-            <button className="h-[44px] px-8 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+            <button className="h-[44px] px-8 rounded-lg bg-[var(--primary)] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_20px_rgba(142,182,155,0.2)]">
               Create Resume
             </button>
           </Link>
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
               <StaggerItem key={action.title}>
                 <Link href={action.href} className={`relative p-[24px] h-full rounded-[12px] bg-[var(--card)] border border-[var(--border)] flex flex-col group transition-all hover:-translate-y-1 hover:border-white/20 hover:shadow-xl`}>
                   {action.tag && (
-                    <div className="absolute top-4 right-4 bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/50 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full">
+                    <div className="absolute top-4 right-4 bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/50 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full">
                       {action.tag}
                     </div>
                   )}
@@ -170,3 +170,7 @@ export default async function DashboardPage() {
     </div>
   );
 }
+
+
+
+

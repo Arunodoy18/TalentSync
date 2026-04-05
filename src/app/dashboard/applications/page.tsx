@@ -15,7 +15,7 @@ export default function ApplicationsPage() {
         </div>
         <div className="flex gap-3">
           <Link href="/dashboard/jobs">
-            <Button className="bg-[#D4AF37] hover:bg-[#B4952F] text-black">
+            <Button className="bg-[var(--primary)] hover:bg-[#B4952F] text-black">
               Explore Jobs
             </Button>
           </Link>
@@ -43,7 +43,7 @@ export default function ApplicationsPage() {
                     </Button>
                 </Link>
                 <Link href="/dashboard/auto-apply">
-                    <Button className="bg-[#D4AF37] hover:bg-[#B4952F] text-black">
+                    <Button className="bg-[var(--primary)] hover:bg-[#B4952F] text-black">
                         Setup Auto-Apply
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -54,3 +54,7 @@ export default function ApplicationsPage() {
     </div>
   );
 }
+
+
+
+

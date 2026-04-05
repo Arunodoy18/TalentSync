@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +24,10 @@ const sections = [
 ];
 
 export default function ResumeBuilderPage() {
+  const searchParams = useSearchParams();
+  const entryMode = searchParams.get("entry") === "ai" ? "ai" : "template";
+  const requestedTemplate = searchParams.get("template") === "jake" ? "jake" : "iit";
+
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
 
@@ -32,6 +37,14 @@ export default function ResumeBuilderPage() {
   const [education, setEducation] = useState<any[]>([]);
   const [skills, setSkills] = useState("");
   const [templateFormat, setTemplateFormat] = useState<"auto" | "iit" | "jake">("auto");
+
+  useEffect(() => {
+    if (entryMode === "ai") {
+      setTemplateFormat("auto");
+    } else {
+      setTemplateFormat(requestedTemplate);
+    }
+  }, [entryMode, requestedTemplate]);
 
   const [generating, setGenerating] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
@@ -101,25 +114,29 @@ export default function ResumeBuilderPage() {
         
         <FadeIn delay={0.1}>
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">Resume Builder</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">
+              {entryMode === "ai" ? "AI Resume Builder" : "Template Resume Builder"}
+            </h1>
             <p className="text-[var(--text-muted)] mt-2">
-              Update your master record and generate tailored PDFs for MAANG applications.
+              {entryMode === "ai"
+                ? "Use AI-first drafting with a single focused resume output."
+                : "Choose IIT Bombay or Jake template and export your final resume."}
             </p>
           </div>
         </FadeIn>
 
         {basics.name === "" && experience.length === 0 && (
-           <FadeIn delay={0.2} className="w-full relative group rounded-2xl border-2 border-dashed border-[#D4AF37]/50 bg-[#D4AF37]/5 hover:bg-[#D4AF37]/10 transition-colors p-8 text-center flex flex-col items-center justify-center cursor-pointer">
+           <FadeIn delay={0.2} className="w-full relative group rounded-2xl border-2 border-dashed border-[var(--primary)]/50 bg-[var(--primary)]/5 hover:bg-[var(--primary)]/10 transition-colors p-8 text-center flex flex-col items-center justify-center cursor-pointer">
              <input type="file" accept=".pdf" onChange={handleFileUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
              {parsingResume ? (
                 <>
-                  <Loader2 className="h-8 w-8 text-[#D4AF37] animate-spin mb-3" />
+                  <Loader2 className="h-8 w-8 text-[var(--primary)] animate-spin mb-3" />
                   <h3 className="text-lg font-semibold text-[var(--text)] mb-1">AI is reading your resume...</h3>
                   <p className="text-sm text-[var(--text-muted)]">Extracting projects, skills, and experience into your Master Vault.</p>
                 </>
              ) : (
                 <>
-                  <UploadCloud className="h-10 w-10 text-[#D4AF37] mb-3 group-hover:scale-110 transition-transform" />
+                  <UploadCloud className="h-10 w-10 text-[var(--primary)] mb-3 group-hover:scale-110 transition-transform" />
                   <h3 className="text-xl font-semibold text-[var(--text)] mb-2">Magic Import (Highly Recommended)</h3>
                   <p className="text-sm text-[var(--text-muted)] max-w-md mx-auto">Skip typing. Drag and drop your old PDF resume right here. Our LLM will instantly parse it perfectly into your Master Vault.</p>
                 </>
@@ -138,19 +155,19 @@ export default function ResumeBuilderPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Full Name</label>
-                    <Input value={basics.name} onChange={e => setBasics({...basics, name: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="Jane Doe" />
+                    <Input value={basics.name} onChange={e => setBasics({...basics, name: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="Jane Doe" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Email</label>
-                    <Input value={basics.email} onChange={e => setBasics({...basics, email: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="jane@example.com" />
+                    <Input value={basics.email} onChange={e => setBasics({...basics, email: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="jane@example.com" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Phone</label>
-                    <Input value={basics.phone} onChange={e => setBasics({...basics, phone: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="+1 (555) 123-4567" />
+                    <Input value={basics.phone} onChange={e => setBasics({...basics, phone: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="+1 (555) 123-4567" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Location</label>
-                    <Input value={basics.location} onChange={e => setBasics({...basics, location: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="San Francisco, CA" />
+                    <Input value={basics.location} onChange={e => setBasics({...basics, location: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="San Francisco, CA" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -158,7 +175,7 @@ export default function ResumeBuilderPage() {
                   <Textarea 
                     value={basics.summary} 
                     onChange={e => setBasics({...basics, summary: e.target.value})}
-                    className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37] min-h-[120px]" 
+                    className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)] min-h-[120px]" 
                     placeholder="Software engineer with 5+ years..." 
                   />
                 </div>
@@ -182,17 +199,17 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Company</label>
-                              <Input value={exp.company} onChange={e => {const n=[...experience]; n[i].company=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="Acme Inc."/>
+                              <Input value={exp.company} onChange={e => {const n=[...experience]; n[i].company=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="Acme Inc."/>
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Role</label>
-                              <Input value={exp.role} onChange={e => {const n=[...experience]; n[i].role=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[#D4AF37]" placeholder="Senior Engineer"/>
+                              <Input value={exp.role} onChange={e => {const n=[...experience]; n[i].role=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="Senior Engineer"/>
                             </div>
                         </div>
                         
                         <div className="space-y-3">
                             <div className="flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5">
-                              <label className="text-sm font-semibold text-[#D4AF37] flex items-center">
+                              <label className="text-sm font-semibold text-[var(--primary)] flex items-center">
                                 <Sparkles className="h-4 w-4 mr-2" /> FAANG Structure Bullets
                               </label>
                               <Button size="sm" variant="secondary" className="h-8 bg-white/10 hover:bg-white/20 text-white border-0" onClick={() => generateBullet(i)} disabled={generating}>
@@ -229,16 +246,16 @@ export default function ResumeBuilderPage() {
                 ) : (
                   <div className="space-y-6">
                     {projects.map((proj, i) => (
-                      <div key={i} className={cn("p-6 rounded-xl border transition-all duration-300 space-y-5", proj.selected ? "border-[#D4AF37]/50 bg-[#D4AF37]/5 shadow-[0_0_15px_rgba(212,175,55,0.05)]" : "border-[var(--border)] bg-white/5")}>
+                      <div key={i} className={cn("p-6 rounded-xl border transition-all duration-300 space-y-5", proj.selected ? "border-[var(--primary)]/50 bg-[var(--primary)]/5 shadow-[0_0_15px_rgba(142,182,155,0.05)]" : "border-[var(--border)] bg-white/5")}>
                         <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
                           <label className="flex items-center space-x-3 cursor-pointer group">
                             <input 
                               type="checkbox" 
-                              className="w-5 h-5 rounded border-gray-600 bg-black/20 text-[#D4AF37] focus:ring-[#D4AF37]" 
+                              className="w-5 h-5 rounded border-gray-600 bg-black/20 text-[var(--primary)] focus:ring-[var(--primary)]" 
                               checked={proj.selected} 
                               onChange={(e) => {const n=[...projects]; n[i].selected=e.target.checked; setProjects(n);}} 
                             />
-                            <span className={cn("font-bold text-sm transition-colors uppercase tracking-wider", proj.selected ? "text-[#D4AF37]" : "text-[var(--text-muted)] group-hover:text-[var(--text)]")}>
+                            <span className={cn("font-bold text-sm transition-colors uppercase tracking-wider", proj.selected ? "text-[var(--primary)]" : "text-[var(--text-muted)] group-hover:text-[var(--text)]")}>
                               {proj.selected ? "Included in active PDF" : "Excluded from active PDF"}
                             </span>
                           </label>
@@ -247,18 +264,18 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Project Name</label>
-                              <Input value={proj.name} onChange={e => {const n=[...projects]; n[i].name=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)]" placeholder="AI Platform"/>
+                              <Input value={proj.name} onChange={e => {const n=[...projects]; n[i].name=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="AI Platform"/>
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-[var(--text-muted)]">Technologies</label>
-                              <Input value={proj.technologies} onChange={e => {const n=[...projects]; n[i].technologies=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)]" placeholder="React, Python"/>
+                              <Input value={proj.technologies} onChange={e => {const n=[...projects]; n[i].technologies=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="React, Python"/>
                             </div>
                         </div>
                         
                         <div className="space-y-2 mt-2">
                             <label className="text-sm font-medium text-[var(--text-muted)]">Impact Bullets</label>
                             <Textarea 
-                              className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)] min-h-[80px] leading-relaxed" 
+                              className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)] min-h-[80px] leading-relaxed" 
                               placeholder="• Built x using y resulting in z"
                               value={(proj.bullets || []).join('\n')}
                               onChange={e => {
@@ -297,7 +314,7 @@ export default function ResumeBuilderPage() {
                 <Textarea 
                   value={skills} 
                   onChange={e => setSkills(e.target.value)}
-                  className="bg-transparent border-[var(--border)] focus:border-[#D4AF37] text-[var(--text)] min-h-[120px] leading-relaxed" 
+                  className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)] min-h-[120px] leading-relaxed" 
                   placeholder="React, Node.js, Python, System Design..." 
                 />
               </AccordionContent>
@@ -310,20 +327,20 @@ export default function ResumeBuilderPage() {
       <FadeIn delay={0.4} className="hidden lg:flex flex-col w-[420px] flex-shrink-0 bg-[var(--card)] border border-[var(--border)] rounded-[24px] p-6 overflow-hidden">
          <div className="mb-6">
            <h3 className="font-semibold text-[var(--text)] mb-4 flex items-center">
-              <LayoutTemplate className="mr-2 h-5 w-5 text-[#D4AF37]" />
+              <LayoutTemplate className="mr-2 h-5 w-5 text-[var(--primary)]" />
               Template Layout
            </h3>
            <div className="flex bg-black/30 p-1.5 rounded-lg border border-[var(--border)] mb-6">
-             {["auto", "iit", "jake"].map((mode) => (
+             {(entryMode === "ai" ? ["auto"] : ["iit", "jake"]).map((mode) => (
                 <button 
                   key={mode}
                   onClick={() => setTemplateFormat(mode as "auto" | "iit" | "jake")} 
                   className={cn(
                     "flex-1 text-xs font-semibold py-2 px-2 rounded-md transition-all capitalize", 
-                    templateFormat === mode ? "bg-[#D4AF37] text-black shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5"
+                    templateFormat === mode ? "bg-[var(--primary)] text-black shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5"
                   )}
                 >
-                  {mode === "auto" ? "AI Auto" : mode === "iit" ? "IIT Bombay" : "Classic"}
+                  {mode === "auto" ? "AI Resume" : mode === "iit" ? "IIT Bombay" : "Jake's Resume"}
                 </button>
              ))}
            </div>
@@ -340,7 +357,7 @@ export default function ResumeBuilderPage() {
                >
                  
                  {({ loading }) => (
-                   <Button className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-black font-semibold rounded-[12px] w-full shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:scale-[1.02] transition-transform">
+                   <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black font-semibold rounded-[12px] w-full shadow-[0_0_20px_rgba(142,182,155,0.15)] hover:scale-[1.02] transition-transform">
                      {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
                      {loading ? "Rendering..." : "Export PDF"}
                    </Button>
@@ -396,3 +413,7 @@ export default function ResumeBuilderPage() {
     </div>
   );
 }
+
+
+
+

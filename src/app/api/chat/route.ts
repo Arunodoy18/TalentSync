@@ -1,4 +1,4 @@
-import { streamText } from "ai";
+﻿import { convertToModelMessages, streamText } from "ai";
 import { createGroq } from "@ai-sdk/groq";
 import { createClient } from "@/lib/supabase-server";
 import { hasPlanAccess } from "@/lib/entitlements";
@@ -43,11 +43,13 @@ export async function POST(req: Request) {
       );
     }
 
+    const modelMessages = await convertToModelMessages(messages);
+
     const result = streamText({
       model: groq("llama-3.3-70b-versatile"),
       system:
         "You are an expert career AI assistant. You help the user generate career roadmaps, suggest skills/projects/jobs, review resumes, improve ATS scores, and prepare for interviews.",
-      messages,
+      messages: modelMessages,
     });
 
     return result.toUIMessageStreamResponse();
@@ -62,4 +64,9 @@ export async function POST(req: Request) {
 
 
 //
+
+
+
+
+
 

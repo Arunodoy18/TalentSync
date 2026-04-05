@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 
 export default function NotFound() {
@@ -22,3 +22,7 @@ export default function NotFound() {
     </div>
   );
 }
+
+
+
+

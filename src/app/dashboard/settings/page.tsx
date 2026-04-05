@@ -1,4 +1,4 @@
-import { Settings, ShieldCheck } from "lucide-react";
+﻿import { Settings, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
@@ -26,7 +26,7 @@ export default function SettingsPage() {
             <div className="pt-3 flex flex-wrap items-center gap-3">
               <Link
                 href="/pricing"
-                className="inline-flex items-center rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-4 py-2 text-sm font-semibold text-[#7a5a00]"
+                className="inline-flex items-center rounded-lg border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-4 py-2 text-sm font-semibold text-[#7a5a00]"
               >
                 Open Pricing Plans
               </Link>
@@ -43,3 +43,7 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -22,3 +22,7 @@ export function DashboardPageTransition({ children }: { children: ReactNode }) {
     </AnimatePresence>
   );
 }
+
+
+
+

@@ -1,4 +1,4 @@
-import { Mail, Sparkles } from "lucide-react";
+﻿import { Mail, Sparkles } from "lucide-react";
 
 export default function CoverLettersPage() {
   return (
@@ -28,3 +28,7 @@ export default function CoverLettersPage() {
     </div>
   );
 }
+
+
+
+

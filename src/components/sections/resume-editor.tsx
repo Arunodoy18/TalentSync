@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase-browser";
@@ -515,9 +515,9 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
             <h1 className="text-4xl font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">{resume.content.personal.fullName || "Your Name"}</h1>
             <div className="flex items-center justify-center gap-4 text-sm text-[#4b5563]">
               {resume.content.personal.email && <span>{resume.content.personal.email}</span>}
-              {resume.content.personal.phone && <span>• {resume.content.personal.phone}</span>}
-              {resume.content.personal.location && <span>• {resume.content.personal.location}</span>}
-              {resume.content.personal.website && <span>• {resume.content.personal.website}</span>}
+              {resume.content.personal.phone && <span>â€¢ {resume.content.personal.phone}</span>}
+              {resume.content.personal.location && <span>â€¢ {resume.content.personal.location}</span>}
+              {resume.content.personal.website && <span>â€¢ {resume.content.personal.website}</span>}
             </div>
           </div>
 
@@ -580,3 +580,7 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
 };
 
 export default ResumeEditor;
+
+
+
+

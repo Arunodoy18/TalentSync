@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
@@ -25,10 +25,13 @@ export default function Error({
 			</div>
 			<button
 				onClick={reset}
-				className="h-[44px] rounded-[14px] border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-5 font-semibold text-indigo-100 hover:bg-[rgba(99,102,241,0.35)]"
+				className="h-[44px] rounded-[14px] border border-[rgba(142,182,155,0.5)] bg-[rgba(35,83,71,0.22)] px-5 font-semibold text-[var(--primary-light)] hover:bg-[rgba(35,83,71,0.35)]"
 			>
 				Try again
 			</button>
 		</div>
 	);
 }
+
+
+

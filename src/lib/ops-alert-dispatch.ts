@@ -1,4 +1,4 @@
-type AlertSeverity = "info" | "warning" | "critical";
+﻿type AlertSeverity = "info" | "warning" | "critical";
 
 type AlertPayload = {
   id: string;
@@ -37,3 +37,7 @@ export async function dispatchOpsAlerts(alerts: AlertPayload[]): Promise<void> {
     throw new Error(`Alert dispatch failed with status ${response.status}`);
   }
 }
+
+
+
+

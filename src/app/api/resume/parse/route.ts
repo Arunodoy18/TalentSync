@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import PDFParser from "pdf2json";
 import { OpenAI } from "openai";
 import { createClient } from "@/lib/supabase-server";
@@ -98,3 +98,7 @@ ${text}`
     return NextResponse.json({ error: error.message || "Failed to parse resume" }, { status: 500 });
   }
 }
+
+
+
+

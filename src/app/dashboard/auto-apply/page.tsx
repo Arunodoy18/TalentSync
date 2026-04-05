@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+﻿import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Rocket, Play, Pause, CircleCheck, CircleDot, Activity } from "lucide-react";
@@ -73,7 +73,7 @@ export default async function AutoApplyPage() {
                             Applied
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20 font-medium px-2 py-0.5 flex w-fit items-center gap-1.5 rounded-full">
+                          <Badge variant="outline" className="bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20 font-medium px-2 py-0.5 flex w-fit items-center gap-1.5 rounded-full">
                             <CircleDot className="h-3 w-3" />
                             Pending
                           </Badge>
@@ -112,3 +112,7 @@ export default async function AutoApplyPage() {
     </StaggerContainer>
   );
 }
+
+
+
+

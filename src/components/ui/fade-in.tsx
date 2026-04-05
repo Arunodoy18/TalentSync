@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
@@ -76,3 +76,6 @@ export function StaggerItem({ children, className }: { children: ReactNode; clas
     </motion.div>
   );
 }
+
+
+

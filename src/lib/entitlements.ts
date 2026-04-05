@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+﻿import { createClient } from "@/lib/supabase-server";
 import { BillingPlan } from "@/lib/billing";
 import { createAdminClient } from "@/lib/supabase-admin";
 
@@ -79,3 +79,7 @@ export async function hasPlanAccess(userId: string, minimumPlan: BillingPlan): P
   const plan = await getUserPlan(userId);
   return PLAN_PRIORITY[plan] >= PLAN_PRIORITY[minimumPlan];
 }
+
+
+
+

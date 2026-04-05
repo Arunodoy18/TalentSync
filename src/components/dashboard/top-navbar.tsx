@@ -27,7 +27,7 @@ export function TopNavbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="hidden items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs font-semibold text-[#D4AF37] sm:flex">
+        <div className="hidden items-center gap-1 rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--primary)] sm:flex">
           <Sparkles className="h-3.5 w-3.5" />
           Pro Workspace
         </div>
@@ -47,10 +47,14 @@ export function TopNavbar() {
           K
         </div>
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/20 text-sm font-semibold text-[#F5D97E]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--primary)]/40 bg-[var(--primary)]/20 text-sm font-semibold text-[var(--primary-light)]">
           TS
         </div>
       </div>
     </motion.header>
   );
 }
+
+
+
+

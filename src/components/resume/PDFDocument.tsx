@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
@@ -87,7 +87,7 @@ export const ResumePDF = ({ basics, experience, education, skills }: Props) => (
       <View style={styles.header}>
         <Text style={styles.name}>{basics.name || "Your Name"}</Text>
         <Text style={styles.contact}>
-          {[basics.email, basics.phone, basics.location].filter(Boolean).join(" • ")}
+          {[basics.email, basics.phone, basics.location].filter(Boolean).join(" â€¢ ")}
         </Text>
       </View>
 
@@ -111,7 +111,7 @@ export const ResumePDF = ({ basics, experience, education, skills }: Props) => (
               </View>
               {exp.bullets && exp.bullets.map((bullet: string, bIdx: number) => (
                 <View key={bIdx} style={styles.bulletPointRow}>
-                  <Text style={styles.bulletPointDot}>•</Text>
+                  <Text style={styles.bulletPointDot}>â€¢</Text>
                   <Text style={styles.bulletText}>{bullet}</Text>
                 </View>
               ))}
@@ -142,3 +142,7 @@ export const ResumePDF = ({ basics, experience, education, skills }: Props) => (
     </Page>
   </Document>
 );
+
+
+
+

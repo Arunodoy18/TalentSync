@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 import PDFParser from "pdf2json";
 
@@ -95,3 +95,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message || "Failed to parse resume" }, { status: 500 });
   }
 }
+
+
+
+

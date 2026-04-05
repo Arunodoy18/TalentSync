@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase-admin";
+﻿import { createAdminClient } from "@/lib/supabase-admin";
 
 type BillingPlan = "free" | "pro" | "auto_apply" | "lifetime";
 
@@ -161,3 +161,7 @@ export class BillingWebhookRepository {
     );
   }
 }
+
+
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, type Transition } from "framer-motion";
 import {
@@ -204,3 +204,7 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
 VerticalCutReveal.displayName = "VerticalCutReveal";
 
 export { VerticalCutReveal };
+
+
+
+

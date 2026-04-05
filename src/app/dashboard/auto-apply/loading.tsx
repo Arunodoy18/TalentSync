@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export default function AutoApplyLoading() {
   return (
@@ -51,3 +51,7 @@ export default function AutoApplyLoading() {
     </div>
   );
 }
+
+
+
+

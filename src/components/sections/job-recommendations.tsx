@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -51,7 +51,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
       <CardHeader className="border-b border-[var(--border)] bg-[rgba(255,255,255,0.02)]">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-semibold flex items-center gap-2 text-indigo-100">
+            <CardTitle className="text-xl font-semibold flex items-center gap-2 text-[var(--primary-light)]">
               <Sparkles className="h-5 w-5" />
               AI Job Recommendations
             </CardTitle>
@@ -61,7 +61,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
             <Button 
               onClick={findJobs} 
               disabled={loading}
-              className="h-[44px] rounded-[14px] border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] text-indigo-100 hover:bg-[rgba(99,102,241,0.35)]"
+              className="h-[44px] rounded-[14px] border border-[rgba(142,182,155,0.5)] bg-[rgba(35,83,71,0.22)] text-[var(--primary-light)] hover:bg-[rgba(35,83,71,0.35)]"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Find My Best Match
@@ -72,7 +72,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
       <CardContent className="pt-6">
         {loading && !jobs && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin mb-4 text-indigo-300" />
+            <Loader2 className="h-8 w-8 animate-spin mb-4 text-[var(--primary)]" />
             <p>Matching your resume with thousands of jobs...</p>
           </div>
         )}
@@ -80,7 +80,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
         {!loading && !jobs && (
           <div className="text-center py-12">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)]">
-              <Briefcase className="h-8 w-8 text-indigo-300" />
+              <Briefcase className="h-8 w-8 text-[var(--primary)]" />
             </div>
             <h3 className="text-lg font-bold mb-2">Discover Matching Jobs</h3>
             <p className="text-muted-foreground max-w-sm mx-auto">
@@ -92,17 +92,17 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
         {jobs && jobs.length > 0 && (
           <div className="space-y-4">
             {jobs.map((job) => (
-              <div key={job.id} className="group rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] p-4 transition-all hover:-translate-y-1 hover:border-[rgba(129,140,248,0.4)] hover:bg-[rgba(99,102,241,0.12)]">
+              <div key={job.id} className="group rounded-[14px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] p-4 transition-all hover:-translate-y-1 hover:border-[rgba(142,182,155,0.4)] hover:bg-[rgba(35,83,71,0.12)]">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <h4 className="font-semibold text-[var(--text)] transition-colors group-hover:text-indigo-200">{job.title}</h4>
+                    <h4 className="font-semibold text-[var(--text)] transition-colors group-hover:text-[var(--primary-light)]">{job.title}</h4>
                     <p className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-1">
                        <Building2 className="h-3 w-3" />
                        {job.company}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="rounded-full border border-[rgba(129,140,248,0.5)] bg-[rgba(99,102,241,0.22)] px-2 py-1 text-xs font-semibold text-indigo-100">
+                    <span className="rounded-full border border-[rgba(142,182,155,0.5)] bg-[rgba(35,83,71,0.22)] px-2 py-1 text-xs font-semibold text-[var(--primary-light)]">
                        {Math.round(job.similarity * 100)}% Match
                     </span>
                   </div>
@@ -113,11 +113,11 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
                      <MapPin className="h-3 w-3" />
                      {job.location}
                    </span>
-                   <span>•</span>
+                   <span>â€¢</span>
                    <span>{job.job_type}</span>
                    {job.salary_range && (
                       <>
-                        <span>•</span>
+                        <span>â€¢</span>
                         <span>{job.salary_range}</span>
                       </>
                    )}
@@ -128,12 +128,12 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
                     <p className="text-xs font-medium text-[var(--text-muted)] mb-2">Missing Skills:</p>
                     <div className="flex flex-wrap gap-1">
                       {job.explainability.missing_skills.slice(0, 5).map((skill, i) => (
-                        <span key={i} className="rounded border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] text-indigo-400 capitalize">
+                        <span key={i} className="rounded border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] text-[var(--primary)] capitalize">
                           {skill}
                         </span>
                       ))}
                       {job.explainability.missing_skills.length > 5 && (
-                        <span className="rounded border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] text-indigo-500/80">
+                        <span className="rounded border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] text-[var(--primary)]/80">
                           +{job.explainability.missing_skills.length - 5} more
                         </span>
                       )}
@@ -170,3 +170,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
 };
 
 export default JobRecommendations;
+
+
+
+

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 
@@ -57,7 +57,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-[var(--border)] transition-colors hover:bg-[rgba(99,102,241,0.12)] data-[state=selected]:bg-[rgba(99,102,241,0.14)]",
+        "border-b border-[var(--border)] transition-colors hover:bg-[rgba(35,83,71,0.12)] data-[state=selected]:bg-[rgba(35,83,71,0.14)]",
         className
       )}
       {...props}
@@ -114,3 +114,7 @@ export {
   TableCell,
   TableCaption,
 }
+
+
+
+

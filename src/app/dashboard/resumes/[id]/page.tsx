@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+﻿import { createClient } from "@/lib/supabase-server";
 import { redirect, notFound } from "next/navigation";
 import ResumeEditor from "@/components/sections/resume-editor";
 
@@ -32,3 +32,6 @@ export default async function ResumePage({
     </div>
   );
 }
+
+
+

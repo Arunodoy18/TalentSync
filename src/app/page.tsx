@@ -1,4 +1,4 @@
-import LoginAuth from "@/components/sections/login-auth";
+﻿import LoginAuth from "@/components/sections/login-auth";
 import DemoOne from "@/components/ui/demo";
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
@@ -29,7 +29,7 @@ export default async function Home() {
             </p>
 
             <div className="mt-8 flex items-center justify-start gap-4">
-              <button className="rounded-xl bg-[#D4AF37] px-6 py-3 font-medium text-black transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+              <button className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-black transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(142,182,155,0.4)]">
                 Build Resume
               </button>
               <button className="rounded-xl border border-[#1F2937] bg-[#111827] px-6 py-3 font-medium text-[#F9FAFB] transition-colors hover:bg-[#1F2937]">
@@ -48,3 +48,7 @@ export default async function Home() {
     </main>
   );
 }
+
+
+
+

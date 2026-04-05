@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
@@ -116,3 +116,6 @@ export default async function AtsSharePage({ params }: { params: Promise<{ id: s
     </main>
   );
 }
+
+
+

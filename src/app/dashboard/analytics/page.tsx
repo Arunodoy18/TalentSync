@@ -1,4 +1,4 @@
-import { BarChart3, LineChart } from "lucide-react";
+﻿import { BarChart3, LineChart } from "lucide-react";
 import Link from "next/link";
 
 export default function AnalyticsPage() {
@@ -42,3 +42,7 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
+
+
+

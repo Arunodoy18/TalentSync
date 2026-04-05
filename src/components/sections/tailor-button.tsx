@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
@@ -65,3 +65,7 @@ const TailorButton = ({ resumeId, jobId, jobTitle }: TailorButtonProps) => {
 };
 
 export default TailorButton;
+
+
+
+

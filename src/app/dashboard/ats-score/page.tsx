@@ -1,4 +1,4 @@
-import { Target, Upload } from "lucide-react";
+﻿import { Target, Upload } from "lucide-react";
 import Link from "next/link";
 
 export default function AtsScorePage() {
@@ -46,3 +46,7 @@ export default function AtsScorePage() {
     </div>
   );
 }
+
+
+
+

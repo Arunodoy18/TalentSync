@@ -359,6 +359,8 @@ export function AnimatedAIChat() {
         return "";
     };
 
+    const lastAssistantMessageId = [...messages].reverse().find((m) => m.role === "assistant")?.id;
+
     return (
         <div className="h-full min-h-0 flex flex-col w-full items-center justify-center bg-[var(--bg)] text-[var(--text)] p-4 sm:p-6 relative overflow-hidden">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -418,16 +420,22 @@ export function AnimatedAIChat() {
                                         m.role === "user" ? "self-end items-end" : "self-start items-start"
                                     )}
                                 >
-                                  {m.role !== "user" && (
+                                                                    {m.role !== "user" && (
                                     <div className="flex items-center gap-2 px-2">
-                                                                                <div className="w-5 h-5 rounded-full bg-[rgba(142,182,155,0.2)] flex items-center justify-center border border-[rgba(142,182,155,0.45)]">
+                                                                            <div className="w-5 h-5 rounded-full bg-[rgba(142,182,155,0.2)] flex items-center justify-center border border-[rgba(142,182,155,0.45)]">
                                                                                 <Sparkles className="w-3 h-3 text-[var(--primary)]" />
                                       </div>
                                       <span className="text-xs font-medium text-white/60">Zap</span>
+                                                                            {isLoading && m.id === lastAssistantMessageId && (
+                                                                                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--primary)]">
+                                                                                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)] animate-pulse" />
+                                                                                    Live
+                                                                                </span>
+                                                                            )}
                                     </div>
                                   )}
                                   <div className={cn(
-                                        "px-5 py-3 rounded-2xl text-[15px] leading-relaxed",
+                                                                                "px-5 py-3 rounded-2xl text-[15px] leading-relaxed break-words",
                                         m.role === "user" 
                                             ? "bg-white/10 text-white shadow-xl backdrop-blur-sm rounded-br-sm border border-white/5" 
                                             : "bg-transparent text-white/80"

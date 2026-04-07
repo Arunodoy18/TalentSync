@@ -1,8 +1,9 @@
 ﻿import { createClient } from "@/lib/supabase-server";
-import { Play, FileText, Briefcase, Zap, Target, BarChart3, Rocket, ChevronRight, CheckCircle2, Circle } from "lucide-react";
+import { FileText, Briefcase, Target, Rocket, ChevronRight, CheckCircle2, Circle } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+import { motion } from "framer-motion";
 
 function ProgressBar() {
   const steps = [
@@ -139,29 +140,41 @@ export default async function DashboardPage() {
 
           {/* ACTION-BASED MATRIX */}
           <StaggerContainer className="grid gap-[24px] sm:grid-cols-2 lg:grid-cols-4">
-            {actions.map((action, idx) => (
+            {actions.map((action) => (
               <StaggerItem key={action.title}>
-                <Link href={action.href} className={`relative p-[24px] h-full rounded-[12px] bg-[var(--card)] border border-[var(--border)] flex flex-col group transition-all hover:-translate-y-1 hover:border-white/20 hover:shadow-xl`}>
-                  {action.tag && (
-                    <div className="absolute top-4 right-4 bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/50 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full">
-                      {action.tag}
+                <motion.div
+                  whileHover={{ y: -6, scale: 1.01 }}
+                  whileTap={{ scale: 0.995 }}
+                  transition={{ type: "spring", stiffness: 280, damping: 24 }}
+                  className="h-full"
+                >
+                  <Link href={action.href} className={`relative p-[24px] h-full rounded-[12px] bg-[var(--card)] border border-[var(--border)] flex flex-col group transition-all hover:border-[var(--surface-hover-border)] hover:shadow-xl`}>
+                    {action.tag && (
+                      <div className="absolute top-4 right-4 bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/50 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full">
+                        {action.tag}
+                      </div>
+                    )}
+
+                    <motion.div
+                      className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} ${action.bg} border ${action.border} mb-6`}
+                      initial={{ rotate: 0 }}
+                      whileHover={{ rotate: -4 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 16 }}
+                    >
+                      <action.icon className="h-6 w-6" />
+                    </motion.div>
+
+                    <div className="flex-1 space-y-2">
+                      <p className="text-[13px] font-medium text-[var(--text-muted)] uppercase tracking-wide">{action.metric}</p>
+                      <h3 className="text-xl font-semibold text-[var(--text)] leading-tight">{action.title}</h3>
+                      <p className="text-sm text-[var(--text-muted)] leading-relaxed">{action.description}</p>
                     </div>
-                  )}
 
-                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} ${action.bg} border ${action.border} mb-6`}>
-                    <action.icon className="h-6 w-6" />
-                  </div>
-
-                  <div className="flex-1 space-y-2">
-                    <p className="text-[13px] font-medium text-[var(--text-muted)] uppercase tracking-wide">{action.metric}</p>
-                    <h3 className="text-xl font-semibold text-[var(--text)] leading-tight">{action.title}</h3>
-                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{action.description}</p>
-                  </div>
-
-                  <div className="mt-8 flex items-center text-sm font-semibold text-white/90 group-hover:text-white transition-colors">
-                    {action.cta} <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
+                    <div className="mt-8 flex items-center text-sm font-semibold text-[var(--text)]/90 group-hover:text-[var(--text)] transition-colors">
+                      {action.cta} <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                </motion.div>
               </StaggerItem>
             ))}
           </StaggerContainer>

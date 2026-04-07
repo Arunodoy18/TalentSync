@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 // Create styles mimicking a standard FAANG single-column resume
 const styles = StyleSheet.create({
@@ -87,7 +87,7 @@ export const ResumePDF = ({ basics, experience, education, skills }: Props) => (
       <View style={styles.header}>
         <Text style={styles.name}>{basics.name || "Your Name"}</Text>
         <Text style={styles.contact}>
-          {[basics.email, basics.phone, basics.location].filter(Boolean).join(" â€¢ ")}
+          {[basics.email, basics.phone, basics.location].filter(Boolean).join(" • ")}
         </Text>
       </View>
 
@@ -111,7 +111,7 @@ export const ResumePDF = ({ basics, experience, education, skills }: Props) => (
               </View>
               {exp.bullets && exp.bullets.map((bullet: string, bIdx: number) => (
                 <View key={bIdx} style={styles.bulletPointRow}>
-                  <Text style={styles.bulletPointDot}>â€¢</Text>
+                  <Text style={styles.bulletPointDot}>•</Text>
                   <Text style={styles.bulletText}>{bullet}</Text>
                 </View>
               ))}

@@ -1,11 +1,9 @@
 ﻿import { createClient } from "@/lib/supabase-server";
-import { Search, Briefcase, MapPin, DollarSign, Sparkles, Filter, ChevronRight, Zap } from "lucide-react";    
+import { Search, Briefcase, MapPin, Sparkles, Filter, ChevronRight, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import TailorButton from "@/components/sections/tailor-button";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+import { FadeIn, StaggerContainer } from "@/components/ui/fade-in";
 
 export default async function JobsPage() {
   const supabase = await createClient();

@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { FileText, Plus, Sparkles, LayoutTemplate, Briefcase, ChevronRight } from "lucide-react";
+import { FileText, Sparkles, LayoutTemplate, ChevronRight } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";

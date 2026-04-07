@@ -5,23 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ChevronRight, FileText, CheckCircle2, Sparkles, Plus, Loader2, Download, UploadCloud, Building2, LayoutTemplate } from "lucide-react";
+import { FileText, Sparkles, Plus, Loader2, UploadCloud, Download, LayoutTemplate } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ResumePDF } from "@/components/resume/PDFDocument";
 import { IITBombayTemplate } from "@/components/resume/IITBombayTemplate";
 import { JakesTemplate } from "@/components/resume/JakesTemplate";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
-
-const sections = [
-  { id: "basics", title: "Basic Info", desc: "Contact details and summary" },
-  { id: "experience", title: "Experience", desc: "Your past roles" },
-  { id: "projects", title: "Projects", desc: "Your Master Vault of 50+ Projects" },
-  { id: "education", title: "Education", desc: "Degrees and certifications" },
-  { id: "skills", title: "Skills", desc: "Technical & soft skills" },
-];
+import { FadeIn } from "@/components/ui/fade-in";
 
 export default function ResumeBuilderPage() {
   const searchParams = useSearchParams();

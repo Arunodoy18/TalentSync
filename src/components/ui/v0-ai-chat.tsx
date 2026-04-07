@@ -7,12 +7,9 @@ import { useChat } from "@ai-sdk/react";
 import {
     ImageIcon,
     FileUp,
-    FileText,
     MonitorIcon,
-    CircleUserRound,
     ArrowUpIcon,
     Paperclip,
-    PlusIcon,
 } from "lucide-react";
 
 interface UseAutoResizeTextareaProps {

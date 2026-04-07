@@ -1,8 +1,7 @@
 ﻿'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Briefcase, Building, MapPin, Clock, Search, ListFilter, AlertCircle, ArrowRight } from "lucide-react";
+import { Briefcase, Search, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function ApplicationsPage() {

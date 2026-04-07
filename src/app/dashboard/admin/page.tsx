@@ -1,9 +1,6 @@
 ﻿import { headers } from "next/headers";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, Eye, Users, Banknote, Activity, GitCommit, CheckCircle2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { CheckCircle2 } from "lucide-react";
 
 type AdminOverview = {
   kpis: {

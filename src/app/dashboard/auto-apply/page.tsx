@@ -1,7 +1,7 @@
 ﻿import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, Play, Pause, CircleCheck, CircleDot, Activity } from "lucide-react";
+import { Rocket, Pause, CircleCheck, CircleDot, Activity } from "lucide-react";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 import { SoftPaywallGate } from "@/components/billing/soft-paywall-gate";
 

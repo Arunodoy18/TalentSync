@@ -135,21 +135,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         
         {showRing && isFocused && (
           <motion.span 
-            className="absolute inset-0 rounded-md pointer-events-none ring-2 ring-offset-0 ring-violet-500/30"
+                        className="absolute inset-0 rounded-md pointer-events-none ring-2 ring-offset-0 ring-[var(--primary)]/35"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-          />
-        )}
-
-        {props.onChange && (
-          <div 
-            className="absolute bottom-2 right-2 opacity-0 w-2 h-2 bg-violet-500 rounded-full"
-            style={{
-              animation: 'none',
-            }}
-            id="textarea-ripple"
           />
         )}
       </div>
@@ -362,11 +352,11 @@ export function AnimatedAIChat() {
     const lastAssistantMessageId = [...messages].reverse().find((m) => m.role === "assistant")?.id;
 
     return (
-        <div className="h-full min-h-0 flex flex-col w-full items-center justify-center bg-[var(--bg)] text-[var(--text)] p-4 sm:p-6 relative overflow-hidden">
+        <div className="h-full min-h-0 flex flex-col w-full items-center justify-start bg-[var(--bg)] text-[var(--text)] p-4 sm:p-6 relative overflow-hidden">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[rgba(142,182,155,0.1)] rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
-                <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
+                <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-[var(--primary)]/12 mix-blend-normal blur-[128px] animate-pulse" />
+                <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-[var(--secondary)]/14 mix-blend-normal blur-[128px] animate-pulse delay-700" />
+                <div className="absolute top-1/4 right-1/3 h-64 w-64 rounded-full bg-[var(--primary)]/10 mix-blend-normal blur-[96px] animate-pulse delay-1000" />
             </div>
 
             <div className="w-full max-w-3xl mx-auto flex flex-col h-full min-h-0 z-10">
@@ -374,7 +364,7 @@ export function AnimatedAIChat() {
                 <div ref={scrollContainerRef} className="flex-1 min-h-0 flex flex-col pt-6 pb-6 overflow-y-auto overflow-x-hidden scroll-smooth pr-1">
                     {messages.length === 0 ? (
                         <motion.div 
-                            className="relative z-10 space-y-12 flex-1 flex flex-col justify-center mb-12"
+                            className="relative z-10 flex flex-1 flex-col justify-start space-y-8 pt-4"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, ease: "easeOut" }}
@@ -386,18 +376,18 @@ export function AnimatedAIChat() {
                                     transition={{ delay: 0.2, duration: 0.5 }}
                                     className="inline-block"
                                 >
-                                    <h1 className="text-3xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/40 pb-1">
+                                    <h1 className="bg-gradient-to-r from-[var(--text)] to-[var(--text-muted)] bg-clip-text pb-1 text-3xl font-medium tracking-tight text-transparent">
                                         How can I help today?
                                     </h1>
                                     <motion.div 
-                                        className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent flex"
+                                        className="flex h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent"
                                         initial={{ width: 0, opacity: 0 }}
                                         animate={{ width: "100%", opacity: 1 }}
                                         transition={{ delay: 0.5, duration: 0.8 }}
                                     />
                                 </motion.div>
                                 <motion.p 
-                                    className="text-sm text-white/40 block"
+                                    className="block text-sm text-[var(--text-muted)]"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.3 }}
@@ -407,7 +397,7 @@ export function AnimatedAIChat() {
                             </div>
                         </motion.div>
                     ) : (
-                        <div className="flex-1 space-y-6 flex flex-col justify-end">
+                        <div className="flex flex-1 flex-col space-y-6">
                             {messages.map((m) => (
                                 <motion.div 
                                     key={m.id} 
@@ -422,10 +412,10 @@ export function AnimatedAIChat() {
                                 >
                                                                     {m.role !== "user" && (
                                     <div className="flex items-center gap-2 px-2">
-                                                                            <div className="w-5 h-5 rounded-full bg-[rgba(142,182,155,0.2)] flex items-center justify-center border border-[rgba(142,182,155,0.45)]">
+                                                                            <div className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--primary)]/45 bg-[var(--primary)]/16">
                                                                                 <Sparkles className="w-3 h-3 text-[var(--primary)]" />
                                       </div>
-                                      <span className="text-xs font-medium text-white/60">Zap</span>
+                                                                            <span className="text-xs font-medium text-[var(--text-muted)]">Zap</span>
                                                                             {isLoading && m.id === lastAssistantMessageId && (
                                                                                 <span className="inline-flex items-center gap-1 rounded-full border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--primary)]">
                                                                                     <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)] animate-pulse" />
@@ -437,8 +427,8 @@ export function AnimatedAIChat() {
                                   <div className={cn(
                                                                                 "px-5 py-3 rounded-2xl text-[15px] leading-relaxed break-words",
                                         m.role === "user" 
-                                            ? "bg-white/10 text-white shadow-xl backdrop-blur-sm rounded-br-sm border border-white/5" 
-                                            : "bg-transparent text-white/80"
+                                            ? "rounded-br-sm border border-[var(--primary)]/35 bg-[var(--primary)]/16 text-[var(--text-strong)] shadow-xl backdrop-blur-sm" 
+                                            : "bg-transparent text-[var(--text)]"
                                     )}>
                                         {getMessageText(m) || (m.role === "assistant" ? "..." : "")}
                                   </div>
@@ -448,16 +438,16 @@ export function AnimatedAIChat() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="self-start max-w-[85%] rounded-2xl rounded-tl-sm border border-white/10 bg-white/[0.03] px-5 py-4"
+                                    className="self-start max-w-[85%] rounded-2xl rounded-tl-sm border border-[var(--border)] bg-[var(--soft-surface-bg)] px-5 py-4"
                                 >
-                                    <div className="flex items-center gap-2 text-xs text-white/50">
+                                    <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
                                         <Sparkles className="h-3.5 w-3.5 text-[var(--primary)]" />
                                         Zap is thinking
                                     </div>
                                     <div className="mt-3 space-y-2">
-                                        <div className="h-2.5 w-52 animate-pulse rounded-full bg-white/10" />
-                                        <div className="h-2.5 w-44 animate-pulse rounded-full bg-white/10" />
-                                        <div className="h-2.5 w-32 animate-pulse rounded-full bg-white/10" />
+                                        <div className="h-2.5 w-52 animate-pulse rounded-full bg-[var(--border)]" />
+                                        <div className="h-2.5 w-44 animate-pulse rounded-full bg-[var(--border)]" />
+                                        <div className="h-2.5 w-32 animate-pulse rounded-full bg-[var(--border)]" />
                                     </div>
                                 </motion.div>
                             )}
@@ -473,7 +463,7 @@ export function AnimatedAIChat() {
 
                 {/* Input Area (Pinned to bottom) */}
                 <motion.div 
-                    className="sticky bottom-0 relative w-full backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl mt-auto z-20"
+                    className="sticky bottom-0 relative z-20 mt-auto w-full rounded-2xl border border-[var(--border)] bg-[var(--surface-bg)] shadow-2xl backdrop-blur-2xl"
                     initial={{ scale: 0.98 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}
@@ -482,32 +472,32 @@ export function AnimatedAIChat() {
                         {showCommandPalette && (
                             <motion.div 
                                 ref={commandPaletteRef}
-                                className="absolute left-4 right-4 bottom-full mb-2 backdrop-blur-xl bg-black/90 rounded-lg z-50 shadow-lg border border-white/10 overflow-hidden"
+                                className="absolute bottom-full left-4 right-4 z-50 mb-2 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)]/95 shadow-lg backdrop-blur-xl"
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 5 }}
                                 transition={{ duration: 0.15 }}
                             >
-                                <div className="py-1 bg-black/95">
+                                <div className="bg-[var(--card)]/95 py-1">
                                     {COMMAND_SUGGESTIONS.map((suggestion, index) => (
                                         <motion.div
                                             key={suggestion.prefix}
                                             className={cn(
                                                 "flex items-center gap-2 px-3 py-2 text-xs transition-colors cursor-pointer",
                                                 activeSuggestion === index 
-                                                    ? "bg-white/10 text-white" 
-                                                    : "text-white/70 hover:bg-white/5"
+                                                    ? "bg-[var(--primary)]/15 text-[var(--text)]" 
+                                                    : "text-[var(--text-muted)] hover:bg-[var(--soft-surface-bg)]"
                                             )}
                                             onClick={() => selectCommandSuggestion(index)}
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: index * 0.03 }}
                                         >
-                                            <div className="w-5 h-5 flex items-center justify-center text-white/60">
+                                            <div className="flex h-5 w-5 items-center justify-center text-[var(--text-muted)]">
                                                 {suggestion.icon}
                                             </div>
                                             <div className="font-medium">{suggestion.label}</div>
-                                            <div className="text-white/40 text-xs ml-1">
+                                            <div className="ml-1 text-xs text-[var(--text-muted)]/80">
                                                 {suggestion.prefix}
                                             </div>
                                         </motion.div>
@@ -535,9 +525,9 @@ export function AnimatedAIChat() {
                                 "resize-none",
                                 "bg-transparent",
                                 "border-none",
-                                "text-white/90 text-sm flex-1",
+                                "text-[var(--text)] text-sm flex-1",
                                 "focus:outline-none focus:ring-0",
-                                "placeholder:text-white/20",
+                                "placeholder:text-[var(--text-muted)]",
                                 "min-h-[60px] max-h-[160px] scrollbar-thin scrollbar-thumb-white/10"
                             )}
                             style={{
@@ -558,7 +548,7 @@ export function AnimatedAIChat() {
                                 {attachments.map((file, index) => (
                                     <motion.div
                                         key={index}
-                                        className="flex items-center gap-2 text-xs bg-white/[0.03] py-1.5 px-3 rounded-lg text-white/70"
+                                        className="flex items-center gap-2 rounded-lg bg-[var(--soft-surface-bg)] px-3 py-1.5 text-xs text-[var(--text-muted)]"
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
@@ -566,7 +556,7 @@ export function AnimatedAIChat() {
                                         <span>{file}</span>
                                         <button 
                                             onClick={() => removeAttachment(index)}
-                                            className="text-white/40 hover:text-white transition-colors"
+                                            className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
                                         >
                                             <XIcon className="w-3 h-3" />
                                         </button>
@@ -576,19 +566,15 @@ export function AnimatedAIChat() {
                         )}
                     </AnimatePresence>
 
-                    <div className="p-3 border-t border-white/[0.05] flex items-center justify-between gap-4">
+                    <div className="flex items-center justify-between gap-4 border-t border-[var(--border)] p-3">
                         <div className="flex items-center gap-2">
                             <motion.button
                                 type="button"
                                 onClick={handleAttachFile}
                                 whileTap={{ scale: 0.94 }}
-                                className="p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group"
+                                className="relative rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:text-[var(--text)]"
                             >
                                 <Paperclip className="w-4 h-4" />
-                                <motion.span
-                                    className="absolute inset-0 bg-white/[0.05] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                    layoutId="button-highlight"
-                                />
                             </motion.button>
                             <motion.button
                                 type="button"
@@ -599,15 +585,11 @@ export function AnimatedAIChat() {
                                 }}
                                 whileTap={{ scale: 0.94 }}
                                 className={cn(
-                                    "p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group",
-                                    showCommandPalette && "bg-white/10 text-white/90"
+                                    "relative rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:text-[var(--text)]",
+                                    showCommandPalette && "bg-[var(--soft-surface-bg)] text-[var(--text)]"
                                 )}
                             >
                                 <Command className="w-4 h-4" />
-                                <motion.span
-                                    className="absolute inset-0 bg-white/[0.05] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                    layoutId="button-highlight"
-                                />
                             </motion.button>
                         </div>
                         
@@ -621,8 +603,8 @@ export function AnimatedAIChat() {
                                 "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                                 "flex items-center gap-2",
                                 value.trim() && !isLoading
-                                    ? "bg-white text-[#0A0A0B] shadow-lg shadow-white/10 hover:shadow-white/20"
-                                    : "bg-white/[0.05] text-white/40"
+                                    ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-lg"
+                                    : "bg-[var(--soft-surface-bg)] text-[var(--text-muted)]"
                             )}
                         >
                             {isLoading ? (
@@ -642,25 +624,13 @@ export function AnimatedAIChat() {
                           <motion.button
                               key={suggestion.prefix}
                           onClick={() => selectCommandSuggestion(index)}
-                              className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.05] rounded-lg text-sm text-white/60 hover:text-white/90 transition-all relative group"
+                              className="relative flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-bg)] px-3 py-2 text-sm text-[var(--text-muted)] transition-all hover:bg-[var(--soft-surface-bg)] hover:text-[var(--text)]"
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.1 }}
                           >
                               {suggestion.icon}
                               <span>{suggestion.label}</span>
-                              <motion.div
-                                  className="absolute inset-0 border border-white/[0.05] rounded-lg"
-                                  initial={false}
-                                  animate={{
-                                      opacity: [0, 1],
-                                      scale: [0.98, 1],
-                                  }}
-                                  transition={{
-                                      duration: 0.3,
-                                      ease: "easeOut",
-                                  }}
-                              />
                           </motion.button>
                       ))}
                   </div>
@@ -686,16 +656,16 @@ export function AnimatedAIChat() {
             <AnimatePresence>
                 {isLoading && (
                     <motion.div 
-                        className="fixed left-1/2 bottom-36 md:bottom-40 transform -translate-x-1/2 backdrop-blur-2xl bg-black/40 rounded-full px-4 py-2 shadow-lg border border-white/[0.05] z-50"
+                        className="fixed left-1/2 bottom-36 z-50 -translate-x-1/2 rounded-full border border-[var(--border)] bg-[var(--card)]/90 px-4 py-2 shadow-lg backdrop-blur-2xl md:bottom-40"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-7 rounded-full bg-white/[0.1] flex items-center justify-center text-center">
-                                <span className="text-xs font-medium text-white/90 mb-0.5">Zap</span>
+                            <div className="flex h-7 w-8 items-center justify-center rounded-full bg-[var(--primary)]/15 text-center">
+                                <span className="mb-0.5 text-xs font-medium text-[var(--text)]">Zap</span>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-white/70">
+                            <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
                                 <span>Thinking</span>
                                 <TypingDots />
                             </div>
@@ -729,7 +699,7 @@ function TypingDots() {
             {[1, 2, 3].map((dot) => (
                 <motion.div
                     key={dot}
-                    className="w-1.5 h-1.5 bg-white/90 rounded-full mx-0.5"
+                    className="mx-0.5 h-1.5 w-1.5 rounded-full bg-[var(--text)]"
                     initial={{ opacity: 0.3 }}
                     animate={{ 
                         opacity: [0.3, 0.9, 0.3],
@@ -741,27 +711,10 @@ function TypingDots() {
                         delay: dot * 0.15,
                         ease: "easeInOut",
                     }}
-                    style={{
-                        boxShadow: "0 0 4px rgba(255, 255, 255, 0.3)"
-                    }}
                 />
             ))}
         </div>
     );
-}
-
-const rippleKeyframes = `
-@keyframes ripple {
-  0% { transform: scale(0.5); opacity: 0.6; }
-  100% { transform: scale(2); opacity: 0; }
-}
-`;
-
-if (typeof document !== 'undefined' && !document.getElementById('textarea-ripple-style')) {
-    const style = document.createElement('style');
-    style.id = 'textarea-ripple-style';
-    style.innerHTML = rippleKeyframes;
-    document.head.appendChild(style);
 }
 
 

@@ -36,19 +36,20 @@ function useAutoResizeTextarea({
 
             if (reset) {
                 textarea.style.height = `${minHeight}px`;
+                textarea.style.overflowY = "hidden";
                 return;
             }
 
-            textarea.style.height = `${minHeight}px`;
-            const newHeight = Math.max(
+            textarea.style.height = "auto";
+
+            const computedHeight = textarea.scrollHeight;
+            const cappedHeight = Math.max(
                 minHeight,
-                Math.min(
-                    textarea.scrollHeight,
-                    maxHeight ?? Number.POSITIVE_INFINITY
-                )
+                Math.min(computedHeight, maxHeight ?? Number.POSITIVE_INFINITY)
             );
 
-            textarea.style.height = `${newHeight}px`;
+            textarea.style.height = `${cappedHeight}px`;
+            textarea.style.overflowY = computedHeight > cappedHeight ? "auto" : "hidden";
         },
         [minHeight, maxHeight]
     );
@@ -156,8 +157,8 @@ export function AnimatedAIChat() {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [showJumpToBottom, setShowJumpToBottom] = useState(false);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
-        minHeight: 60,
-        maxHeight: 200,
+        minHeight: 48,
+        maxHeight: 150,
     });
     const shouldReduceMotion = useReducedMotion();
     const [inputFocused, setInputFocused] = useState(false);
@@ -324,6 +325,18 @@ export function AnimatedAIChat() {
         const selectedCommand = COMMAND_SUGGESTIONS[index];
         setValue(selectedCommand.prefix + ' ');
         setShowCommandPalette(false);
+    };
+
+    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const container = scrollContainerRef.current;
+        const prevScrollTop = container?.scrollTop ?? 0;
+
+        setValue(e.target.value);
+        adjustHeight();
+
+        if (container) {
+            container.scrollTop = prevScrollTop;
+        }
     };
 
     const getMessageText = (message: unknown): string => {
@@ -511,10 +524,7 @@ export function AnimatedAIChat() {
                         <Textarea
                             ref={textareaRef}
                             value={value}
-                            onChange={(e) => {
-                                setValue(e.target.value);
-                                adjustHeight();
-                            }}
+                            onChange={handleTextareaChange}
                             onKeyDown={handleKeyDown}
                             onFocus={() => setInputFocused(true)}
                             onBlur={() => setInputFocused(false)}
@@ -526,9 +536,10 @@ export function AnimatedAIChat() {
                                 "bg-transparent",
                                 "border-none",
                                 "text-[var(--text)] text-sm flex-1",
+                                "transition-[height] duration-100 ease-linear",
                                 "focus:outline-none focus:ring-0",
                                 "placeholder:text-[var(--text-muted)]",
-                                "min-h-[60px] max-h-[160px] scrollbar-thin scrollbar-thumb-white/10"
+                                "min-h-[48px] max-h-[150px] scrollbar-thin scrollbar-thumb-white/10"
                             )}
                             style={{
                                 overflowY: "auto",

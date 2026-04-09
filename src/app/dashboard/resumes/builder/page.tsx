@@ -30,6 +30,14 @@ export default function ResumeBuilderPage() {
   const [templateFormat, setTemplateFormat] = useState<"auto" | "iit" | "jake">("auto");
 
   const effectiveTemplate = entryMode === "ai" ? "auto" : templateFormat;
+  const isIIT = effectiveTemplate === "iit";
+  const isJake = effectiveTemplate === "jake";
+
+  const basicsOrderClass = "order-1";
+  const educationOrderClass = isIIT || isJake ? "order-2" : "order-4";
+  const experienceOrderClass = isIIT ? "order-3" : "order-2";
+  const projectsOrderClass = isIIT ? "hidden" : isJake ? "order-4" : "order-3";
+  const skillsOrderClass = isIIT ? "order-4" : "order-5";
 
   useEffect(() => {
     if (entryMode === "ai") {
@@ -119,6 +127,10 @@ export default function ResumeBuilderPage() {
                 ? "Use AI-first drafting with a single focused resume output."
                 : "Choose IIT Bombay or Jake template and export your final resume."}
             </p>
+            <p className="text-xs text-[var(--primary-light)] mt-2">
+              Active structure: {effectiveTemplate === "auto" ? "AI" : effectiveTemplate === "iit" ? "IIT Bombay" : "Jake"}
+              {" "}template flow is applied to this form.
+            </p>
           </div>
         </FadeIn>
 
@@ -142,9 +154,9 @@ export default function ResumeBuilderPage() {
         )}
 
         <FadeIn delay={0.3}>
-          <Accordion type="single" collapsible defaultValue="basics" className="space-y-4">
+          <Accordion type="single" collapsible defaultValue="basics" className="flex flex-col gap-4">
             {/* BASICS */}
-            <AccordionItem value="basics" className="border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6">
+            <AccordionItem value="basics" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", basicsOrderClass)}>
               <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
                 Basic Information
               </AccordionTrigger>
@@ -176,21 +188,21 @@ export default function ResumeBuilderPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[var(--text-muted)]">Professional Summary</label>
+                  <label className="text-sm font-medium text-[var(--text-muted)]">{isIIT ? "Profile / Positions of Responsibility" : "Professional Summary"}</label>
                   <Textarea 
                     value={basics.summary} 
                     onChange={e => setBasics({...basics, summary: e.target.value})}
                     className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)] min-h-[120px]" 
-                    placeholder="Software engineer with 5+ years..." 
+                    placeholder={isIIT ? "Leadership roles, profile highlights, and key responsibilities..." : "Software engineer with 5+ years..."}
                   />
                 </div>
               </AccordionContent>
             </AccordionItem>
 
             {/* EXPERIENCE */}
-            <AccordionItem value="experience" className="border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6">
+            <AccordionItem value="experience" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", experienceOrderClass)}>
               <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                Experience
+                {isIIT ? "Work Experience & Internships" : "Experience"}
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-6 space-y-6">
                 {experience.length === 0 ? (
@@ -239,7 +251,7 @@ export default function ResumeBuilderPage() {
             </AccordionItem>
 
             {/* PROJECTS */}
-            <AccordionItem value="projects" className="border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6">
+            <AccordionItem value="projects" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", projectsOrderClass)}>
               <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
                 Projects
               </AccordionTrigger>
@@ -301,7 +313,7 @@ export default function ResumeBuilderPage() {
             </AccordionItem>
 
             {/* EDUCATION */}
-            <AccordionItem value="education" className="border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6">
+            <AccordionItem value="education" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", educationOrderClass)}>
               <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
                 Education
               </AccordionTrigger>
@@ -343,9 +355,9 @@ export default function ResumeBuilderPage() {
             </AccordionItem>
 
             {/* SKILLS */}
-            <AccordionItem value="skills" className="border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6">
+            <AccordionItem value="skills" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", skillsOrderClass)}>
               <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                Skills
+                {isIIT ? "Technical Skills" : "Skills"}
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-6 space-y-6">
                 <Textarea 

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Sparkles, Plus, Loader2, UploadCloud, Download, LayoutTemplate } from "lucide-react";
+import { FileText, Sparkles, Plus, Loader2, UploadCloud, Download, LayoutTemplate, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ResumePDF } from "@/components/resume/PDFDocument";
@@ -29,6 +29,8 @@ export default function ResumeBuilderPage() {
   const [skills, setSkills] = useState("");
   const [templateFormat, setTemplateFormat] = useState<"auto" | "iit" | "jake">("auto");
 
+  const effectiveTemplate = entryMode === "ai" ? "auto" : templateFormat;
+
   useEffect(() => {
     if (entryMode === "ai") {
       setTemplateFormat("auto");
@@ -39,6 +41,10 @@ export default function ResumeBuilderPage() {
 
   const [generating, setGenerating] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
+
+  const downloadFileName = `${
+    basics.name?.trim().toLowerCase().replace(/\s+/g, "-") || "resume"
+  }-${effectiveTemplate}.pdf`;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,6 +165,14 @@ export default function ResumeBuilderPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[var(--text-muted)]">Location</label>
                     <Input value={basics.location} onChange={e => setBasics({...basics, location: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="San Francisco, CA" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-[var(--text-muted)]">LinkedIn</label>
+                    <Input value={basics.linkedin} onChange={e => setBasics({...basics, linkedin: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="linkedin.com/in/your-handle" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-[var(--text-muted)]">GitHub</label>
+                    <Input value={basics.github} onChange={e => setBasics({...basics, github: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="github.com/your-handle" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -292,7 +306,39 @@ export default function ResumeBuilderPage() {
                 Education
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-6 space-y-6">
-                <p className="text-[var(--text-muted)] text-sm">Add your academic background here.</p>
+                {education.length === 0 ? (
+                  <div className="text-center py-10 border border-dashed border-[var(--border)] bg-white/5 rounded-xl">
+                    <p className="text-[var(--text-muted)] text-sm">No education added yet.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {education.map((edu, i) => (
+                      <div key={i} className="p-6 rounded-xl border border-[var(--border)] bg-white/5 space-y-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-[var(--text-muted)]">School / Institute</label>
+                            <Input value={edu.school || ""} onChange={e => { const n=[...education]; n[i].school=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="IIT Bombay" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-[var(--text-muted)]">Degree</label>
+                            <Input value={edu.degree || ""} onChange={e => { const n=[...education]; n[i].degree=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="B.Tech in Computer Science" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-[var(--text-muted)]">Year</label>
+                            <Input value={edu.year || ""} onChange={e => { const n=[...education]; n[i].year=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="2024" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-[var(--text-muted)]">CPI/GPA/%</label>
+                            <Input value={edu.grade || ""} onChange={e => { const n=[...education]; n[i].grade=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="8.7/10" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Button variant="outline" className="w-full border-dashed border-[var(--border)] bg-transparent hover:bg-white/5 text-[var(--text-muted)] hover:text-white" onClick={() => setEducation([...education, { school: "", degree: "", year: "", grade: "", location: "" }])}>
+                  <Plus className="mr-2 h-4 w-4"/> Add Education
+                </Button>
               </AccordionContent>
             </AccordionItem>
 
@@ -319,7 +365,7 @@ export default function ResumeBuilderPage() {
          <div className="mb-6">
            <h3 className="font-semibold text-[var(--text)] mb-4 flex items-center">
               <LayoutTemplate className="mr-2 h-5 w-5 text-[var(--primary)]" />
-              Template Layout
+              Template Layout ({effectiveTemplate === "auto" ? "AI Resume" : effectiveTemplate === "iit" ? "IIT Bombay" : "Jake"})
            </h3>
            <div className="flex bg-black/30 p-1.5 rounded-lg border border-[var(--border)] mb-6">
              {(entryMode === "ai" ? ["auto"] : ["iit", "jake"]).map((mode) => (
@@ -340,11 +386,11 @@ export default function ResumeBuilderPage() {
              {isClient ? (
                <PDFDownloadLink
                   document={
-                    templateFormat === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={skills} /> :
-                    templateFormat === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={skills} /> :
+                    effectiveTemplate === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={skills} /> :
+                    effectiveTemplate === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={skills} /> :
                     <JakesTemplate basics={basics} experience={experience} education={education} projects={projects.filter(p => p.selected)} skills={skills} />
                   }
-                  fileName={"resume-.pdf"}
+                  fileName={downloadFileName}
                >
                  
                  {({ loading }) => (
@@ -365,38 +411,123 @@ export default function ResumeBuilderPage() {
          {/* Miniature Document Preview Container */}
          <div className="relative flex-1 bg-white rounded-lg shadow-inner overflow-hidden border-4 border-black/20">
            <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50 p-6 overflow-y-auto text-gray-900 text-[9px] scrollbar-none">
-              <div className="text-center font-bold text-lg uppercase mb-1 tracking-tight">{basics.name || "YOUR NAME"}</div>
-              <div className="text-center text-[8px] text-gray-600 mb-5 pb-4 border-b-2 border-gray-900">
-                {basics.email || "email@address.com"} • {basics.phone || "Phone"} • {basics.location || "City, State"}
-              </div>
-              
-              <div className="uppercase text-[10px] font-bold text-gray-900 mb-2">Summary</div>
-              <p className="text-[9px] mb-5 text-gray-700 leading-relaxed font-serif">{basics.summary || "Professional summary goes here..."}</p>
+              {effectiveTemplate === "iit" && (
+                <>
+                  <div className="text-center font-bold text-lg uppercase mb-1 tracking-tight">{basics.name || "YOUR NAME"}</div>
+                  <div className="text-center text-[8px] text-gray-600 mb-3">{basics.email || "email@address.com"} | {basics.phone || "Phone"} | {basics.location || "City, State"}</div>
 
-              <div className="uppercase text-[10px] font-bold text-gray-900 border-b border-gray-300 pb-1 mb-3">Experience</div>
-              <div className="space-y-4">
-                {experience.length > 0 ? experience.map((exp, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between text-[9px] font-bold text-gray-900">
-                      <span>{exp.role || "Role"}</span>
-                      <span>{exp.company || "Company"}</span>
+                  <div className="uppercase text-[10px] font-bold bg-gray-200 px-2 py-1 mb-2">Education</div>
+                  <div className="border-y border-black mb-4 text-[8px]">
+                    <div className="grid grid-cols-4 font-bold py-1 px-1 border-b border-gray-300">
+                      <span>Degree</span><span className="text-center">Institute</span><span className="text-center">Year</span><span className="text-right">CPI/%</span>
                     </div>
-                    <ul className="list-disc pl-4 text-[9px] mt-1.5 space-y-1 text-gray-700 font-serif">
-                      {(exp.bullets || []).map((b: string, idx: number) => <li key={idx} className="leading-tight">{b}</li>)}
-                      {!(exp.bullets?.length) && <li>Resume bullet one</li>}
-                    </ul>
+                    {(education.length > 0 ? education : [{ degree: "Degree", school: "Institute", year: "20xx", grade: "N/A" }]).slice(0, 2).map((edu, i) => (
+                      <div key={i} className="grid grid-cols-4 py-1 px-1 border-b border-gray-200 last:border-b-0">
+                        <span>{edu.degree || "Degree"}</span>
+                        <span className="text-center">{edu.school || "Institute"}</span>
+                        <span className="text-center">{edu.year || "20xx"}</span>
+                        <span className="text-right">{edu.grade || "N/A"}</span>
+                      </div>
+                    ))}
                   </div>
-                )) : (
-                  <div>
-                    <div className="flex justify-between text-[9px] font-bold text-gray-900">
-                      <span>Software Engineer</span>
-                      <span>Tech Corp</span>
-                    </div>
-                    <ul className="list-disc pl-4 text-[9px] mt-1.5 space-y-1 text-gray-700 font-serif">
-                      <li>Designed and developed scalable microservices</li>
-                    </ul>
+
+                  <div className="uppercase text-[10px] font-bold bg-gray-200 px-2 py-1 mb-2">Work Experience & Internships</div>
+                  <div className="space-y-3 text-[8.5px]">
+                    {(experience.length > 0 ? experience : [{ role: "Role", company: "Company", bullets: ["Impact bullet"] }]).slice(0, 3).map((exp, i) => (
+                      <div key={i}>
+                        <div className="font-bold">* {exp.role || "Role"} | <span className="font-normal">{exp.company || "Company"}</span></div>
+                        <ul className="pl-3 mt-1 space-y-0.5">
+                          {(exp.bullets?.length ? exp.bullets : ["Impact bullet with measurable result"]).slice(0, 2).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </>
+              )}
+
+              {effectiveTemplate === "jake" && (
+                <>
+                  <div className="text-center font-serif text-[18px] mb-1">{basics.name || "Your Name"}</div>
+                  <div className="text-center text-[8px] text-gray-700 mb-4">{[basics.phone, basics.email, basics.linkedin, basics.github, basics.location].filter(Boolean).join(" | ") || "Phone | email | linkedin | github | location"}</div>
+
+                  <div className="uppercase text-[10px] font-semibold border-b border-black pb-1 mb-2">Education</div>
+                  <div className="space-y-2 text-[8.5px] mb-4">
+                    {(education.length > 0 ? education : [{ school: "University", degree: "Degree", year: "2024", grade: "3.8" }]).slice(0, 2).map((edu, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between font-semibold"><span>{edu.school || "University"}</span><span>{edu.year || "2024"}</span></div>
+                        <div className="flex justify-between italic"><span>{edu.degree || "Degree"}</span><span>{edu.grade ? `GPA: ${edu.grade}` : ""}</span></div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="uppercase text-[10px] font-semibold border-b border-black pb-1 mb-2">Experience</div>
+                  <div className="space-y-3 text-[8.5px] mb-4">
+                    {(experience.length > 0 ? experience : [{ role: "Software Engineer", company: "Company", bullets: ["Delivered measurable impact"] }]).slice(0, 3).map((exp, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between font-semibold"><span>{exp.role || "Role"}</span><span>{exp.date || "Present"}</span></div>
+                        <div className="italic">{exp.company || "Company"}</div>
+                        <ul className="pl-3 mt-1 space-y-0.5">
+                          {(exp.bullets?.length ? exp.bullets : ["Impact bullet with quantifiable result"]).slice(0, 2).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="uppercase text-[10px] font-semibold border-b border-black pb-1 mb-2">Projects</div>
+                  <div className="space-y-2 text-[8.5px] mb-4">
+                    {(projects.filter(p => p.selected).length > 0 ? projects.filter(p => p.selected) : [{ name: "Project", technologies: "React, Node", bullets: ["Built end-to-end feature"] }]).slice(0, 2).map((proj, i) => (
+                      <div key={i}>
+                        <div className="font-semibold">{proj.name || "Project"} | <span className="italic">{proj.technologies || "Tech"}</span></div>
+                        <ul className="pl-3 mt-1 space-y-0.5">
+                          {(proj.bullets?.length ? proj.bullets : ["Project impact bullet"]).slice(0, 2).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {effectiveTemplate === "auto" && (
+                <>
+                  <div className="text-center font-bold text-lg uppercase mb-1 tracking-tight">{basics.name || "YOUR NAME"}</div>
+                  <div className="text-center text-[8px] text-gray-600 mb-5 pb-4 border-b-2 border-gray-900">
+                    {[basics.email || "email@address.com", basics.phone || "Phone", basics.location || "City, State"].join(" | ")}
+                  </div>
+
+                  <div className="uppercase text-[10px] font-bold text-gray-900 mb-2">Summary</div>
+                  <p className="text-[9px] mb-5 text-gray-700 leading-relaxed font-serif">{basics.summary || "Professional summary goes here..."}</p>
+
+                  <div className="uppercase text-[10px] font-bold text-gray-900 border-b border-gray-300 pb-1 mb-3">Experience</div>
+                  <div className="space-y-4">
+                    {experience.length > 0 ? experience.map((exp, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between text-[9px] font-bold text-gray-900">
+                          <span>{exp.role || "Role"}</span>
+                          <span>{exp.company || "Company"}</span>
+                        </div>
+                        <ul className="pl-4 text-[9px] mt-1.5 space-y-1 text-gray-700 font-serif">
+                          {(exp.bullets || []).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
+                          {!(exp.bullets?.length) && <li>- Resume bullet one</li>}
+                        </ul>
+                      </div>
+                    )) : (
+                      <div>
+                        <div className="flex justify-between text-[9px] font-bold text-gray-900">
+                          <span>Software Engineer</span>
+                          <span>Tech Corp</span>
+                        </div>
+                        <ul className="pl-4 text-[9px] mt-1.5 space-y-1 text-gray-700 font-serif">
+                          <li>- Designed and developed scalable microservices</li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              <div className="mt-5 rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-[8px] text-gray-600 flex items-center gap-1">
+                <Link2 className="h-3 w-3" />
+                Structure synced with selected template ({effectiveTemplate.toUpperCase()}).
               </div>
            </div>
          </div>

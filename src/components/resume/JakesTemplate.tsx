@@ -131,7 +131,7 @@ export const JakesTemplate = ({ basics, experience, education, projects, skills 
                 <View style={styles.bulletList}>
                   {exp.bullets && exp.bullets.map((bullet: string, bIdx: number) => (
                     <View key={bIdx} style={styles.bulletRow}>
-                      <Text style={styles.bulletDot}>â€¢</Text>
+                      <Text style={styles.bulletDot}>-</Text>
                       <Text style={styles.bulletText}>{bullet}</Text>
                     </View>
                   ))}
@@ -154,7 +154,7 @@ export const JakesTemplate = ({ basics, experience, education, projects, skills 
                 <View style={styles.bulletList}>
                   {proj.bullets && proj.bullets.map((bullet: string, bIdx: number) => (
                     <View key={bIdx} style={styles.bulletRow}>
-                      <Text style={styles.bulletDot}>â€¢</Text>
+                      <Text style={styles.bulletDot}>-</Text>
                       <Text style={styles.bulletText}>{bullet}</Text>
                     </View>
                   ))}

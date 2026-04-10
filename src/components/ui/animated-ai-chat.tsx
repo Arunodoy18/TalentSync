@@ -167,12 +167,18 @@ export function AnimatedAIChat() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const autoStickToBottomRef = useRef(true);
 
+    const scrollMessagesToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        container.scrollTo({ top: container.scrollHeight, behavior });
+    }, []);
+
     // Wire up standard AI SDK logic
     const { messages, sendMessage, status, error } = useChat();
     const isLoading = status === "submitted" || status === "streaming";
 
     useEffect(() => {
-        textareaRef.current?.focus();
+        textareaRef.current?.focus({ preventScroll: true });
     }, [textareaRef]);
 
         // Keep the viewport pinned to the latest assistant response unless the user manually scrolls up.
@@ -192,23 +198,23 @@ export function AnimatedAIChat() {
 
         // Auto-scroll when messages change.
     useEffect(() => {
-            if (messages.length > 0 && messagesEndRef.current && autoStickToBottomRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, [messages]);
+        if (messages.length > 0 && autoStickToBottomRef.current) {
+            scrollMessagesToBottom("smooth");
+        }
+    }, [messages, scrollMessagesToBottom]);
 
         // While streaming, continuously keep the latest token in view when user is near the bottom.
         useEffect(() => {
             if (status !== "streaming") return;
 
             const id = window.setInterval(() => {
-                if (messagesEndRef.current && autoStickToBottomRef.current) {
-                    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+                if (autoStickToBottomRef.current) {
+                    scrollMessagesToBottom("smooth");
                 }
             }, 120);
 
             return () => window.clearInterval(id);
-        }, [status]);
+        }, [status, scrollMessagesToBottom]);
 
     useEffect(() => {
         if (value.startsWith('/') && !value.includes(' ')) {
@@ -309,7 +315,7 @@ export function AnimatedAIChat() {
         const scrollToBottom = () => {
                 autoStickToBottomRef.current = true;
                 setShowJumpToBottom(false);
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            scrollMessagesToBottom("smooth");
         };
 
     const handleAttachFile = () => {

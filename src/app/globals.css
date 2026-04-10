@@ -145,28 +145,28 @@
   .theme-cyprus {
     color-scheme: light;
     --bg: #F0EDE5;
-    --card: #F9F8F6;
-    --border: rgba(0, 70, 67, 0.15);
+    --card: #FFFFFF;
+    --border: rgba(0, 0, 0, 0.08); /* Subtle grey border */
     --primary: #004643;
-    --primary-light: #006662;
-    --text: #002221;
-    --text-muted: #4B6361;
-    --text-strong: #000000;
-    --accent: #B4CFC1;
+    --primary-light: #003331; /* Slightly darker green for hover */
+    --text: #333333; /* Main body text */
+    --text-muted: #666666; /* Muted text, no green */
+    --text-strong: #1A1A1A; /* Dark charcoal headings */
+    --accent: #E5E5E5;
 
     --success: #2E7D32;
     --danger: #C62828;
     --warning: #D97706;
 
-    --field-bg: rgba(255, 255, 255, 0.8);
-    --surface-bg: rgba(240, 237, 229, 0.72);
-    --soft-surface-bg: rgba(249, 248, 246, 0.58);
-    --surface-hover-border: rgba(0, 70, 67, 0.35);
-    --shadow-strong: rgba(0, 70, 67, 0.14);
-    --shadow-hover: rgba(0, 70, 67, 0.2);
-    --bg-atmo-1: rgba(180, 207, 193, 0.35);
-    --bg-atmo-2: rgba(0, 70, 67, 0.1);
-    --bg-gradient: linear-gradient(145deg, #F0EDE5 0%, #F9F8F6 45%, #E2DFD6 100%);
+    --field-bg: #FFFFFF;
+    --surface-bg: rgba(255, 255, 255, 0.85); /* Clear separation from background */
+    --soft-surface-bg: rgba(255, 255, 255, 0.7);
+    --surface-hover-border: rgba(0, 0, 0, 0.15);
+    --shadow-strong: rgba(0, 0, 0, 0.05); /* Soft elevation shadow */
+    --shadow-hover: rgba(0, 0, 0, 0.1);
+    --bg-atmo-1: rgba(255, 255, 255, 0.4);
+    --bg-atmo-2: rgba(0, 0, 0, 0.02);
+    --bg-gradient: linear-gradient(145deg, #F0EDE5 0%, #FFFFFF 45%, #EFEBE1 100%);
 
     --background: var(--bg);
     --foreground: var(--text);

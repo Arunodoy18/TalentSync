@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,58 @@ import { IITBombayTemplate } from "@/components/resume/IITBombayTemplate";
 import { JakesTemplate } from "@/components/resume/JakesTemplate";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FadeIn } from "@/components/ui/fade-in";
+
+type TemplateMode = "auto" | "iit" | "jake";
+
+type TemplateSkillsState = {
+  iit: {
+    programming: string;
+    frameworks: string;
+    tools: string;
+    coursework: string;
+  };
+  jake: {
+    languages: string;
+    frameworks: string;
+    tools: string;
+    concepts: string;
+  };
+};
+
+type ResumeDraftState = {
+  basics: { name: string; email: string; phone: string; location: string; summary: string; github: string; linkedin: string };
+  experience: any[];
+  projects: any[];
+  education: any[];
+  skills: string;
+  templateSkills: TemplateSkillsState;
+};
+
+const createEmptyTemplateSkills = (): TemplateSkillsState => ({
+  iit: {
+    programming: "",
+    frameworks: "",
+    tools: "",
+    coursework: "",
+  },
+  jake: {
+    languages: "",
+    frameworks: "",
+    tools: "",
+    concepts: "",
+  },
+});
+
+const createEmptyDraft = (): ResumeDraftState => ({
+  basics: { name: "", email: "", phone: "", location: "", summary: "", github: "", linkedin: "" },
+  experience: [],
+  projects: [],
+  education: [],
+  skills: "",
+  templateSkills: createEmptyTemplateSkills(),
+});
+
+const getDraftStorageKey = (mode: TemplateMode) => `resume-builder-draft-${mode}`;
 
 export default function ResumeBuilderPage() {
   const searchParams = useSearchParams();
@@ -27,6 +79,7 @@ export default function ResumeBuilderPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [education, setEducation] = useState<any[]>([]);
   const [skills, setSkills] = useState("");
+  const [templateSkills, setTemplateSkills] = useState<TemplateSkillsState>(createEmptyTemplateSkills());
   const [templateFormat, setTemplateFormat] = useState<"auto" | "iit" | "jake">("auto");
 
   const effectiveTemplate = entryMode === "ai" ? "auto" : templateFormat;
@@ -49,10 +102,140 @@ export default function ResumeBuilderPage() {
 
   const [generating, setGenerating] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
+  const [validationTouched, setValidationTouched] = useState(false);
 
   const downloadFileName = `${
     basics.name?.trim().toLowerCase().replace(/\s+/g, "-") || "resume"
   }-${effectiveTemplate}.pdf`;
+
+  const selectedProjects = projects.filter((p) => p.selected);
+
+  const resolvedSkills = useMemo(() => {
+    if (effectiveTemplate === "iit") {
+      const lines = [
+        templateSkills.iit.programming ? `Programming: ${templateSkills.iit.programming}` : "",
+        templateSkills.iit.frameworks ? `Frameworks: ${templateSkills.iit.frameworks}` : "",
+        templateSkills.iit.tools ? `Tools: ${templateSkills.iit.tools}` : "",
+        templateSkills.iit.coursework ? `Coursework: ${templateSkills.iit.coursework}` : "",
+      ].filter(Boolean);
+      return lines.join(" | ");
+    }
+
+    if (effectiveTemplate === "jake") {
+      const lines = [
+        templateSkills.jake.languages ? `Languages: ${templateSkills.jake.languages}` : "",
+        templateSkills.jake.frameworks ? `Frameworks: ${templateSkills.jake.frameworks}` : "",
+        templateSkills.jake.tools ? `Tools: ${templateSkills.jake.tools}` : "",
+        templateSkills.jake.concepts ? `Concepts: ${templateSkills.jake.concepts}` : "",
+      ].filter(Boolean);
+      return lines.join(" | ");
+    }
+
+    return skills.trim();
+  }, [effectiveTemplate, skills, templateSkills]);
+
+  const validationErrors = useMemo(() => {
+    const errors: string[] = [];
+    if (!basics.name.trim()) errors.push("Full name is required.");
+    if (!basics.email.trim()) errors.push("Email is required.");
+    if (experience.length === 0) errors.push("Add at least one experience entry.");
+
+    if (effectiveTemplate === "auto") {
+      if (!skills.trim()) errors.push("Add skills for AI resume format.");
+      return errors;
+    }
+
+    if (effectiveTemplate === "iit") {
+      if (education.length === 0) errors.push("IIT template needs at least one education entry.");
+      if (!resolvedSkills.trim()) errors.push("IIT template needs categorized technical skills.");
+      return errors;
+    }
+
+    if (effectiveTemplate === "jake") {
+      if (education.length === 0) errors.push("Jake template needs at least one education entry.");
+      if (selectedProjects.length === 0) errors.push("Select at least one project for Jake template.");
+      if (!resolvedSkills.trim()) errors.push("Jake template needs categorized skills.");
+    }
+
+    return errors;
+  }, [basics.email, basics.name, education.length, effectiveTemplate, experience.length, resolvedSkills, selectedProjects.length, skills]);
+
+  const canExport = validationErrors.length === 0;
+
+  useEffect(() => {
+    if (!isClient) return;
+
+    const key = getDraftStorageKey(effectiveTemplate as TemplateMode);
+    const raw = window.localStorage.getItem(key);
+    if (!raw) {
+      const empty = createEmptyDraft();
+      setBasics(empty.basics);
+      setExperience(empty.experience);
+      setProjects(empty.projects);
+      setEducation(empty.education);
+      setSkills(empty.skills);
+      setTemplateSkills(empty.templateSkills);
+      setValidationTouched(false);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Partial<ResumeDraftState>;
+      const empty = createEmptyDraft();
+
+      setBasics(parsed.basics ?? empty.basics);
+      setExperience(Array.isArray(parsed.experience) ? parsed.experience : empty.experience);
+      setProjects(Array.isArray(parsed.projects) ? parsed.projects : empty.projects);
+      setEducation(Array.isArray(parsed.education) ? parsed.education : empty.education);
+      setSkills(typeof parsed.skills === "string" ? parsed.skills : empty.skills);
+
+      const incomingTemplateSkills = parsed.templateSkills ?? empty.templateSkills;
+      setTemplateSkills({
+        iit: {
+          programming: incomingTemplateSkills.iit?.programming ?? "",
+          frameworks: incomingTemplateSkills.iit?.frameworks ?? "",
+          tools: incomingTemplateSkills.iit?.tools ?? "",
+          coursework: incomingTemplateSkills.iit?.coursework ?? "",
+        },
+        jake: {
+          languages: incomingTemplateSkills.jake?.languages ?? "",
+          frameworks: incomingTemplateSkills.jake?.frameworks ?? "",
+          tools: incomingTemplateSkills.jake?.tools ?? "",
+          concepts: incomingTemplateSkills.jake?.concepts ?? "",
+        },
+      });
+      setValidationTouched(false);
+    } catch {
+      const empty = createEmptyDraft();
+      setBasics(empty.basics);
+      setExperience(empty.experience);
+      setProjects(empty.projects);
+      setEducation(empty.education);
+      setSkills(empty.skills);
+      setTemplateSkills(empty.templateSkills);
+      setValidationTouched(false);
+    }
+  }, [effectiveTemplate, isClient]);
+
+  useEffect(() => {
+    if (!isClient) return;
+
+    const key = getDraftStorageKey(effectiveTemplate as TemplateMode);
+    const payload: ResumeDraftState = {
+      basics,
+      experience,
+      projects,
+      education,
+      skills,
+      templateSkills,
+    };
+
+    const id = window.setTimeout(() => {
+      window.localStorage.setItem(key, JSON.stringify(payload));
+    }, 250);
+
+    return () => window.clearTimeout(id);
+  }, [basics, education, effectiveTemplate, experience, isClient, projects, skills, templateSkills]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,7 +257,19 @@ export default function ResumeBuilderPage() {
         if (data.experience) setExperience(data.experience);
         if (data.projects) setProjects(data.projects.map((p: any) => ({ ...p, selected: true })));
         if (data.education) setEducation(data.education);
-        if (data.skills) setSkills(data.skills);
+        if (data.skills) {
+          setSkills(data.skills);
+          setTemplateSkills((prev) => ({
+            iit: {
+              ...prev.iit,
+              programming: prev.iit.programming || data.skills,
+            },
+            jake: {
+              ...prev.jake,
+              languages: prev.jake.languages || data.skills,
+            },
+          }));
+        }
       } else {
         const errorData = await response.json().catch(() => null); alert(errorData?.error || "Failed to parse resume.");
       }
@@ -287,6 +482,18 @@ export default function ResumeBuilderPage() {
                               <label className="text-sm font-medium text-[var(--text-muted)]">Technologies</label>
                               <Input value={proj.technologies} onChange={e => {const n=[...projects]; n[i].technologies=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="React, Python"/>
                             </div>
+                            {isJake && (
+                              <>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-[var(--text-muted)]">Project Date</label>
+                                  <Input value={proj.date || ""} onChange={e => {const n=[...projects]; n[i].date=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Jan 2024 - Mar 2024"/>
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-[var(--text-muted)]">Project Link</label>
+                                  <Input value={proj.link || ""} onChange={e => {const n=[...projects]; n[i].link=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="https://project-demo.com"/>
+                                </div>
+                              </>
+                            )}
                         </div>
                         
                         <div className="space-y-2 mt-2">
@@ -306,7 +513,7 @@ export default function ResumeBuilderPage() {
                     ))}
                   </div>
                 )}
-                <Button variant="outline" className="w-full border-dashed border-[var(--border)] bg-transparent hover:bg-white/5 text-[var(--text-muted)] hover:text-white" onClick={() => setProjects([...projects, { name:"", technologies:"", link:"", github:"", bullets: [], selected: false }])}>
+                <Button variant="outline" className="w-full border-dashed border-[var(--border)] bg-transparent hover:bg-white/5 text-[var(--text-muted)] hover:text-white" onClick={() => setProjects([...projects, { name:"", technologies:"", date:"", link:"", github:"", bullets: [], selected: false }])}>
                   <Plus className="mr-2 h-4 w-4"/> Add Project Vault Entry
                 </Button>
               </AccordionContent>
@@ -360,12 +567,52 @@ export default function ResumeBuilderPage() {
                 {isIIT ? "Technical Skills" : "Skills"}
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-6 space-y-6">
-                <Textarea 
-                  value={skills} 
-                  onChange={e => setSkills(e.target.value)}
-                  className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)] min-h-[120px] leading-relaxed" 
-                  placeholder="React, Node.js, Python, System Design..." 
-                />
+                {isIIT ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Programming</label>
+                      <Input value={templateSkills.iit.programming} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, programming: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="C++, Java, Python"/>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Frameworks/Libraries</label>
+                      <Input value={templateSkills.iit.frameworks} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, frameworks: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="React, FastAPI, Spring"/>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Tools/Platforms</label>
+                      <Input value={templateSkills.iit.tools} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, tools: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Docker, AWS, Git"/>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Relevant Coursework</label>
+                      <Input value={templateSkills.iit.coursework} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, coursework: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="OS, DBMS, DSA"/>
+                    </div>
+                  </div>
+                ) : isJake ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Languages</label>
+                      <Input value={templateSkills.jake.languages} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, languages: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="TypeScript, Python, Go"/>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Frameworks</label>
+                      <Input value={templateSkills.jake.frameworks} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, frameworks: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Next.js, Node.js, Express"/>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Tools</label>
+                      <Input value={templateSkills.jake.tools} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, tools: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Docker, Postgres, AWS"/>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[var(--text-muted)]">Concepts</label>
+                      <Input value={templateSkills.jake.concepts} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, concepts: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="System Design, Testing, CI/CD"/>
+                    </div>
+                  </div>
+                ) : (
+                  <Textarea 
+                    value={skills} 
+                    onChange={e => setSkills(e.target.value)}
+                    className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)] min-h-[120px] leading-relaxed" 
+                    placeholder="React, Node.js, Python, System Design..." 
+                  />
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -395,12 +642,12 @@ export default function ResumeBuilderPage() {
            </div>
            
            <div className="flex justify-end">
-             {isClient ? (
+             {isClient && canExport ? (
                <PDFDownloadLink
                   document={
-                    effectiveTemplate === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={skills} /> :
-                    effectiveTemplate === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={skills} /> :
-                    <JakesTemplate basics={basics} experience={experience} education={education} projects={projects.filter(p => p.selected)} skills={skills} />
+                    effectiveTemplate === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={resolvedSkills} /> :
+                    effectiveTemplate === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={resolvedSkills} /> :
+                    <JakesTemplate basics={basics} experience={experience} education={education} projects={selectedProjects} skills={resolvedSkills} />
                   }
                   fileName={downloadFileName}
                >
@@ -413,9 +660,33 @@ export default function ResumeBuilderPage() {
                  )}
                </PDFDownloadLink>
              ) : (
-               <Button className="bg-white/5 cursor-not-allowed text-[var(--text-muted)] rounded-[12px] w-full border border-[var(--border)]">
-                 <Loader2 className="h-4 w-4 animate-spin mr-2" /> Starting Engine
+               <Button
+                 onClick={() => setValidationTouched(true)}
+                 className="bg-white/5 text-[var(--text-muted)] rounded-[12px] w-full border border-[var(--border)]"
+               >
+                 {!isClient ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+                 {!isClient ? "Starting Engine" : "Complete Required Fields"}
                </Button>
+             )}
+           </div>
+
+           <div className="mt-3 rounded-lg border border-[var(--border)] bg-black/20 p-3">
+             {validationErrors.length === 0 ? (
+               <p className="text-xs text-[var(--primary-light)]">All required sections are complete for {effectiveTemplate.toUpperCase()} export.</p>
+             ) : (
+               <>
+                 <p className="text-xs font-medium text-[var(--text)]">Export Checklist ({effectiveTemplate.toUpperCase()})</p>
+                 {(validationTouched || !isClient) && (
+                   <ul className="mt-2 space-y-1 text-xs text-[var(--text-muted)]">
+                     {validationErrors.map((item) => (
+                       <li key={item}>- {item}</li>
+                     ))}
+                   </ul>
+                 )}
+                 {!validationTouched && isClient && (
+                   <p className="mt-2 text-xs text-[var(--text-muted)]">Click export to view required items.</p>
+                 )}
+               </>
              )}
            </div>
          </div>

@@ -1,5 +1,5 @@
-﻿"use client";
-
+﻿
+"use client";
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -18,23 +18,18 @@ export function ThemeSwitcher({ variant = "icon", className }: ThemeSwitcherProp
     setMounted(true);
   }, []);
 
-  const currentTheme = theme === "gold" ? "gold" : "dark";
-  const toggleTheme = () => setTheme(currentTheme === "dark" ? "gold" : "dark");
+  const currentTheme = theme === "theme-cyprus" ? "theme-cyprus" : "theme-plum";
+  const toggleTheme = () => setTheme(currentTheme === "theme-plum" ? "theme-cyprus" : "theme-plum");
 
   if (!mounted) {
     if (variant === "segmented") {
       return (
         <div className={cn("inline-flex rounded-xl border border-[var(--border)] bg-[var(--card)] p-1 opacity-60", className)}>
-          <button className="h-9 rounded-lg px-3 text-sm" disabled>
-            Dark
-          </button>
-          <button className="h-9 rounded-lg px-3 text-sm" disabled>
-            Gold
-          </button>
+          <button className="h-9 rounded-lg px-3 text-sm" disabled>Plum</button>
+          <button className="h-9 rounded-lg px-3 text-sm" disabled>Cyprus</button>
         </div>
       );
     }
-
     return (
       <button
         className="relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] text-[var(--text-muted)] opacity-50"
@@ -49,28 +44,22 @@ export function ThemeSwitcher({ variant = "icon", className }: ThemeSwitcherProp
     return (
       <div className={cn("inline-flex rounded-xl border border-[var(--border)] bg-[var(--card)] p-1", className)}>
         <button
-          type="button"
-          onClick={() => setTheme("dark")}
+          onClick={() => setTheme("theme-plum")}
           className={cn(
-            "h-9 rounded-lg px-3 text-sm font-medium transition-all",
-            currentTheme === "dark"
-              ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-              : "text-[var(--text-muted)] hover:text-[var(--text)]"
+            "h-9 rounded-lg px-3 text-sm font-medium transition-all duration-300",
+            currentTheme === "theme-plum" ? "bg-[var(--primary)] text-[var(--background)] shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)]"
           )}
         >
-          Dark
+          Plum
         </button>
         <button
-          type="button"
-          onClick={() => setTheme("gold")}
+          onClick={() => setTheme("theme-cyprus")}
           className={cn(
-            "h-9 rounded-lg px-3 text-sm font-medium transition-all",
-            currentTheme === "gold"
-              ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-              : "text-[var(--text-muted)] hover:text-[var(--text)]"
+            "h-9 rounded-lg px-3 text-sm font-medium transition-all duration-300",
+            currentTheme === "theme-cyprus" ? "bg-[var(--primary)] text-[var(--background)] shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)]"
           )}
         >
-          Gold
+          Cyprus
         </button>
       </div>
     );
@@ -78,24 +67,29 @@ export function ThemeSwitcher({ variant = "icon", className }: ThemeSwitcherProp
 
   return (
     <button
-      type="button"
       onClick={toggleTheme}
-      title={currentTheme === "dark" ? "Switch to Gold Theme" : "Switch to Dark Theme"}
       className={cn(
-        "relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[rgba(255,255,255,0.08)] transition-all",
+        "group relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[var(--text-muted)] transition-all duration-300 hover:text-[var(--text)] hover:bg-[var(--primary)]/10 active:scale-95",
         className
       )}
+      title={currentTheme === "theme-plum" ? "Switch to Cyprus Focus" : "Switch to Plum Luxury"}
     >
-      {currentTheme === "gold" ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
+      <div className="relative h-4 w-4">
+        <Sun 
+          className={cn(
+            "absolute inset-0 h-full w-full transition-all duration-300",
+            currentTheme === "theme-plum" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-50 opacity-0"
+          )} 
+        />
+        <Moon 
+          className={cn(
+            "absolute inset-0 h-full w-full transition-all duration-300",
+            currentTheme === "theme-cyprus" ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-50 opacity-0"
+          )} 
+        />
+      </div>
       <span className="sr-only">Toggle theme</span>
     </button>
   );
 }
-
-
-
 

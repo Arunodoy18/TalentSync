@@ -148,7 +148,7 @@ export function AppSidebar() {
           <div className="app-pill hidden h-9 items-center px-3 text-[11px] tracking-[0.16em] uppercase transition-all group-data-[collapsible=icon]:hidden md:inline-flex">
             TalentSync
           </div>
-          <div className="hidden h-9 w-9 items-center justify-center rounded-[12px] border border-[rgba(142,182,155,0.5)] bg-[rgba(142,182,155,0.15)] text-[var(--primary-light)] group-data-[collapsible=icon]:flex md:flex font-bold">
+          <div className="hidden h-9 w-9 items-center justify-center rounded-[12px] border border-[var(--primary)]/50 bg-[var(--primary)]/15 text-[var(--primary-light)] group-data-[collapsible=icon]:flex md:flex font-bold">
             T
           </div>
         </motion.div>
@@ -167,7 +167,7 @@ export function AppSidebar() {
                     asChild
                     isActive={pathname === item.url}
                     tooltip={item.title}
-                    className="h-11 rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--card)] hover:text-[var(--text)] data-[active=true]:border-[rgba(142,182,155,0.3)] data-[active=true]:bg-[rgba(142,182,155,0.1)] data-[active=true]:text-[var(--primary)] transition-all"
+                    className="h-11 rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--card)] hover:text-[var(--text)] data-[active=true]:border-[var(--primary)]/30 data-[active=true]:bg-[var(--primary)]/10 data-[active=true]:text-[var(--primary)] transition-all"
                   >
                     <Link href={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5" />
@@ -192,7 +192,7 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   type="submit"
                   tooltip="Logout"
-                  className="h-11 w-full rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.16)] hover:text-red-200 transition-all"
+                  className="h-11 w-full rounded-[12px] border border-transparent text-[var(--text-muted)] hover:border-[var(--danger)]/40 hover:bg-[var(--danger)]/15 hover:text-[var(--danger)] transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <LogOut className="h-5 w-5" />
@@ -208,6 +208,7 @@ export function AppSidebar() {
     </Sidebar>
   )
 }
+
 
 
 

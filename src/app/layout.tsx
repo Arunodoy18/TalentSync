@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} themes={["dark", "gold"]}>
+        <ThemeProvider attribute="class" defaultTheme="theme-plum" enableSystem={false} themes={["theme-plum", "theme-cyprus"]}>
           {children}
           <VisualEditsMessenger />
         </ThemeProvider>

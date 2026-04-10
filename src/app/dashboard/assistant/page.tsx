@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { SoftPaywallGate } from "@/components/billing/soft-paywall-gate";
+import { useTheme } from "next-themes";
+import { useEffect, useRef } from "react";
 
 const AnimatedAIChat = dynamic(
     () => import("@/components/ui/animated-ai-chat").then((m) => m.AnimatedAIChat),
@@ -20,6 +22,18 @@ const AnimatedAIChat = dynamic(
 );
 
 export default function AssistantPage() {
+    const { setTheme } = useTheme();
+    const setCyprusRef = useRef(false);
+
+    useEffect(() => {
+        if (!setCyprusRef.current) {
+            setCyprusRef.current = true;
+            setTimeout(() => {
+                setTheme("theme-cyprus");
+            }, 0);
+        }
+    }, [setTheme]);
+
     return (
         <div data-no-page-scroll="true" className="w-full flex-1 h-full min-h-0 overscroll-none overflow-hidden m-0 p-0">
              <SoftPaywallGate

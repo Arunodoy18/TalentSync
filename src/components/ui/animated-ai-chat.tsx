@@ -471,7 +471,7 @@ export function AnimatedAIChat() {
                                 </motion.div>
                             )}
                             {error && (
-                                <div className="self-start max-w-[85%] px-5 py-3 rounded-2xl rounded-tl-sm bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
+                                <div className="self-start max-w-[85%] px-5 py-3 rounded-2xl rounded-tl-sm bg-[var(--danger)]/10 border border-[var(--danger)]/30 text-[var(--danger)] text-sm">
                                     Assistant error: {error.message || "unable to generate a reply right now. Please try again."}
                                 </div>
                             )}
@@ -693,7 +693,7 @@ export function AnimatedAIChat() {
 
             {inputFocused && !shouldReduceMotion && (
                 <motion.div 
-                    className="fixed w-[50rem] h-[50rem] rounded-full pointer-events-none z-0 opacity-[0.03] bg-gradient-to-r from-[#163832] via-[#235347] to-[#8EB69B] blur-[100px]"
+                    className="fixed w-[50rem] h-[50rem] rounded-full pointer-events-none z-0 opacity-[0.03] bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--accent)] blur-[100px]"
                     animate={{
                         x: mousePosition.x - 400,
                         y: mousePosition.y - 400,

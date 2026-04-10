@@ -84,14 +84,14 @@ export function SoftPaywallGate({
 
   return (
     <div className="fixed inset-0 z-[120] bg-black/70 backdrop-blur-[3px] flex items-center justify-center p-4">
-      <div className="w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[rgba(18,20,34,0.95)] p-6 text-center shadow-2xl">
+      <div className="w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 text-center shadow-2xl">
         <h2 className="text-2xl font-semibold text-[var(--text)]">{title}</h2>
         <p className="mt-2 text-sm text-[var(--text-muted)]">{subtitle}</p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Link
             href="/pricing"
-            className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
+            className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-foreground)]"
           >
             Upgrade Now
           </Link>

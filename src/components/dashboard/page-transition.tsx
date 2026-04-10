@@ -16,7 +16,7 @@ export function DashboardPageTransition({ children }: { children: ReactNode }) {
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         exit={{ opacity: 0, y: -10, filter: "blur(2px)" }}
         transition={{ duration: 0.28, ease: "easeOut" }}
-        className={isAssistantRoute ? "h-full min-h-0 overflow-hidden" : "min-h-[calc(100vh-140px)]"}
+        className={isAssistantRoute ? "h-[calc(100vh-140px)] min-h-0 overflow-hidden rounded-2xl border border-[var(--border)] shadow-sm bg-[var(--soft-surface-bg)] flex flex-col" : "min-h-[calc(100vh-140px)]"}
       >
         {children}
       </motion.div>

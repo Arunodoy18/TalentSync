@@ -14,8 +14,8 @@ export function TopNavbar() {
       className="app-surface sticky top-0 z-40 mb-6 flex h-[68px] items-center justify-between px-4 md:px-6"
     >
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="h-10 w-10 rounded-[12px] border border-[var(--border)] bg-[rgba(255,255,255,0.05)] text-[var(--text)] hover:bg-[rgba(255,255,255,0.1)]" />
-        <div className="hidden items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] px-3 md:flex">
+        <SidebarTrigger className="h-10 w-10 rounded-[12px] border border-[var(--border)] bg-[var(--primary)]/[0.03] text-[var(--text)] hover:bg-[var(--primary)]/[0.08]" />
+        <div className="hidden items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--primary)]/[0.02] px-3 md:flex">
           <Search className="h-4 w-4 text-[var(--text-muted)]" />
           <input
             title="Search dashboard"
@@ -36,13 +36,13 @@ export function TopNavbar() {
           type="button"
           title="Open notifications"
           aria-label="Open notifications"
-          className="relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] text-[var(--text-muted)] hover:text-[var(--text)]"
+          className="relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-[var(--border)] bg-[var(--primary)]/[0.03] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--primary)]/[0.08] transition-colors"
         >
           <Bell className="h-4 w-4" />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[var(--warning)]" />
         </button>
 
-        <div className="hidden items-center gap-1 rounded-[12px] border border-[var(--border)] bg-[rgba(255,255,255,0.04)] px-2 py-1 text-xs text-[var(--text-muted)] sm:flex">
+        <div className="hidden items-center gap-1 rounded-[12px] border border-[var(--border)] bg-[var(--primary)]/[0.02] px-2 py-1 text-xs text-[var(--text-muted)] sm:flex">
           <Command className="h-3.5 w-3.5" />
           K
         </div>

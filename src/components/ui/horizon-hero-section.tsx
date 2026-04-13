@@ -62,17 +62,17 @@ export const Component = () => {
   const sections = useMemo(
     () => [
       {
-        title: "HORIZON",
+        title: "TALENT",
         line1: "Where vision meets reality,",
         line2: "we shape the future of tomorrow",
       },
       {
-        title: "COSMOS",
+        title: "SYNC",
         line1: "Beyond the boundaries of imagination,",
         line2: "lies the universe of possibilities",
       },
       {
-        title: "INFINITY",
+        title: "MATCH",
         line1: "In the space between thought and creation,",
         line2: "we find the essence of true innovation",
       },

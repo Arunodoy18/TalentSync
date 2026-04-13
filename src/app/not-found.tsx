@@ -1,28 +1,17 @@
-﻿import Link from "next/link";
-import { AlertCircle } from "lucide-react";
+import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[600px] w-full">
-      <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
-        <AlertCircle className="h-10 w-10 text-red-500" />
-      </div>
-      <h2 className="text-3xl font-semibold mb-3 tracking-tight">Page Not Found</h2>
-      <p className="text-[var(--muted-foreground)] max-w-[420px] mb-8 text-base">
-        The page you are looking for does not exist or has been moved.
-      </p>
-      <div className="flex gap-4">
-        <Link
-          href="/dashboard"
-          className="btn-interaction inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)/90] h-10 px-8 py-2"
-        >
-          Return to Dashboard
-        </Link>
-      </div>
+    <div className="flex h-screen w-full flex-col items-center justify-center bg-[#040611] text-white p-6 text-center">
+      <h2 className="mb-2 text-6xl font-bold text-[var(--primary)]">404</h2>
+      <h3 className="mb-4 text-2xl font-semibold">Page Not Found</h3>
+      <p className="mb-8 text-gray-400">Could not find requested resource or the page has been moved.</p>
+      <Link 
+        href="/"
+        className="rounded-xl px-8 py-3 bg-[var(--primary)] text-white font-semibold hover:bg-[var(--primary-light)] transition-all"
+      >
+        Return Home
+      </Link>
     </div>
-  );
+  )
 }
-
-
-
-

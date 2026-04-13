@@ -1,3 +1,4 @@
+import { ResumeCard } from "./resume-card";
 ﻿import Link from "next/link";
 import { FileText, Sparkles, LayoutTemplate, ChevronRight } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -81,29 +82,7 @@ export default async function ResumesPage() {
         <h2 className="text-xl font-semibold text-[var(--text)]">Your Document Vault</h2>
         <div className="grid gap-[24px] md:grid-cols-2 lg:grid-cols-3">
           {(resumes || []).map((resume) => (
-            <StaggerItem key={resume.id}>
-              <Link
-                href={`/dashboard/resumes/${resume.id}`}
-                className="group p-[24px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] transition-all hover:border-[var(--primary)] flex flex-col"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="h-12 w-12 rounded-[12px] bg-white/5 border border-white/10 flex items-center justify-center text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  {resume.is_base ? (
-                    <span className="rounded-full bg-[var(--primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--primary)] border border-[var(--primary)]/20">
-                      Master
-                    </span>
-                  ) : null}
-                </div>
-                <h3 className="truncate text-lg font-semibold text-[var(--text)] group-hover:text-[var(--text)]">
-                  {resume.title || "Untitled Resume"}
-                </h3>
-                <p className="mt-1 text-sm text-[var(--text-muted)]">
-                  Updated {new Date(resume.updated_at).toLocaleDateString()}
-                </p>
-              </Link>
-            </StaggerItem>
+            <StaggerItem key={resume.id}><ResumeCard resume={resume} /></StaggerItem>
           ))}
         </div>
 

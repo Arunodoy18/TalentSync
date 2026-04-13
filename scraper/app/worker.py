@@ -46,8 +46,16 @@ def process_payload(payload: dict) -> None:
     
     location = payload.get("location")
     
-    print(f"[*] Worker booting up Scraper '{source}' {location or ''}")
-    scraped_data = scraper_instance.scrape(location)
+    # We now pass the entire payload or a sub-dict to handle rich AI params
+    search_params = payload.get("search_params", {"location": location})
+    
+    print(f"[*] Worker booting up Scraper '{source}' with params: {search_params}")
+    
+    # Check if the scraper uses the old string location or new dict approach
+    try:
+        scraped_data = scraper_instance.scrape(search_params)
+    except TypeError:
+        scraped_data = scraper_instance.scrape(location)
     
     print(f"[*] Scraper '{source}' found {len(scraped_data)} jobs.")
     if scraped_data:

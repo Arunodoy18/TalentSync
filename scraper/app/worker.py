@@ -4,9 +4,11 @@ import json
 import os
 import time
 
-# Load environment variables explicitly from the root .env.local 
+# Load environment variables expressly from the root .env.local if running locally
 from dotenv import load_dotenv
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env.local'))
+env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.env.local'))
+if os.path.exists(env_path):
+    load_dotenv(dotenv_path=env_path)
 
 from .queue import (
     SCRAPE_CONSUMER,

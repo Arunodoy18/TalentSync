@@ -17,7 +17,7 @@ export default async function ResumesPage() {
 
   const { data: resumes } = await supabase
     .from("resumes")
-    .select("id, title, updated_at, is_base")
+    .select("id, title, created_at, updated_at, is_base")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 

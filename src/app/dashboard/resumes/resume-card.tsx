@@ -44,22 +44,30 @@ export function ResumeCard({ resume }: { resume: any }) {
               Master
             </span>
           )}
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="p-2 text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors z-10 disabled:opacity-50"
-            title="Delete resume"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
         </div>
       </div>
-      <h3 className="truncate text-lg font-semibold text-[var(--text)] group-hover:text-[var(--text)] pr-8">
-        {resume.title || 'Untitled Resume'}
-      </h3>
-      <p className="mt-1 text-sm text-[var(--text-muted)]">
-        Updated {new Date(resume.updated_at).toLocaleDateString()}
-      </p>
+
+      <div className="flex-1">
+        <h3 className="truncate text-lg font-semibold text-[var(--text)] group-hover:text-[var(--text)] pr-8">
+          {resume.title || 'Untitled Resume'}
+        </h3>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Created {new Date(resume.created_at || resume.updated_at).toLocaleDateString()}
+        </p>
+      </div>
+
+      {/* Put the actions down at the bottom so it's a clear option */}
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 px-3 py-1.5 rounded-[8px] transition-colors z-10 disabled:opacity-50 border border-transparent hover:border-red-500/20"
+          title="Delete resume"
+        >
+          <Trash2 className="h-4 w-4" />
+          {isDeleting ? 'Deleting...' : 'Delete'}
+        </button>
+      </div>
     </Link>
   )
 }

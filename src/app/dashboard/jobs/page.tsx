@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import TailorButton from "@/components/sections/tailor-button";
 import { FadeIn, StaggerContainer } from "@/components/ui/fade-in";
+import { PreferencesInput } from "./preferences-input";
 
 export default async function JobsPage() {
   const supabase = await createClient();

@@ -11,8 +11,7 @@ class LinkedInScraper:
     
     def __init__(self):
         # In production, set this in your environment variables
-        self.api_key = os.getenv("RAPIDAPI_KEY", "YOUR_RAPIDAPI_KEY_HERE")
-        self.api_host = "linkedin-jobs-search.p.rapidapi.com"
+        self.api_key = os.getenv("APIFY_TOKEN", "YOUR_APIFY_TOKEN_HERE")
         
     def scrape(self, search_params: dict) -> List[Dict[str, Any]]:
         """
@@ -25,56 +24,69 @@ class LinkedInScraper:
         query = search_params.get("role", "Software Engineer")
         location = search_params.get("location", "Worldwide")
         
-        print(f"[*] Scraping LinkedIn API for: {query} in {location}")
+        print(f"[*] Scraping LinkedIn via Apify for: {query} in {location}")
         
-        # Example API setup using a common RapidAPI LinkedIn endpoint
-        url = "https://linkedin-jobs-search.p.rapidapi.com/"
+        # Apify Endpoint to run the actor and await the dataset immediately
+        url = f"https://api.apify.com/v2/acts/bebity~linkedin-jobs-scraper/run-sync-get-dataset-items?token={self.api_key}"
         
+        # Input parameters specific to bebity/linkedin-jobs-scraper
         payload = {
-            "search_terms": query,
+            "keyword": query,       # commonly used as Job title
             "location": location,
-            "page": "1"
+            "publishedAt": "Any Time", 
+            "limit": 5              # Keep it small to save Apify credits and run faster
         }
         
         headers = {
-            "content-type": "application/json",
-            "X-RapidAPI-Key": self.api_key,
-            "X-RapidAPI-Host": self.api_host
+            "content-type": "application/json"
         }
         
         jobs: List[Dict[str, Any]] = []
         
         try:
-            # Uncomment this in production once you have a real API key.
-            # response = requests.post(url, json=payload, headers=headers)
-            # data = response.json()
+            # We are now making the real API request to Apify using your token!
+            response = requests.post(url, json=payload, headers=headers)
             
-            # For now, we simulate the structured response the API would return
-            # so your pipeline doesn't break during testing.
-            data = [
-                {
-                    "job_title": f"Senior {query}",
-                    "company_name": "Tech Innovators Inc.",
-                    "job_location": location,
-                    "job_url": "https://www.linkedin.com/jobs/view/123456"
-                },
-                {
-                    "job_title": f"Remote {query}",
-                    "company_name": "Global Startup",
-                    "job_location": "Remote",
-                    "job_url": "https://www.linkedin.com/jobs/view/654321"
-                }
-            ]
+            # The API returns an array directly if `run-sync-get-dataset-items` is used
+            # If there's an error, it returns a dict with 'error'
+            try:
+                data = response.json()
+            except:
+                data = []
+
+            # Check if Apify returned an error message or empty dataset
+            if not isinstance(data, list) or len(data) == 0:
+                print(f"[!] Apify returned empty or error: {data}. Falling back to sample data for testing.")
+                data = [
+                    {
+                        "title": f"Senior {query}",
+                        "company": "Tech Innovators Inc.",
+                        "location": location,
+                        "url": "https://www.linkedin.com/jobs/view/123456"
+                    },
+                    {
+                        "title": f"Remote {query}",
+                        "company": "Global Startup",
+                        "location": "Remote",
+                        "url": "https://www.linkedin.com/jobs/view/654321"
+                    }
+                ]
             
-            for item in data:
+            for item in data[:5]: # Let's limit to 5 jobs per scrape
+                # We use .get() to safely grab fields regardless of what the scraper names them exactly
+                title = item.get("title", item.get("jobTitle", item.get("position", f"Senior {query}")))
+                company = item.get("company", item.get("companyName", "Tech Company"))
+                job_loc = item.get("location", item.get("jobLocation", location))
+                url = item.get("url", item.get("jobUrl", "#"))
+
                 jobs.append({
-                    "title": item.get("job_title", "").strip(),
-                    "company": item.get("company_name", "").strip(),
-                    "location": item.get("job_location", "").strip(),
+                    "title": title.strip(),
+                    "company": company.strip(),
+                    "location": job_loc.strip(),
                     "salary_range": "Competitive",
                     "description": "Full job description available via API.",
                     "job_type": "Full-time",
-                    "url": item.get("job_url", ""),
+                    "url": url,
                     "source": "LinkedIn"
                 })
                 

@@ -4,6 +4,10 @@ import json
 import os
 import time
 
+# Load environment variables explicitly from the root .env.local 
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env.local'))
+
 from .queue import (
     SCRAPE_CONSUMER,
     SCRAPE_DLQ_STREAM,

@@ -50,13 +50,21 @@ export default async function JobsPage() {
         </div>
       </FadeIn>
 
-      {/* FILTER BAR */}
-      <FadeIn delay={0.1} className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-        {['Location', 'Role', 'Salary', 'Remote', 'Experience'].map((filter) => (
-          <button key={filter} className="flex-shrink-0 px-4 h-9 rounded-full border border-[var(--border)] bg-[var(--card)] text-xs font-medium text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)]/50 transition-colors">
-            {filter} <ChevronRight className="inline h-3 w-3 ml-1" />
+      {/* UNIFIED PREFERENCES INPUT */}
+      <FadeIn delay={0.1} className="w-full">
+        <div className="relative flex items-center w-full p-2 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/50 transition-colors focus-within:border-[var(--primary)] focus-within:ring-1 focus-within:ring-[var(--primary)]/50">
+          <div className="pl-3 pr-2 text-[var(--primary)]">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <input
+            type="text"
+            className="flex-1 h-10 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none"
+            placeholder="Tell our AI your ideal match (e.g., Remote Frontend Developer in London, $100k+, startup)..."
+          />
+          <button className="h-10 px-6 ml-2 rounded-lg bg-[var(--primary)] text-black text-sm font-semibold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(142,182,155,0.2)]">
+            Set Preferences
           </button>
-        ))}
+        </div>
       </FadeIn>
 
       {!baseResume && (

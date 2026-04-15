@@ -63,18 +63,18 @@ export const Component = () => {
     () => [
       {
         title: "TALENT",
-        line1: "Where vision meets reality,",
-        line2: "we shape the future of tomorrow",
+        line1: "Build a MAANG-Level Resume,",
+        line2: "optimized for ATS success.",
       },
       {
         title: "SYNC",
-        line1: "Beyond the boundaries of imagination,",
-        line2: "lies the universe of possibilities",
+        line1: "Get Matched to the Right Jobs,",
+        line2: "powered by AI-driven insights.",
       },
       {
-        title: "MATCH",
-        line1: "In the space between thought and creation,",
-        line2: "we find the essence of true innovation",
+        title: "APPLY",
+        line1: "Auto-Apply with AI,",
+        line2: "we do the hard work for you.",
       },
     ],
     []
@@ -89,7 +89,7 @@ export const Component = () => {
     const lowMotion = isMobile || prefersReducedMotion;
 
     refs.scene = new THREE.Scene();
-    refs.scene.fog = new THREE.FogExp2(0x030712, 0.00035);
+    refs.scene.fog = new THREE.FogExp2(0x0f172a, 0.00035);
 
     refs.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2500);
     refs.camera.position.set(0, 20, 160);
@@ -104,12 +104,12 @@ export const Component = () => {
     refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowMotion ? 1.2 : 2));
     refs.renderer.setSize(window.innerWidth, window.innerHeight);
     refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    refs.renderer.toneMappingExposure = 0.7;
+    refs.renderer.toneMappingExposure = 0.85;
 
     refs.composer = new EffectComposer(refs.renderer);
     refs.composer.addPass(new RenderPass(refs.scene, refs.camera));
     refs.composer.addPass(
-      new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), lowMotion ? 0.35 : 0.8, 0.35, 0.9)
+      new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), lowMotion ? 0.25 : 0.4, 0.35, 0.85)
     );
 
     const createStars = () => {
@@ -134,11 +134,11 @@ export const Component = () => {
           const color = new THREE.Color();
           const colorChoice = Math.random();
           if (colorChoice < 0.65) {
-            color.setHSL(0.62, 0.4, 0.82);
+            color.setHex(0xf9fafb); // White
           } else if (colorChoice < 0.9) {
-            color.setHSL(0.09, 0.6, 0.8);
+            color.setHex(0xd4af37); // Gold
           } else {
-            color.setHSL(0.87, 0.45, 0.82);
+            color.setHex(0x9ca3af); // Ash
           }
 
           colors[i * 3] = color.r;
@@ -166,7 +166,7 @@ export const Component = () => {
             void main() {
               vColor = color;
               vec3 p = position;
-              float angle = time * 0.03 * (1.0 - depth * 0.25);
+              float angle = time * 0.015 * (1.0 - depth * 0.25);
               mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
               p.xy = rot * p.xy;
 
@@ -203,9 +203,9 @@ export const Component = () => {
       const material = new THREE.ShaderMaterial({
         uniforms: {
           time: { value: 0 },
-          color1: { value: new THREE.Color("#1b3f91") },
-          color2: { value: new THREE.Color("#db2763") },
-          opacity: { value: 0.24 },
+          color1: { value: new THREE.Color("#1f2937") },
+          color2: { value: new THREE.Color("#d4af37") },
+          opacity: { value: 0.22 },
         },
         vertexShader: `
           varying vec2 vUv;
@@ -253,10 +253,10 @@ export const Component = () => {
       if (!refs.scene) return;
 
       const layers = [
-        { z: -60, height: 60, color: "#0e1b33", opacity: 1 },
-        { z: -110, height: 90, color: "#12284a", opacity: 0.82 },
-        { z: -160, height: 110, color: "#183462", opacity: 0.65 },
-        { z: -220, height: 140, color: "#204070", opacity: 0.42 },
+        { z: -60, height: 60, color: "#0f172a", opacity: 1 },
+        { z: -110, height: 90, color: "#111827", opacity: 0.82 },
+        { z: -160, height: 110, color: "#1f2937", opacity: 0.65 },
+        { z: -220, height: 140, color: "#374151", opacity: 0.42 },
       ];
 
       layers.forEach((layer, index) => {
@@ -316,7 +316,7 @@ export const Component = () => {
 
           void main() {
             float i = pow(0.75 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-            vec3 c = vec3(0.22, 0.54, 1.0) * i;
+            vec3 c = vec3(0.83, 0.68, 0.21) * i;
             c *= 0.88 + sin(time * 1.8) * 0.12;
             gl_FragColor = vec4(c, i * 0.24);
           }
@@ -350,13 +350,13 @@ export const Component = () => {
       }
 
       if (state.camera) {
-        const smoothing = lowMotion ? 0.06 : 0.045;
+        const smoothing = lowMotion ? 0.05 : 0.035;
         smoothCameraPos.current.x += (state.target.x - smoothCameraPos.current.x) * smoothing;
         smoothCameraPos.current.y += (state.target.y - smoothCameraPos.current.y) * smoothing;
         smoothCameraPos.current.z += (state.target.z - smoothCameraPos.current.z) * smoothing;
 
-        const floatX = lowMotion ? Math.sin(time * 0.12) * 0.7 : Math.sin(time * 0.17) * 1.5;
-        const floatY = lowMotion ? Math.cos(time * 0.14) * 0.4 : Math.cos(time * 0.21) * 0.8;
+        const floatX = lowMotion ? Math.sin(time * 0.08) * 0.5 : Math.sin(time * 0.12) * 1.0;
+        const floatY = lowMotion ? Math.cos(time * 0.10) * 0.3 : Math.cos(time * 0.15) * 0.6;
 
         state.camera.position.set(
           smoothCameraPos.current.x + floatX,
@@ -368,7 +368,7 @@ export const Component = () => {
 
       state.mountains.forEach((mountain, index) => {
         const factor = 1 + index * 0.45;
-        mountain.position.x = Math.sin(time * (lowMotion ? 0.06 : 0.09)) * factor * (lowMotion ? 1.2 : 2);
+        mountain.position.x = Math.sin(time * (lowMotion ? 0.04 : 0.06)) * factor * (lowMotion ? 0.8 : 1.5);
       });
 
       state.composer?.render();
@@ -451,8 +451,8 @@ export const Component = () => {
         {
           y: 120,
           opacity: 0,
-          duration: 1.2,
-          stagger: 0.04,
+          duration: 1.5,
+          stagger: 0.06,
           ease: "power4.out",
         },
         "-=0.5"
@@ -466,11 +466,11 @@ export const Component = () => {
         {
           y: 38,
           opacity: 0,
-          duration: 0.9,
-          stagger: 0.16,
+          duration: 1.2,
+          stagger: 0.18,
           ease: "power3.out",
         },
-        "-=0.7"
+        "-=0.9"
       );
     }
 
@@ -605,10 +605,10 @@ export const Component = () => {
           position: relative;
           min-height: 300vh;
           background:
-            radial-gradient(circle at 20% 15%, rgba(53, 84, 197, 0.42) 0%, transparent 40%),
-            radial-gradient(circle at 80% 18%, rgba(220, 39, 115, 0.35) 0%, transparent 38%),
-            linear-gradient(180deg, #040611 0%, #0b1020 60%, #090d1a 100%);
-          color: #f6f7fb;
+            radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 80% 18%, rgba(31, 41, 55, 0.35) 0%, transparent 38%),
+            linear-gradient(180deg, #0f172a 0%, #111827 60%, #030712 100%);
+          color: #f9fafb;
           overflow-x: clip;
         }
 

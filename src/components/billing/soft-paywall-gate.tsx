@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -90,13 +90,13 @@ export function SoftPaywallGate({
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Link
-            href="/pricing"
+            href="/dashboard/billing"
             className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-foreground)]"
           >
             Upgrade Now
           </Link>
           <Link
-            href="/billing"
+            href="/dashboard/billing"
             className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)]"
           >
             Open Billing

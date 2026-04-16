@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
@@ -107,7 +107,7 @@ export default async function AtsSharePage({ params }: { params: Promise<{ id: s
               Start Free
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/pricing" className="inline-flex h-11 items-center rounded-full border border-[#003893] px-5 font-semibold text-[#003893] hover:bg-[#00389308]">
+            <Link href="/dashboard/billing" className="inline-flex h-11 items-center rounded-full border border-[#003893] px-5 font-semibold text-[#003893] hover:bg-[#00389308]">
               View Pricing
             </Link>
           </div>

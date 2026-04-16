@@ -1,11 +1,11 @@
-﻿"use client"
+"use client"
 
 import * as React from "react"
 import {
   FileText,
   LayoutDashboard,
   ChartNoAxesColumn,
-  Shield,
+
   Settings,
   LogOut,
   Briefcase,
@@ -14,7 +14,7 @@ import {
   Map,
   FileSignature,
   CheckSquare,
-  BadgeIndianRupee,
+
   Wallet
 } from "lucide-react"
 import { motion, Variants } from "framer-motion"
@@ -79,18 +79,8 @@ const items = [
     icon: ChartNoAxesColumn,
   },
   {
-    title: "Admin",
-    url: "/dashboard/admin",
-    icon: Shield,
-  },
-  {
-    title: "Pricing",
-    url: "/pricing",
-    icon: BadgeIndianRupee,
-  },
-  {
-    title: "Billing",
-    url: "/billing",
+    title: "Billing & Pricing",
+    url: "/dashboard/billing",
     icon: Wallet,
   },
   {

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
@@ -210,7 +210,7 @@ const LoginAuth = () => {
               Free ATS Checker
             </Link>
             <span className="text-[#9ca3af]">|</span>
-            <Link href="/pricing" className="text-[#003893] font-semibold hover:underline">
+            <Link href="/dashboard/billing" className="text-[#003893] font-semibold hover:underline">
               View Pricing
             </Link>
           </div>

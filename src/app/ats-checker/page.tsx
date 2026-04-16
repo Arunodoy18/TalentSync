@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -151,7 +151,7 @@ export default function AtsCheckerPage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/pricing"
+                href="/dashboard/billing"
                 className="inline-flex h-12 items-center rounded-full border border-[#003893] px-6 font-semibold text-[#003893] hover:bg-[#00389308]"
               >
                 View Plans

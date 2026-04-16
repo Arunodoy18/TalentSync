@@ -1,4 +1,4 @@
-﻿import { createClient } from "@/lib/supabase-server";
+import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { Settings, ShieldCheck, UserRound, Wallet, Bell, Lock } from "lucide-react";
 import Link from "next/link";
@@ -80,13 +80,13 @@ export default async function SettingsPage() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/pricing"
+              href="/dashboard/billing"
               className="inline-flex items-center rounded-lg border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-4 py-2 text-sm font-semibold text-[var(--primary-light)]"
             >
               Open Pricing Plans
             </Link>
             <Link
-              href="/billing"
+              href="/dashboard/billing"
               className="inline-flex items-center rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-sm font-semibold text-[var(--text)]"
             >
               Open Billing

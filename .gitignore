@@ -48,3 +48,10 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# local tooling artifacts
+scraper/venv/
+script-add-upload.js
+script-api.js
+script-frontend-upload.js
+script-jobs.js

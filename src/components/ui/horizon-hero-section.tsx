@@ -35,6 +35,7 @@ export const Component = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const subtitleRef = useRef<HTMLDivElement | null>(null);
+  const descriptionRef = useRef<HTMLDivElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -65,16 +66,19 @@ export const Component = () => {
         title: "TALENT",
         line1: "Build a MAANG-Level Resume,",
         line2: "optimized for ATS success.",
+        description: "Stop throwing resumes into the void. TalentSync uses advanced AI to meticulously tailor your application for each specific role, ensuring you bypass ATS filters and land directly on the recruiter's desk.",
       },
       {
         title: "SYNC",
         line1: "Get Matched to the Right Jobs,",
         line2: "powered by AI-driven insights.",
+        description: "Discover opportunities perfectly aligned with your skills and aspirations. Our intelligent matching engine analyzes millions of data points to connect you with top companies where you're guaranteed to thrive.",
       },
       {
         title: "APPLY",
         line1: "Auto-Apply with AI,",
         line2: "we do the hard work for you.",
+        description: "Scale your job search without the burnout. TalentSync automates the application process, sending out personalized submissions on your behalf while you focus on preparing for the interviews.",
       },
     ],
     []
@@ -205,7 +209,7 @@ export const Component = () => {
           time: { value: 0 },
           color1: { value: new THREE.Color("#1f2937") },
           color2: { value: new THREE.Color("#d4af37") },
-          opacity: { value: 0.22 },
+          opacity: { value: 0.12 },
         },
         vertexShader: `
           varying vec2 vUv;
@@ -318,7 +322,7 @@ export const Component = () => {
             float i = pow(0.75 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
             vec3 c = vec3(0.83, 0.68, 0.21) * i;
             c *= 0.88 + sin(time * 1.8) * 0.12;
-            gl_FragColor = vec4(c, i * 0.24);
+            gl_FragColor = vec4(c, i * 0.08);
           }
         `,
         side: THREE.BackSide,
@@ -429,7 +433,7 @@ export const Component = () => {
   useEffect(() => {
     if (!ready) return;
 
-    gsap.set([menuRef.current, titleRef.current, subtitleRef.current, progressRef.current], {
+    gsap.set([menuRef.current, titleRef.current, subtitleRef.current, descriptionRef.current, progressRef.current], {
       visibility: "visible",
     });
 
@@ -471,6 +475,19 @@ export const Component = () => {
           ease: "power3.out",
         },
         "-=0.9"
+      );
+    }
+
+    if (descriptionRef.current) {
+      timeline.from(
+        descriptionRef.current,
+        {
+          y: 24,
+          opacity: 0,
+          duration: 1.0,
+          ease: "power3.out",
+        },
+        "-=0.6"
       );
     }
 
@@ -578,6 +595,14 @@ export const Component = () => {
           <p className="horizon-subtitle-line">{sections[0].line1}</p>
           <p className="horizon-subtitle-line">{sections[0].line2}</p>
         </div>
+
+        <div 
+          className="horizon-description mt-6 max-w-2xl mx-auto text-center text-gray-300 text-sm md:text-base leading-relaxed tracking-wide" 
+          ref={descriptionRef}
+          style={{ visibility: "hidden" }}
+        >
+          {sections[0].description}
+        </div>
       </div>
 
       <div className="horizon-scroll-progress" ref={progressRef} style={{ visibility: "hidden" }}>
@@ -596,6 +621,9 @@ export const Component = () => {
             <h2>{section.title}</h2>
             <p>{section.line1}</p>
             <p>{section.line2}</p>
+            <p className="mt-6 max-w-xl mx-auto text-center text-gray-300 text-sm md:text-base leading-relaxed tracking-wide">
+              {section.description}
+            </p>
           </section>
         ))}
       </div>

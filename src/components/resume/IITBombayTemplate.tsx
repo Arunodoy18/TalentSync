@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 });
-export const IITGuwahatiTemplate = ({ basics, experience, education, projects = [], skills }: Props) => {
+export const IITTemplate = ({ basics, experience, education, projects = [], skills }: Props) => {
   const contactParts = [
     basics.phone,
     basics.email,
@@ -334,7 +334,8 @@ export const IITGuwahatiTemplate = ({ basics, experience, education, projects = 
   );
 };
 
-export const IITBombayTemplate = IITGuwahatiTemplate;
+export const IITBombayTemplate = IITTemplate;
+export const IITGuwahatiTemplate = IITTemplate;
 
 
 

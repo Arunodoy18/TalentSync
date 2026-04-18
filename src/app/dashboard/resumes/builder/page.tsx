@@ -9,7 +9,7 @@ import { FileText, Sparkles, Plus, Loader2, UploadCloud, Download, LayoutTemplat
 import { cn } from "@/lib/utils";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ResumePDF } from "@/components/resume/PDFDocument";
-import { IITBombayTemplate } from "@/components/resume/IITBombayTemplate";
+import { IITGuwahatiTemplate } from "@/components/resume/IITBombayTemplate";
 import { JakesTemplate } from "@/components/resume/JakesTemplate";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FadeIn } from "@/components/ui/fade-in";
@@ -321,10 +321,10 @@ export default function ResumeBuilderPage() {
             <p className="text-[var(--text-muted)] mt-2">
               {entryMode === "ai"
                 ? "Use AI-first drafting with a single focused resume output."
-                : "Choose IIT Bombay or Jake template and export your final resume."}
+                : "Choose IIT Guwahati or Jake template and export your final resume."}
             </p>
             <p className="text-xs text-[var(--primary-light)] mt-2">
-              Active structure: {effectiveTemplate === "auto" ? "AI" : effectiveTemplate === "iit" ? "IIT Bombay" : "Jake"}
+              Active structure: {effectiveTemplate === "auto" ? "AI" : effectiveTemplate === "iit" ? "IIT Guwahati" : "Jake"}
               {" "}template flow is applied to this form.
             </p>
           </div>
@@ -537,7 +537,7 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <label className="text-sm font-medium text-[var(--text-muted)]">School / Institute</label>
-                            <Input value={edu.school || ""} onChange={e => { const n=[...education]; n[i].school=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="IIT Bombay" />
+                            <Input value={edu.school || ""} onChange={e => { const n=[...education]; n[i].school=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="IIT Guwahati" />
                           </div>
                           <div className="space-y-2">
                             <label className="text-sm font-medium text-[var(--text-muted)]">Degree</label>
@@ -625,7 +625,7 @@ export default function ResumeBuilderPage() {
          <div className="mb-6">
            <h3 className="font-semibold text-[var(--text)] mb-4 flex items-center">
               <LayoutTemplate className="mr-2 h-5 w-5 text-[var(--primary)]" />
-              Template Layout ({effectiveTemplate === "auto" ? "AI Resume" : effectiveTemplate === "iit" ? "IIT Bombay" : "Jake"})
+              Template Layout ({effectiveTemplate === "auto" ? "AI Resume" : effectiveTemplate === "iit" ? "IIT Guwahati" : "Jake"})
            </h3>
            <div className="flex bg-black/30 p-1.5 rounded-lg border border-[var(--border)] mb-6">
              {(entryMode === "ai" ? ["auto"] : ["iit", "jake"]).map((mode) => (
@@ -637,7 +637,7 @@ export default function ResumeBuilderPage() {
                     templateFormat === mode ? "bg-[var(--primary)] text-black shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5"
                   )}
                 >
-                  {mode === "auto" ? "AI Resume" : mode === "iit" ? "IIT Bombay" : "Jake's Resume"}
+                  {mode === "auto" ? "AI Resume" : mode === "iit" ? "IIT Guwahati" : "Jake's Resume"}
                 </button>
              ))}
            </div>
@@ -647,7 +647,7 @@ export default function ResumeBuilderPage() {
                <PDFDownloadLink
                   document={
                     effectiveTemplate === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={resolvedSkills} /> :
-                    effectiveTemplate === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} projects={iitProjects} skills={resolvedSkills} /> :
+                    effectiveTemplate === "iit" ? <IITGuwahatiTemplate basics={basics} experience={experience} education={education} projects={iitProjects} skills={resolvedSkills} /> :
                     <JakesTemplate basics={basics} experience={experience} education={education} projects={selectedProjects} skills={resolvedSkills} />
                   }
                   fileName={downloadFileName}

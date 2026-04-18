@@ -45,7 +45,7 @@ export default async function ResumesPage() {
               </div>
               <h2 className="text-2xl font-semibold text-[var(--text)] mb-2">Choose Template</h2>
               <p className="text-sm text-[var(--text-muted)] mb-4">
-                Select our IIT Bombay or Jake's FAANG-level layouts. Pick which projects and experiences from your Master Vault to inject.
+                Select our IIT Guwahati or Jake's FAANG-level layouts. Pick which projects and experiences from your Master Vault to inject.
               </p>
             </div>
             <div className="relative z-10 flex items-center text-[var(--primary)] text-sm font-medium mt-auto group-hover:translate-x-1 transition-transform">
@@ -94,7 +94,7 @@ export default async function ResumesPage() {
               </div>
               <h3 className="text-xl font-semibold text-[var(--text)] mb-3">No Resume Created Yet</h3>
               <p className="text-sm text-[var(--text-muted)] mb-8 max-w-md mx-auto leading-relaxed">
-                Create your ATS-optimized resume using our IIT or Jake template,<br/>
+                Create your ATS-optimized resume using our IIT Guwahati or Jake template,<br/>
                 or build one with AI.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4">

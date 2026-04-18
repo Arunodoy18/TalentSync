@@ -6,10 +6,10 @@ import { LayoutTemplate, ChevronRight } from "lucide-react";
 const templateCards = [
   {
     id: "iit",
-    title: "IIT Bombay Template",
+    title: "IIT Guwahati Template",
     description: "Academic-first layout with dense achievements and structured sections.",
     href: "/dashboard/resumes/builder?entry=template&template=iit",
-    previewTitle: "IIT Bombay Resume",
+    previewTitle: "IIT Guwahati Resume",
   },
   {
     id: "jake",

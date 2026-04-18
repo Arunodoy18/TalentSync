@@ -109,6 +109,7 @@ export default function ResumeBuilderPage() {
   }-${effectiveTemplate}.pdf`;
 
   const selectedProjects = projects.filter((p) => p.selected);
+  const iitProjects = selectedProjects.length > 0 ? selectedProjects : projects;
 
   const resolvedSkills = useMemo(() => {
     if (effectiveTemplate === "iit") {
@@ -646,7 +647,7 @@ export default function ResumeBuilderPage() {
                <PDFDownloadLink
                   document={
                     effectiveTemplate === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={resolvedSkills} /> :
-                    effectiveTemplate === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} skills={resolvedSkills} /> :
+                    effectiveTemplate === "iit" ? <IITBombayTemplate basics={basics} experience={experience} education={education} projects={iitProjects} skills={resolvedSkills} /> :
                     <JakesTemplate basics={basics} experience={experience} education={education} projects={selectedProjects} skills={resolvedSkills} />
                   }
                   fileName={downloadFileName}

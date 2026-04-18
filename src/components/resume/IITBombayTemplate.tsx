@@ -3,233 +3,336 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
-// Styles tailored for the ultra-dense, 10pt Sans-Serif IIT Bombay format
+type ResumeBasics = {
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  summary: string;
+  linkedin?: string;
+  github?: string;
+};
+
+type ResumeEducation = {
+  examination?: string;
+  university?: string;
+  institute?: string;
+  year?: string;
+  score?: string;
+  degree?: string;
+  school?: string;
+  location?: string;
+  grade?: string;
+};
+
+type ResumeExperience = {
+  role?: string;
+  position?: string;
+  company?: string;
+  location?: string;
+  date?: string;
+  duration?: string;
+  bullets?: string[];
+  points?: string[];
+};
+
+type ResumeProject = {
+  title?: string;
+  name?: string;
+  course?: string;
+  technologies?: string;
+  duration?: string;
+  date?: string;
+  bullets?: string[];
+  points?: string[];
+};
+
+type Props = {
+  basics: ResumeBasics;
+  experience: ResumeExperience[];
+  education: ResumeEducation[];
+  projects?: ResumeProject[];
+  skills: string;
+};
+
+const getBullets = (item: { bullets?: string[]; points?: string[] }): string[] => {
+  if (Array.isArray(item.bullets) && item.bullets.length > 0) return item.bullets;
+  if (Array.isArray(item.points) && item.points.length > 0) return item.points;
+  return [];
+};
+
+const parseSkills = (skills: string): Array<{ label: string; value: string }> => {
+  return skills
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const idx = part.indexOf(":");
+      if (idx === -1) {
+        return { label: "Skills", value: part };
+      }
+
+      return {
+        label: part.slice(0, idx).trim(),
+        value: part.slice(idx + 1).trim(),
+      };
+    });
+};
+
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 36, // ~0.5in
-    paddingBottom: 24, // ~0.33in
-    paddingLeft: 36, // ~0.5in
-    paddingRight: 36, // ~0.5in
+    paddingTop: 28,
+    paddingBottom: 24,
+    paddingLeft: 30,
+    paddingRight: 30,
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 9.2,
     color: "#000",
   },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  headerLeft: {
-    width: "25%",
-  }, 
-  headerCenter: {
-    width: "50%",
+  header: {
     textAlign: "center",
-  },
-  headerRight: {
-    width: "25%",
-    textAlign: "right",
-    fontSize: 9,
+    marginBottom: 8,
   },
   name: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: "bold",
-    marginBottom: 2,
+    letterSpacing: 0.35,
   },
-  subtitle: {
-    fontSize: 10,
-    fontWeight: "bold",
+  contactRow: {
+    marginTop: 3,
+    fontSize: 8,
   },
-  subSubtitle: {
-    fontSize: 9,
-  },
-  sectionTitleBox: {
-    backgroundColor: "#d9d9d9", // Typical gray box
-    paddingVertical: 2,
+  sectionBand: {
+    backgroundColor: "#d1d1d1",
+    paddingVertical: 1.5,
     paddingHorizontal: 4,
-    marginTop: 8,
+    marginTop: 6,
     marginBottom: 4,
   },
   sectionTitle: {
-    fontSize: 9.5,
+    fontSize: 8.6,
     fontWeight: "bold",
     textTransform: "uppercase",
   },
   table: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    borderTopWidth: 1.5,
-    borderBottomWidth: 1.5,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
     borderColor: "#000",
-    marginTop: 4,
-    marginBottom: 4,
+    marginBottom: 2,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    borderBottomWidth: 0.7,
+    borderColor: "#000",
+    paddingVertical: 2,
+    fontWeight: "bold",
+    fontSize: 8.2,
   },
   tableRow: {
     flexDirection: "row",
-    borderBottomWidth: 0.5,
-    borderColor: "#a0a0a0",
-    paddingVertical: 3,
+    borderBottomWidth: 0.35,
+    borderColor: "#b7b7b7",
+    paddingVertical: 1.8,
+    fontSize: 8.2,
   },
-  tableHeader: {
-    fontWeight: "bold",
+  colExam: { width: "30%", paddingLeft: 3 },
+  colUniversity: { width: "26%" },
+  colInstitute: { width: "22%" },
+  colYear: { width: "10%", textAlign: "right" },
+  colScore: { width: "12%", textAlign: "right", paddingRight: 3 },
+  subsection: {
+    marginBottom: 3,
   },
-  tableCol1: { width: "25%", textAlign: "left", paddingLeft: 4 },
-  tableCol2: { width: "35%", textAlign: "center" },
-  tableCol3: { width: "25%", textAlign: "center" },
-  tableCol4: { width: "15%", textAlign: "right", paddingRight: 4 },
-  
-  entryItem: {
-    marginBottom: 4,
-  },
-  entryHeaderRow: {
+  headingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 1.5,
   },
-  entryTitle: {
+  leftHeading: {
+    width: "78%",
+    fontSize: 8.8,
     fontWeight: "bold",
-    fontSize: 9.5,
   },
-  entryDate: {
-    fontStyle: "italic",
-    fontSize: 9,
+  rightHeading: {
+    width: "22%",
     textAlign: "right",
+    fontSize: 8.3,
+    fontWeight: "bold",
+    fontStyle: "italic",
   },
-  bulletList: {
-    paddingLeft: 8,
+  metaLine: {
+    fontSize: 8,
+    fontStyle: "italic",
+    marginBottom: 1,
   },
   bulletRow: {
     flexDirection: "row",
-    marginTop: 2,
+    alignItems: "flex-start",
+    marginTop: 0.8,
+    paddingLeft: 4,
   },
   bulletDot: {
     width: 8,
-    fontSize: 10,
+    fontSize: 8.8,
+    lineHeight: 1.12,
   },
   bulletText: {
-    flex: 1,
-    fontSize: 9.5,
+    width: "96%",
+    fontSize: 8.4,
+    lineHeight: 1.22,
+  },
+  skillLine: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingLeft: 2,
+    marginBottom: 1,
+  },
+  skillLabel: {
+    fontWeight: "bold",
+    fontSize: 8.6,
+  },
+  skillValue: {
+    fontSize: 8.5,
     lineHeight: 1.2,
-  }
+  },
+  mutedText: {
+    fontSize: 8.1,
+    color: "#2a2a2a",
+  },
+  projectLinks: {
+    fontSize: 8,
+    marginTop: 0.5,
+    textAlign: "right",
+  },
 });
+export const IITBombayTemplate = ({ basics, experience, education, projects = [], skills }: Props) => {
+  const contactParts = [
+    basics.phone,
+    basics.email,
+    basics.linkedin,
+    basics.github,
+    basics.location,
+  ].filter(Boolean);
 
-type Props = {
-  basics: { name: string; email: string; phone: string; location: string; summary: string; linkedin?: string };
-  experience: any[];
-  education: any[];
-  skills: string;
-};
+  const skillLines = parseSkills(skills);
+  const summaryLines = (basics.summary || "")
+    .split(/\n|\./)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
 
-// Represents the Ultra-Dense IIT Bombay LaTeX Template Structure
-export const IITBombayTemplate = ({ basics, experience, education, skills }: Props) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      
-      {/* Header replicating the IITB centered logo/name layout */}
-      <View style={styles.headerRow}>
-        <View style={styles.headerLeft}>
-          {/* Typically where the seal goes, omitting for textual density */}
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <Text style={styles.name}>{(basics.name || "YOUR NAME").toUpperCase()}</Text>
+          <Text style={styles.contactRow}>{contactParts.join("  |  ")}</Text>
         </View>
-        <View style={styles.headerCenter}>
-          <Text style={styles.name}>{basics.name || "Your Name"}</Text>
-          <Text style={styles.subtitle}>Software Engineer</Text>
-          <Text style={styles.subSubtitle}>{basics.location || "City, State"}</Text>
-        </View>
-        <View style={styles.headerRight}>
-          <Text>{basics.email}</Text>
-          <Text>{basics.phone}</Text>
-          {basics.linkedin && <Text>{basics.linkedin}</Text>}
-        </View>
-      </View>
 
-      {/* Education - Rendered as a formal tabular format */}
-      {education && education.length > 0 && (
-        <View>
-          <View style={styles.sectionTitleBox}>
-            <Text style={styles.sectionTitle}>Education</Text>
+        <View style={styles.sectionBand}>
+          <Text style={styles.sectionTitle}>Education</Text>
+        </View>
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={styles.colExam}>Examination</Text>
+            <Text style={styles.colUniversity}>University</Text>
+            <Text style={styles.colInstitute}>Institute</Text>
+            <Text style={styles.colYear}>Year</Text>
+            <Text style={styles.colScore}>CPI/%</Text>
           </View>
-          <View style={styles.table}>
-            <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={styles.tableCol1}>Degree</Text>
-              <Text style={styles.tableCol2}>University / Institute</Text>
-              <Text style={styles.tableCol3}>Year</Text>
-              <Text style={styles.tableCol4}>CPI/%</Text>
+
+          {(education.length > 0 ? education : [{ }]).map((edu, idx) => (
+            <View key={`edu-${idx}`} style={styles.tableRow}>
+              <Text style={styles.colExam}>{edu.examination || edu.degree || "Bachelor of Technology"}</Text>
+              <Text style={styles.colUniversity}>{edu.university || edu.school || "-"}</Text>
+              <Text style={styles.colInstitute}>{edu.institute || edu.location || "-"}</Text>
+              <Text style={styles.colYear}>{edu.year || "-"}</Text>
+              <Text style={styles.colScore}>{edu.score || edu.grade || "-"}</Text>
             </View>
-            {education.map((edu, idx) => (
-              <View key={idx} style={styles.tableRow}>
-                <Text style={styles.tableCol1}>{edu.degree || "Degree"}</Text>
-                <Text style={styles.tableCol2}>{edu.school || "University Name"}</Text>
-                <Text style={styles.tableCol3}>{edu.year || "20xx"}</Text>
-                <Text style={styles.tableCol4}>{edu.grade || "N/A"}</Text>
-              </View>
-            ))}
-          </View>
+          ))}
         </View>
-      )}
 
-      {/* Experience - Work & Internships */}
-      {experience && experience.length > 0 && (
-        <View>
-          <View style={styles.sectionTitleBox}>
-            <Text style={styles.sectionTitle}>Work Experience & Internships</Text>
-          </View>
-          <View style={styles.bulletList}>
-            {experience.map((exp, idx) => (
-              <View key={idx} style={styles.entryItem}>
-                <View style={styles.entryHeaderRow}>
-                  <Text style={styles.entryTitle}>
-                    * {exp.role || "Role"} | <Text style={{ fontWeight: "normal" }}>{exp.company || "Company"}</Text>
-                  </Text>
-                  <Text style={styles.entryDate}>{exp.location || "Duration/Location"}</Text>
-                </View>
-                {exp.bullets && exp.bullets.map((bullet: string, bIdx: number) => (
-                  <View key={bIdx} style={styles.bulletRow}>
-                    <Text style={[styles.bulletDot, { paddingLeft: 8 }]}>-</Text>
+        <View style={styles.sectionBand}>
+          <Text style={styles.sectionTitle}>Course Projects</Text>
+        </View>
+        {(projects.length > 0 ? projects : [{ }]).slice(0, 4).map((project, idx) => {
+          const bullets = getBullets(project);
+          return (
+            <View key={`proj-${idx}`} style={styles.subsection}>
+              <View style={styles.headingRow}>
+                <Text style={styles.leftHeading}>
+                  {(project.title || project.name || "Project Title")}
+                  {(project.course || project.technologies) ? ` | ${project.course || project.technologies}` : ""}
+                </Text>
+                <Text style={styles.rightHeading}>{project.duration || project.date || ""}</Text>
+              </View>
+
+              {bullets.length > 0 ? (
+                bullets.slice(0, 3).map((bullet, bIdx) => (
+                  <View key={`proj-b-${idx}-${bIdx}`} style={styles.bulletRow}>
+                    <Text style={styles.bulletDot}>•</Text>
                     <Text style={styles.bulletText}>{bullet}</Text>
                   </View>
-                ))}
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
+                ))
+              ) : (
+                <Text style={styles.mutedText}>Add project bullet points to complete IIT format details.</Text>
+              )}
+            </View>
+          );
+        })}
 
-      {/* Skills Component (Dense Category based) */}
-      {skills && (
-        <View>
-          <View style={styles.sectionTitleBox}>
-            <Text style={styles.sectionTitle}>Technical Skills</Text>
-          </View>
-          <View style={styles.bulletList}>
-            <View style={styles.bulletRow}>
-              <Text style={styles.bulletDot}>-</Text>
-              <Text style={styles.bulletText}>
-                <Text style={{ fontWeight: "bold" }}>Core Competencies: </Text>
-                {skills}
-              </Text>
-            </View>
-          </View>
+        <View style={styles.sectionBand}>
+          <Text style={styles.sectionTitle}>Work Experience & Internships</Text>
         </View>
-      )}
-      
-      {/* Summary / Extracurriculars mapping */}
-      {basics.summary && (
-        <View>
-           <View style={styles.sectionTitleBox}>
-            <Text style={styles.sectionTitle}>Positions of Responsibility & Profile</Text>
-          </View>
-          <View style={styles.bulletList}>
-            <View style={styles.bulletRow}>
-              <Text style={styles.bulletDot}>-</Text>
-              <Text style={styles.bulletText}>{basics.summary}</Text>
+        {(experience.length > 0 ? experience : [{ }]).slice(0, 4).map((exp, idx) => {
+          const bullets = getBullets(exp);
+          return (
+            <View key={`exp-${idx}`} style={styles.subsection}>
+              <View style={styles.headingRow}>
+                <Text style={styles.leftHeading}>{exp.position || exp.role || "Role"} | {exp.company || "Organization"}</Text>
+                <Text style={styles.rightHeading}>{exp.duration || exp.date || ""}</Text>
+              </View>
+
+              {!!exp.location && <Text style={styles.metaLine}>{exp.location}</Text>}
+
+              {bullets.length > 0 ? (
+                bullets.slice(0, 3).map((bullet, bIdx) => (
+                  <View key={`exp-b-${idx}-${bIdx}`} style={styles.bulletRow}>
+                    <Text style={styles.bulletDot}>•</Text>
+                    <Text style={styles.bulletText}>{bullet}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.mutedText}>Add experience bullet points to complete IIT format details.</Text>
+              )}
             </View>
-          </View>
+          );
+        })}
+
+        <View style={styles.sectionBand}>
+          <Text style={styles.sectionTitle}>Technical Skills</Text>
         </View>
-      )}
-    </Page>
-  </Document>
-);
+        {(skillLines.length > 0 ? skillLines : [{ label: "Skills", value: "Add categorized skills" }]).map((line, idx) => (
+          <View key={`skill-${idx}`} style={styles.skillLine}>
+            <Text style={styles.skillLabel}>{line.label}: </Text>
+            <Text style={styles.skillValue}>{line.value}</Text>
+          </View>
+        ))}
+
+        <View style={styles.sectionBand}>
+          <Text style={styles.sectionTitle}>POR & Extra-Curriculars</Text>
+        </View>
+        {(summaryLines.length > 0 ? summaryLines : ["Add summary/POR achievements for IIT format completeness."]).map((line, idx) => (
+          <View key={`por-${idx}`} style={styles.bulletRow}>
+            <Text style={styles.bulletDot}>•</Text>
+            <Text style={styles.bulletText}>{line}</Text>
+          </View>
+        ))}
+      </Page>
+    </Document>
+  );
+};
 
 
 

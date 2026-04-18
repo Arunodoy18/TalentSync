@@ -78,6 +78,11 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
+      SCRAPE_SCHEDULER_ENABLED: ${SCRAPE_SCHEDULER_ENABLED:-true}
+      SCRAPE_SCHEDULE_SECONDS: ${SCRAPE_SCHEDULE_SECONDS:-21600}
+      SCRAPE_SOURCES: ${SCRAPE_SOURCES:-remoteok,greenhouse,linkedin,indeed}
+      SCRAPE_DEFAULT_LOCATION: ${SCRAPE_DEFAULT_LOCATION:-}
+      APIFY_TOKEN: ${APIFY_TOKEN:-}
     ports:
       - "8003:8003"
 
@@ -89,6 +94,9 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
+      APIFY_TOKEN: ${APIFY_TOKEN:-}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
     command: ["python", "-m", "app"]
 
   automation:

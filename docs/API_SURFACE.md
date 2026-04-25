@@ -19,6 +19,14 @@
 - GET /jobs/recommend
 - GET /jobs/:id
 - POST /jobs/save
+- POST /api/jobs/seed
+- POST /api/jobs/match
+
+## Admin Jobs Sync
+
+- POST /api/admin/jobs/sync
+- GET /api/admin/jobs/sync
+- GET /api/admin/jobs/sync?mode=status
 
 ## Matching
 

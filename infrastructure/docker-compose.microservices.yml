@@ -83,6 +83,9 @@ services:
       SCRAPE_SOURCES: ${SCRAPE_SOURCES:-remoteok,greenhouse,linkedin,indeed}
       SCRAPE_DEFAULT_LOCATION: ${SCRAPE_DEFAULT_LOCATION:-}
       APIFY_TOKEN: ${APIFY_TOKEN:-}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
     ports:
       - "8003:8003"
 
@@ -96,6 +99,7 @@ services:
       REDIS_URL: redis://redis:6379
       APIFY_TOKEN: ${APIFY_TOKEN:-}
       SUPABASE_URL: ${SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
       SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
     command: ["python", "-m", "app"]
 

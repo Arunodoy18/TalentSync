@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import TailorButton from "@/components/sections/tailor-button";
 import { FadeIn, StaggerContainer } from "@/components/ui/fade-in";
-import { PreferencesInput } from "./preferences-input";
+import FetchRealJobsButton from "@/components/sections/fetch-real-jobs-button";
 
 export default async function JobsPage() {
   const supabase = await createClient();
@@ -26,7 +26,7 @@ export default async function JobsPage() {
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*")
-    .order("posted_at", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(10);
 
   return (
@@ -36,6 +36,7 @@ export default async function JobsPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">Job Matches</h1>
           <p className="text-[var(--text-muted)] mt-2">Curated opportunities based on your skills and experience.</p>
         </div>
+        <FetchRealJobsButton />
         <div className="flex items-center gap-3 w-full lg:w-auto">
           <div className="relative w-full lg:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />

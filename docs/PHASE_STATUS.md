@@ -47,6 +47,14 @@ Auto-approve mode enabled. Phases are executed sequentially with validation at e
 - Added alert delivery integration via webhook sink (`OPS_ALERT_WEBHOOK_URL`) for warning/critical ops alerts.
 - Added rolling 14-day and 7-day trend analytics with dashboard chart visualizations.
 
+### Phase 5: Jobs Pipeline Reliability
+- Replaced mock jobs seed flow with real RemoteOK ingestion pipeline.
+- Added embedding generation + URL dedupe during ingestion.
+- Added resilient jobs-match fallback ranking for low/no-vector scenarios.
+- Added dashboard trigger to fetch real jobs and fixed jobs listing sort.
+- Added admin-protected jobs sync endpoint and status mode: `/api/admin/jobs/sync?mode=status`.
+- Added jobs sync metrics migration: `database/migrations/008_jobs_sync_metrics.sql`.
+
 ## Required Environment Variables
 - NEXT_PUBLIC_SUPABASE_URL
 - NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -57,6 +65,11 @@ Auto-approve mode enabled. Phases are executed sequentially with validation at e
 - RAZORPAY_WEBHOOK_SECRET
 - INTERNAL_ADMIN_TOKEN
 - OPS_ALERT_WEBHOOK_URL (optional, used for alert dispatch)
+- JOBS_INGEST_DEFAULT_SOURCE (optional)
+- JOBS_INGEST_DEFAULT_LOCATION (optional)
+- JOBS_INGEST_DEFAULT_KEYWORD (optional)
+- JOBS_INGEST_DEFAULT_LIMIT (optional)
+- JOBS_INGEST_MAX_LIMIT (optional)
 
 ## Notes
 - Current workspace is not a git repository, so commit history and diff-based review are unavailable.

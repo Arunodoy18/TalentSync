@@ -17,6 +17,13 @@ class AIPipeline:
         self.model_skill = os.getenv("OPENAI_MODEL_SKILL", "gpt-4.1-mini")
         self.model_chat = os.getenv("OPENAI_MODEL_CHAT", "gpt-4.1-mini")
         self.model_embedding = os.getenv("OPENAI_MODEL_EMBEDDING", "text-embedding-3-large")
+        self.chat_system_prompt = (
+            "You are Zap, a human-like career assistant. Sound natural, warm, and practical, "
+            "like a trusted mentor in a real conversation. Use plain language and avoid robotic "
+            "phrasing. Start with a direct answer, then provide concrete next steps when useful. "
+            "Be honest, helpful, and specific for resumes, ATS, job search, interviews, projects, "
+            "and career planning."
+        )
 
     def parse_resume(self, raw_text: str) -> Dict[str, Any]:
         if not self.client:
@@ -196,14 +203,17 @@ class AIPipeline:
 
     def chat(self, message: str, context: Dict[str, Any] | None = None) -> str:
         if not self.client:
-            return "OpenAI key missing; chat fallback is active."
+            return (
+                "I can still help, but my advanced response engine is offline right now. "
+                "Share your goal and I will give you a practical step-by-step plan."
+            )
 
         response = self.client.responses.create(
             model=self.model_chat,
             input=[
                 {
                     "role": "system",
-                    "content": "You are TalentSync assistant for career guidance.",
+                    "content": self.chat_system_prompt,
                 },
                 {"role": "user", "content": json.dumps({"message": message, "context": context or {}})},
             ],

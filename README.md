@@ -44,6 +44,12 @@ RAZORPAY_WEBHOOK_SECRET=
 
 INTERNAL_ADMIN_TOKEN=
 OPS_ALERT_WEBHOOK_URL=
+
+JOBS_INGEST_DEFAULT_SOURCE=remoteok
+JOBS_INGEST_DEFAULT_LOCATION=
+JOBS_INGEST_DEFAULT_KEYWORD=
+JOBS_INGEST_DEFAULT_LIMIT=20
+JOBS_INGEST_MAX_LIMIT=50
 ```
 
 3. Run development server
@@ -85,6 +91,9 @@ This project is configured with:
 ### Jobs and Matching
 - `POST /api/jobs/seed`
 - `POST /api/jobs/match`
+- `GET /api/admin/jobs/sync` (admin-token protected; supports `source`, `location`, `keyword`, `limit` query params)
+- `POST /api/admin/jobs/sync` (admin-token protected)
+- `GET /api/admin/jobs/sync?mode=status` (admin-token protected; returns last run, last successful run, and 24h summary)
 
 ### Billing and Subscriptions
 - `POST /api/billing/razorpay/order`
@@ -140,6 +149,30 @@ npm run dev
 npm run build
 npm run start
 npm run lint
+npm run smoke:resume-upload
+```
+
+## Resume Upload Smoke Test
+
+This verifies upload -> parse -> save -> vault visibility end-to-end using a real authenticated user session.
+
+Required environment variables before running:
+
+- `SMOKE_BASE_URL` (example: `http://localhost:3000`)
+- `SMOKE_AUTH_COOKIE` (copy browser cookie header from an authenticated session)
+- `SMOKE_USER_ID` (user id for the authenticated session)
+- `SMOKE_PDF_PATH` (path to a real PDF file)
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Optional:
+
+- `SMOKE_CLEANUP=true` to delete the created resume row after the test.
+
+Run:
+
+```bash
+npm run smoke:resume-upload
 ```
 
 ## Recommended Next Steps

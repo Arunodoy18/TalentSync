@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-URL: str = os.environ.get("SUPABASE_URL", "")
+URL: str = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "")
 KEY: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
 supabase: Client | None = None

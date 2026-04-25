@@ -42,9 +42,6 @@ const ResumeUpload = () => {
     } catch (error: any) {
       console.error("Upload error:", error);
       toast.error(error.message || "Failed to parse resume");
-      if (error.message.includes("OpenAI")) {
-        // Show some raw text to the user or tell them to check env
-      }
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

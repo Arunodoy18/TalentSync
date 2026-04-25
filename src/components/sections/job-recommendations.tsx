@@ -27,10 +27,23 @@ interface JobRecommendationsProps {
 const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState<Job[] | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const findJobs = async () => {
     setLoading(true);
+    setMessage(null);
     try {
+      const seedResponse = await fetch("/api/jobs/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ limit: 20 }),
+      });
+
+      if (!seedResponse.ok) {
+        const seedError = await seedResponse.json().catch(() => ({}));
+        console.warn("Real job ingestion warning:", seedError?.error || "Failed to ingest fresh jobs");
+      }
+
       const response = await fetch("/api/jobs/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,8 +52,12 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setJobs(data.jobs);
+      if (data?.fallbackUsed) {
+        setMessage("Showing ranked results from latest jobs while semantic vectors warm up.");
+      }
     } catch (error) {
       console.error("Failed to match jobs:", error);
+      setMessage("Unable to fetch fresh matches right now. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -70,6 +87,7 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
         </div>
       </CardHeader>
       <CardContent className="pt-6">
+        {message && <p className="mb-4 text-xs text-[var(--text-muted)]">{message}</p>}
         {loading && !jobs && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin mb-4 text-[var(--primary)]" />
@@ -113,11 +131,11 @@ const JobRecommendations = ({ resumeId }: JobRecommendationsProps) => {
                      <MapPin className="h-3 w-3" />
                      {job.location}
                    </span>
-                   <span>â€¢</span>
+                   <span>|</span>
                    <span>{job.job_type}</span>
                    {job.salary_range && (
                       <>
-                        <span>â€¢</span>
+                        <span>|</span>
                         <span>{job.salary_range}</span>
                       </>
                    )}

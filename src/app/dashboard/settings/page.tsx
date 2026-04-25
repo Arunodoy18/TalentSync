@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Settings, ShieldCheck, UserRound, Wallet, Bell, Lock } from "lucide-react";
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { SmokeTestHelper } from "@/components/settings/smoke-test-helper";
 
 function formatDate(value?: string | null) {
   if (!value) return "-";
@@ -114,6 +115,8 @@ export default async function SettingsPage() {
             </div>
           </div>
         </div>
+
+        <SmokeTestHelper userId={user.id} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

@@ -13,6 +13,7 @@ import { IITTemplate } from "@/components/resume/IITBombayTemplate";
 import { JakesTemplate } from "@/components/resume/JakesTemplate";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FadeIn } from "@/components/ui/fade-in";
+import { toast } from "sonner";
 
 type TemplateMode = "auto" | "iit" | "jake";
 
@@ -247,36 +248,86 @@ export default function ResumeBuilderPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/resumes/parse", {
+      const response = await fetch("/api/resume/parse", {
         method: "POST",
         body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        if (data.basics) setBasics(data.basics);
-        if (data.experience) setExperience(data.experience);
-        if (data.projects) setProjects(data.projects.map((p: any) => ({ ...p, selected: true })));
-        if (data.education) setEducation(data.education);
-        if (data.skills) {
-          setSkills(data.skills);
-          setTemplateSkills((prev) => ({
-            iit: {
-              ...prev.iit,
-              programming: prev.iit.programming || data.skills,
-            },
-            jake: {
-              ...prev.jake,
-              languages: prev.jake.languages || data.skills,
-            },
-          }));
-        }
+        const parsed = data?.resume?.content ?? data;
+        const personal = parsed?.personal ?? {};
+
+        setBasics({
+          name: personal.fullName ?? "",
+          email: personal.email ?? "",
+          phone: personal.phone ?? "",
+          location: personal.location ?? "",
+          summary: personal.summary ?? "",
+          github: "",
+          linkedin: personal.website ?? "",
+        });
+
+        const normalizedExperience = Array.isArray(parsed?.experience)
+          ? parsed.experience.map((entry: any) => ({
+              company: entry?.company ?? "",
+              role: entry?.role ?? "",
+              start: entry?.startDate ?? "",
+              end: entry?.endDate ?? "",
+              bullets: typeof entry?.description === "string"
+                ? entry.description.split("\n").map((line: string) => line.trim()).filter(Boolean)
+                : [],
+            }))
+          : [];
+
+        const normalizedProjects = Array.isArray(parsed?.projects)
+          ? parsed.projects.map((project: any) => ({
+              name: project?.name ?? "",
+              technologies: project?.technologies ?? "",
+              github: project?.github ?? "",
+              link: project?.link ?? "",
+              bullets: Array.isArray(project?.bullets) ? project.bullets : [],
+              selected: true,
+            }))
+          : [];
+
+        const normalizedEducation = Array.isArray(parsed?.education)
+          ? parsed.education.map((entry: any) => ({
+              school: entry?.school ?? "",
+              degree: entry?.degree ?? "",
+              year: `${entry?.startDate ?? ""}${entry?.endDate ? ` - ${entry.endDate}` : ""}`.trim(),
+              grade: entry?.description ?? "",
+            }))
+          : [];
+
+        const normalizedSkills = Array.isArray(parsed?.skills)
+          ? parsed.skills.join(", ")
+          : typeof parsed?.skills === "string"
+            ? parsed.skills
+            : "";
+
+        setExperience(normalizedExperience);
+        setProjects(normalizedProjects);
+        setEducation(normalizedEducation);
+        setSkills(normalizedSkills);
+        setTemplateSkills((prev) => ({
+          iit: {
+            ...prev.iit,
+            programming: prev.iit.programming || normalizedSkills,
+          },
+          jake: {
+            ...prev.jake,
+            languages: prev.jake.languages || normalizedSkills,
+          },
+        }));
+        toast.success("Resume imported and saved to your vault.");
       } else {
-        const errorData = await response.json().catch(() => null); alert(errorData?.error || "Failed to parse resume.");
+        const errorData = await response.json().catch(() => null);
+        toast.error(errorData?.error || "Failed to parse resume.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error parsing resume.");
+      toast.error("Error parsing resume.");
     } finally {
       setParsingResume(false);
     }
@@ -332,7 +383,14 @@ export default function ResumeBuilderPage() {
 
         {basics.name === "" && experience.length === 0 && (
            <FadeIn delay={0.2} className="w-full relative group rounded-2xl border-2 border-dashed border-[var(--primary)]/50 bg-[var(--primary)]/5 hover:bg-[var(--primary)]/10 transition-colors p-8 text-center flex flex-col items-center justify-center cursor-pointer">
-             <input type="file" accept=".pdf" onChange={handleFileUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+             <input
+               type="file"
+               accept=".pdf"
+               title="Upload resume PDF"
+               aria-label="Upload resume PDF"
+               onChange={handleFileUpload}
+               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+             />
              {parsingResume ? (
                 <>
                   <Loader2 className="h-8 w-8 text-[var(--primary)] animate-spin mb-3" />

@@ -29,11 +29,26 @@ function extractJobSkills(job: any): string[] {
     return job.skills_required.map((s: string) => normalizeSkill(s)).filter(Boolean);
   }
 
-  const text = `${job?.title || ""} ${job?.description || ""}`;
+  const text = `${job?.title || ""} ${job?.description || ""} ${job?.job_description || ""}`;
   return text
     .split(/[^a-zA-Z0-9+#\.]/)
     .map(normalizeSkill)
     .filter((token) => token.length > 2);
+}
+
+function titleTokenOverlap(title: string, resumeSkills: Set<string>): number {
+  const tokens = title
+    .toLowerCase()
+    .split(/[^a-z0-9+#\.]/)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 2);
+
+  if (tokens.length === 0 || resumeSkills.size === 0) {
+    return 0;
+  }
+
+  const overlap = tokens.filter((token) => resumeSkills.has(token)).length;
+  return overlap / tokens.length;
 }
 
 export async function POST(req: NextRequest) {
@@ -78,12 +93,47 @@ export async function POST(req: NextRequest) {
       match_threshold: 0.65,
       match_count: 20,
     });
-
-    if (matchError) throw matchError;
+    if (matchError) {
+      console.warn("match_jobs RPC warning:", matchError.message);
+    }
 
     const resumeSkills = Array.from(new Set(extractResumeSkills(resume.content)));
+    const resumeSkillSet = new Set(resumeSkills);
+    let fallbackUsed = false;
+    let similarityThreshold = 0.65;
 
-    const rankedJobs = (jobs || [])
+    let jobsForRanking: any[] = Array.isArray(jobs) ? jobs : [];
+
+    if (jobsForRanking.length === 0) {
+      fallbackUsed = true;
+      similarityThreshold = 0.15;
+
+      const { data: recentJobs, error: recentJobsError } = await supabase
+        .from("jobs")
+        .select("id, title, company, location, salary_range, description, job_type, url, skills_required, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (recentJobsError) {
+        throw new Error(`Failed to fetch recent jobs for fallback ranking: ${recentJobsError.message}`);
+      }
+
+      jobsForRanking = (recentJobs ?? []).map((job: any) => {
+        const jobSkills = Array.from(new Set(extractJobSkills(job)));
+        const overlappingSkills = jobSkills.filter((skill) => resumeSkillSet.has(skill)).length;
+        const skillScore = jobSkills.length > 0 ? overlappingSkills / jobSkills.length : 0;
+        const titleScore = titleTokenOverlap(job.title || "", resumeSkillSet);
+
+        const fallbackSimilarity = Math.max(0, Math.min(1, skillScore * 0.8 + titleScore * 0.2));
+
+        return {
+          ...job,
+          similarity: fallbackSimilarity,
+        };
+      });
+    }
+
+    const rankedJobs = jobsForRanking
       .map((job: any) => {
         const match_score = Math.max(0, Math.min(1, Number(job.similarity || 0)));
         
@@ -100,7 +150,7 @@ export async function POST(req: NextRequest) {
           },
         };
       })
-      .filter((job: any) => job.similarity > 0.65)
+      .filter((job: any) => job.similarity > similarityThreshold)
       .sort((a: any, b: any) => b.match_score - a.match_score)
       .slice(0, 20);
       const matchRows = rankedJobs.map((job: any) => ({
@@ -123,7 +173,7 @@ export async function POST(req: NextRequest) {
         console.error("Job match persistence warning:", persistError);
       }
 
-      return NextResponse.json({ jobs: rankedJobs });
+      return NextResponse.json({ jobs: rankedJobs, fallbackUsed });
     } catch (error: unknown) {
     console.error("Job match error:", error);
     const message = error instanceof Error ? error.message : "Failed to match jobs";

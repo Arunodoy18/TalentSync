@@ -14,6 +14,10 @@ This tracker is updated in strict sequence to avoid ambiguity.
 8. Queue-backed scraper and automation orchestration with retry + dead-letter handling
 9. Notification provider adapters with retry and audit logging
 10. CI gates for backend tests, python syntax checks, compose validation, and integration smoke
+11. Replaced mock job seeding with real RemoteOK ingestion + embedding + dedupe
+12. Added robust jobs match fallback ranking when semantic vectors are unavailable
+13. Added dashboard "Fetch Real Jobs" trigger and jobs ordering fix
+14. Added admin-protected jobs sync endpoint and sync run metrics/status API
 
 ## Step 8 Delivered Details
 
@@ -30,3 +34,5 @@ This tracker is updated in strict sequence to avoid ambiguity.
 - Python services compile checks pass.
 - Compose config validates.
 - Integration smoke checks are automated in CI.
+- Jobs sync metrics migration added: database/migrations/008_jobs_sync_metrics.sql.
+- Admin status endpoint available: /api/admin/jobs/sync?mode=status.

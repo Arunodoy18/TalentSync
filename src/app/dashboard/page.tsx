@@ -75,14 +75,10 @@ export default function DashboardPage() {
           (authUser.user_metadata?.name as string | undefined) ||
           formatEmailName(authUser.email ?? "");
 
-        const [resumesCountResult, resumesScoresResult, applicationsResult] = await Promise.all([
+        const [resumesCountResult, applicationsResult] = await Promise.all([
           supabase
             .from("resumes")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", authUser.id),
-          supabase
-            .from("resumes")
-            .select("ats_score")
             .eq("user_id", authUser.id),
           supabase
             .from("job_applications")
@@ -91,10 +87,25 @@ export default function DashboardPage() {
         ]);
 
         if (resumesCountResult.error) throw new Error(resumesCountResult.error.message);
-        if (resumesScoresResult.error) throw new Error(resumesScoresResult.error.message);
         if (applicationsResult.error) throw new Error(applicationsResult.error.message);
 
+        // Backward-compatible query: some environments may not have `resumes.ats_score` yet.
+        const resumesScoresResult = await supabase
+          .from("resumes")
+          .select("ats_score")
+          .eq("user_id", authUser.id);
+
         const resumeCount = resumesCountResult.count ?? 0;
+        const atsQueryFailed = Boolean(resumesScoresResult.error);
+        const atsColumnMissing =
+          atsQueryFailed &&
+          resumesScoresResult.error?.message?.toLowerCase().includes("ats_score") &&
+          resumesScoresResult.error?.message?.toLowerCase().includes("does not exist");
+
+        if (atsQueryFailed && !atsColumnMissing) {
+          throw new Error(resumesScoresResult.error?.message || "Failed to fetch ATS scores.");
+        }
+
         const atsScores = (resumesScoresResult.data ?? [])
           .map((row) => Number(row.ats_score))
           .filter((value) => Number.isFinite(value) && value >= 0);

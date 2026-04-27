@@ -1,5 +1,15 @@
-﻿import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
+
+type ReferralRow = {
+  id: string;
+  created_at: string;
+  converted_at: string | null;
+  first_payment_id: string | null;
+  source: string | null;
+  campaign: string | null;
+};
 
 function isoDay(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -21,7 +31,7 @@ function getLastNDays(n: number): string[] {
 
 export async function GET() {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -41,7 +51,7 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const referrals = rows || [];
+    const referrals: ReferralRow[] = (rows ?? []) as ReferralRow[];
     const touches = referrals.length;
     const converted = referrals.filter((r) => !!r.converted_at).length;
     const conversionRate = touches > 0 ? Number(((converted / touches) * 100).toFixed(2)) : 0;

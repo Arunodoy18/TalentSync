@@ -1,5 +1,6 @@
-﻿import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 import { ingestRealJobs } from "@/lib/jobs-ingestion";
 
 type SeedRequestBody = {
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
   try {
     const body = ((await req.json().catch(() => ({}))) ?? {}) as SeedRequestBody;
 
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

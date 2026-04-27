@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { cookies } from "next/headers"
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers"
 
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
+    const supabase = createRouteHandlerClient({ cookies })
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -31,8 +32,9 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true }, { status: 200 })
-  } catch (err: any) {
-    console.error('DELETE resume error:', err)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  } catch (error: unknown) {
+    console.error('DELETE resume error:', error)
+    const message = error instanceof Error ? error.message : 'Internal Server Error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

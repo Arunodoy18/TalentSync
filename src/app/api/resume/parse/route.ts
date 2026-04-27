@@ -1,7 +1,8 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import PDFParser from "pdf2json";
 import { OpenAI } from "openai";
-import { createClient } from "@/lib/supabase-server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 
 export const runtime = "nodejs";
 
@@ -107,7 +108,7 @@ function normalizeParsedContent(raw: unknown): ResumeContent {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -144,18 +145,30 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "system",
-          content: "You are a professional resume parser. Extract information into structured JSON. If a field is missing, leave it as an empty string or empty array. Be precise and preserve formatting where appropriate."
+          content: "You are an expert ATS resume parser and resume writer. Convert raw resume text into dense, keyword-rich, ATS-optimized structured JSON while preserving factual information. Always return valid JSON only."
         },
         {
           role: "user",
-          content: `Extract the professional information from this resume text and return it in a structured JSON format following this schema:
+          content: `Extract and ENRICH the professional information from this resume text and return it in a structured JSON format following this schema:
 {
   "personal": { "fullName": "", "email": "", "phone": "", "location": "", "website": "", "summary": "" },
   "experience": [ { "company": "", "role": "", "startDate": "", "endDate": "", "description": "" } ],
-  "education": [ { "school": "", "degree": "", "startDate": "", "endDate": "" } ],
+  "education": [ { "school": "", "degree": "", "startDate": "", "endDate": "", "description": "" } ],
   "skills": [],
   "projects": []
 }
+
+STRICT OUTPUT RULES:
+1) For every experience entry, "description" must contain 4-5 bullet points separated by newline characters.
+2) Every bullet point must start with a strong action verb from this set whenever applicable:
+   Engineered, Architected, Optimized, Implemented, Designed, Led, Reduced, Increased.
+3) Every bullet must include at least one concrete metric/number where possible
+   (examples: "reduced load time by 40%", "served 10k+ users", "cut costs by 22%").
+4) "skills" must list 15-20 relevant technical skills minimum, deduplicated, ATS keyword-rich.
+5) The generated content should be dense enough to fill a full A4 resume when rendered.
+6) Keep output concise, high-signal, and recruiter-friendly while remaining truthful to the source.
+7) If a field is missing, use an empty string or empty array instead of inventing unrelated facts.
+8) Return JSON only; do not add markdown or explanations.
 
 Resume text:
 ${text}`
@@ -186,9 +199,10 @@ ${text}`
     if (error) throw error;
 
     return NextResponse.json({ resume });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Parsing error:", error);
-    return NextResponse.json({ error: error.message || "Failed to parse resume" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to parse resume";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

@@ -1,6 +1,7 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { createClient } from "@/lib/supabase-server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 import { hasPlanAccess } from "@/lib/entitlements";
 
 const openai = new OpenAI({
@@ -9,7 +10,7 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

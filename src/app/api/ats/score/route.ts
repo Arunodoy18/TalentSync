@@ -1,10 +1,11 @@
-﻿import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 
 // Calls our Python AI service to generate deeply analytical ATS score breakdown
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

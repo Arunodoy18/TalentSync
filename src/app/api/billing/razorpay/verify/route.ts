@@ -1,6 +1,7 @@
-﻿import crypto from "node:crypto";
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 import { createAdminClient } from "@/lib/supabase-admin";
 import {
   addDays,
@@ -22,7 +23,7 @@ function normalizePlan(planCode: SubscriptionPlanCode): "pro" {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const {
       data: { user },
     } = await supabase.auth.getUser();

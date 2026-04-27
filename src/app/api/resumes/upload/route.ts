@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { cookies } from "next/headers"
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers"
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = createRouteHandlerClient({ cookies })
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -59,8 +60,9 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, resume: dbData })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('File upload error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

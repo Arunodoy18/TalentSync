@@ -1,5 +1,6 @@
-﻿import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -8,7 +9,7 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -51,9 +52,10 @@ export async function POST(req: NextRequest) {
     ];
 
     return NextResponse.json({ skills });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Skill analysis error:", error);
-    return NextResponse.json({ error: error.message || "Failed to analyze skills" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to analyze skills";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

@@ -1,6 +1,8 @@
-﻿import { convertToModelMessages, streamText } from "ai";
+import { convertToModelMessages, streamText } from "ai";
 import { createGroq } from "@ai-sdk/groq";
-import { createClient } from "@/lib/supabase-server";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 import { hasPlanAccess } from "@/lib/entitlements";
 
 export const maxDuration = 60;
@@ -10,25 +12,25 @@ const HUMAN_STYLE_SYSTEM_PROMPT =
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const allowed = await hasPlanAccess(user.id, "pro");
     if (!allowed) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Trial expired. Upgrade to continue using AI Assistant." },
         { status: 402 }
       );
     }
 
     if (!process.env.GROQ_API_KEY) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Missing GROQ_API_KEY on server." },
         { status: 500 }
       );
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
 
     const { messages } = await req.json();
     if (!Array.isArray(messages)) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Invalid request payload: messages array required." },
         { status: 400 }
       );
@@ -53,7 +55,7 @@ export async function POST(req: Request) {
     );
 
     if (sanitizedMessages.length === 0) {
-      return Response.json(
+      return NextResponse.json(
         { error: "At least one user or assistant message is required." },
         { status: 400 }
       );
@@ -72,7 +74,7 @@ export async function POST(req: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown server error";
     console.error("Chat API error:", message);
-    return Response.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

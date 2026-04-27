@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { cookies } from "next/headers"
+import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers"
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = createRouteHandlerClient({ cookies })
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -26,8 +27,9 @@ export async function POST(req: Request) {
     console.log(`[AI-Scraper Trigger] User ${user.id} requested: ${prompt}`)
 
     return NextResponse.json({ success: true, message: 'Preferences updated and sent to scraper queue.' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Job preferences error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

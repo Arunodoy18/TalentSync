@@ -1,5 +1,5 @@
 ﻿import { createClient } from "@/lib/supabase-server";
-import { Search, Briefcase, MapPin, Sparkles, Filter, ChevronRight, Zap } from "lucide-react";
+import { Search, Briefcase, MapPin, Sparkles, Filter, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import TailorButton from "@/components/sections/tailor-button";
@@ -21,6 +21,16 @@ export default async function JobsPage() {
     .eq("user_id", user.id)
     .eq("is_base", true)
     .maybeSingle();
+
+  const { data: latestResume } = await supabase
+    .from("resumes")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const activeResume = baseResume ?? latestResume;
 
   // Get jobs
   const { data: jobs } = await supabase
@@ -69,7 +79,7 @@ export default async function JobsPage() {
         </div>
       </FadeIn>
 
-      {!baseResume && (
+      {!activeResume && (
         <FadeIn delay={0.2}>
           <div className="p-[24px] rounded-[12px] bg-gradient-to-r from-[var(--primary)]/10 to-[var(--card)] border border-[var(--primary)]/30 flex flex-col md:flex-row items-center gap-6">
             <div className="h-12 w-12 rounded-[12px] bg-[var(--primary)]/20 border border-[var(--primary)]/30 flex items-center justify-center">
@@ -79,9 +89,9 @@ export default async function JobsPage() {
               <h3 className="font-semibold text-lg text-[var(--text)]">Upload your Master Resume</h3>
               <p className="text-[var(--text-muted)] text-sm mt-1">We need your skills and experience to find perfect job matches instantly.</p>
             </div>
-            <Link href="/dashboard/resumes">
+            <Link href="/dashboard/resumes/upload">
               <button className="h-[44px] px-6 rounded-[12px] bg-[var(--primary)] text-black font-medium hover:scale-105 active:scale-95 transition-transform shadow-[0_0_15px_rgba(142,182,155,0.2)]">
-                Go to Vault
+                Upload Resume
               </button>
             </Link>
           </div>
@@ -130,10 +140,10 @@ export default async function JobsPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {baseResume && (
+                            {activeResume && (
                               <div className="scale-90 origin-right">
                                 <TailorButton 
-                                  resumeId={baseResume.id} 
+                                  resumeId={activeResume.id} 
                                   jobId={job.id} 
                                   jobTitle={job.title} 
                                 />

@@ -38,7 +38,12 @@ export default async function AutoApplyPage() {
             <Activity className="h-4 w-4 animate-pulse" />
             Engine Active
           </div>
-          <button className="h-[44px] px-4 rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
+          <button
+            type="button"
+            aria-label="Pause auto-apply engine"
+            title="Pause auto-apply engine"
+            className="h-[44px] px-4 rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition-all"
+          >
             <Pause className="h-5 w-5" />
           </button>
         </div>

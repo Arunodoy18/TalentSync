@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +40,44 @@ type ResumeDraftState = {
   education: any[];
   skills: string;
   templateSkills: TemplateSkillsState;
+};
+
+const ACTION_VERBS = [
+  "Engineered",
+  "Architected",
+  "Optimized",
+  "Implemented",
+  "Designed",
+  "Led",
+  "Reduced",
+  "Increased",
+  "Developed",
+  "Built",
+  "Automated",
+  "Delivered",
+];
+
+const ensureActionSentence = (value: string): string => {
+  const cleaned = value.replace(/^[\-\u2022\s]+/, "").replace(/\s+/g, " ").trim();
+  if (!cleaned) {
+    return "Implemented improvements that increased measurable outcomes by 20%.";
+  }
+
+  const startsWithVerb = ACTION_VERBS.some((verb) =>
+    new RegExp(`^${verb}\\b`, "i").test(cleaned)
+  );
+
+  const sentence = startsWithVerb
+    ? cleaned
+    : `Implemented ${cleaned.charAt(0).toLowerCase()}${cleaned.slice(1)}`;
+
+  return `${sentence.replace(/[.!?]+$/g, "")}.`;
+};
+
+const normalizeBullets = (raw: string[]): string[] => {
+  return raw
+    .map((item) => ensureActionSentence(item))
+    .filter(Boolean);
 };
 
 const createEmptyTemplateSkills = (): TemplateSkillsState => ({
@@ -104,6 +143,11 @@ export default function ResumeBuilderPage() {
   const [generating, setGenerating] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
   const [validationTouched, setValidationTouched] = useState(false);
+  const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
+  const [isSavingToVault, setIsSavingToVault] = useState(false);
+  const [isRunningAts, setIsRunningAts] = useState(false);
+  const [atsScore, setAtsScore] = useState<number | null>(null);
+  const [atsSuggestions, setAtsSuggestions] = useState<string[]>([]);
 
   const downloadFileName = `${
     basics.name?.trim().toLowerCase().replace(/\s+/g, "-") || "resume"
@@ -255,6 +299,13 @@ export default function ResumeBuilderPage() {
 
       if (response.ok) {
         const data = await response.json();
+        if (data?.resume?.id) {
+          setSavedResumeId(data.resume.id);
+          setAtsScore(typeof data.resume.ats_score === "number" ? data.resume.ats_score : null);
+          setAtsSuggestions(
+            Array.isArray(data.resume.feedback?.suggestions) ? data.resume.feedback.suggestions : []
+          );
+        }
         const parsed = data?.resume?.content ?? data;
         const personal = parsed?.personal ?? {};
 
@@ -275,7 +326,9 @@ export default function ResumeBuilderPage() {
               start: entry?.startDate ?? "",
               end: entry?.endDate ?? "",
               bullets: typeof entry?.description === "string"
-                ? entry.description.split("\n").map((line: string) => line.trim()).filter(Boolean)
+                ? normalizeBullets(
+                    entry.description.split("\n").map((line: string) => line.trim()).filter(Boolean)
+                  )
                 : [],
             }))
           : [];
@@ -286,7 +339,7 @@ export default function ResumeBuilderPage() {
               technologies: project?.technologies ?? "",
               github: project?.github ?? "",
               link: project?.link ?? "",
-              bullets: Array.isArray(project?.bullets) ? project.bullets : [],
+              bullets: Array.isArray(project?.bullets) ? normalizeBullets(project.bullets) : [],
               selected: true,
             }))
           : [];
@@ -350,13 +403,106 @@ export default function ResumeBuilderPage() {
         const data = await resp.json();
         const updated = [...experience];
         updated[index].bullets = updated[index].bullets || [];
-        updated[index].bullets.push(data.bullet_point);
+        updated[index].bullets.push(ensureActionSentence(data.bullet_point || "Delivered measurable impact with strong execution"));
         setExperience(updated);
       }
     } catch(err) {
       console.error(err);
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const buildResumePayload = () => {
+    const sourceProjects = effectiveTemplate === "jake" ? selectedProjects : projects;
+    const sourceSkills = (resolvedSkills || skills)
+      .split(/[,|]/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(", ");
+
+    return {
+      resumeId: savedResumeId ?? undefined,
+      mode: effectiveTemplate,
+      title: `${basics.name?.trim() || "Resume"} (${effectiveTemplate.toUpperCase()})`,
+      basics,
+      experience,
+      education,
+      projects: sourceProjects,
+      skills: sourceSkills,
+    };
+  };
+
+  const saveResumeToVault = async (silent = false): Promise<string | null> => {
+    if (!canExport) {
+      setValidationTouched(true);
+      if (!silent) {
+        toast.error("Complete required fields before saving.");
+      }
+      return null;
+    }
+
+    setIsSavingToVault(true);
+    try {
+      const response = await fetch("/api/resume/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildResumePayload()),
+      });
+
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.resume?.id) {
+        throw new Error(data?.error || "Failed to save resume to vault.");
+      }
+
+      setSavedResumeId(data.resume.id);
+      setAtsScore(typeof data.resume.ats_score === "number" ? data.resume.ats_score : null);
+      setAtsSuggestions(
+        Array.isArray(data.resume.feedback?.suggestions) ? data.resume.feedback.suggestions : []
+      );
+
+      if (!silent) {
+        toast.success("Resume saved to your vault.");
+      }
+
+      return data.resume.id as string;
+    } catch (error) {
+      console.error(error);
+      if (!silent) {
+        toast.error(error instanceof Error ? error.message : "Failed to save resume.");
+      }
+      return null;
+    } finally {
+      setIsSavingToVault(false);
+    }
+  };
+
+  const handleCheckAts = async () => {
+    setIsRunningAts(true);
+    try {
+      const resumeId = await saveResumeToVault(true);
+      if (!resumeId) {
+        toast.error("Save your resume first to run ATS check.");
+        return;
+      }
+
+      const response = await fetch(`/api/resume/${resumeId}/ats`, { method: "POST" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.resume) {
+        throw new Error(data?.error || "Failed to calculate ATS score.");
+      }
+
+      setSavedResumeId(data.resume.id);
+      setAtsScore(typeof data.resume.ats_score === "number" ? data.resume.ats_score : null);
+      setAtsSuggestions(
+        Array.isArray(data.resume.feedback?.suggestions) ? data.resume.feedback.suggestions : []
+      );
+      toast.success("ATS score updated.");
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : "Failed to run ATS check.");
+    } finally {
+      setIsRunningAts(false);
     }
   };
 
@@ -377,6 +523,9 @@ export default function ResumeBuilderPage() {
             <p className="text-xs text-[var(--primary-light)] mt-2">
               Active structure: {effectiveTemplate === "auto" ? "AI" : effectiveTemplate === "iit" ? "IIT Template" : "Jake"}
               {" "}template flow is applied to this form.
+            </p>
+            <p className="text-xs text-[var(--text-muted)] mt-2">
+              Workflow: Fill details -&gt; Save to Vault -&gt; Check ATS -&gt; Move to Jobs.
             </p>
           </div>
         </FadeIn>
@@ -563,7 +712,7 @@ export default function ResumeBuilderPage() {
                               value={(proj.bullets || []).join('\n')}
                               onChange={e => {
                                   const n=[...projects]; 
-                                  n[i].bullets=e.target.value.split('\n').filter(Boolean); 
+                                  n[i].bullets=normalizeBullets(e.target.value.split('\n').filter(Boolean)); 
                                   setProjects(n);
                               }}
                             />
@@ -712,7 +861,12 @@ export default function ResumeBuilderPage() {
                >
                  
                  {({ loading }) => (
-                   <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black font-semibold rounded-[12px] w-full shadow-[0_0_20px_rgba(142,182,155,0.15)] hover:scale-[1.02] transition-transform">
+                   <Button
+                     onClick={() => {
+                       void saveResumeToVault(true);
+                     }}
+                     className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black font-semibold rounded-[12px] w-full shadow-[0_0_20px_rgba(142,182,155,0.15)] hover:scale-[1.02] transition-transform"
+                   >
                      {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
                      {loading ? "Rendering..." : "Export PDF"}
                    </Button>
@@ -748,6 +902,60 @@ export default function ResumeBuilderPage() {
                </>
              )}
            </div>
+
+           <div className="mt-3 grid gap-2">
+             <Button
+               onClick={() => {
+                 void saveResumeToVault();
+               }}
+               disabled={isSavingToVault || isRunningAts}
+               className="w-full rounded-[12px] bg-white/5 border border-[var(--border)] text-[var(--text)] hover:bg-white/10"
+             >
+               {isSavingToVault ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+               {isSavingToVault ? "Saving to Vault..." : "Save to Vault"}
+             </Button>
+
+             <Button
+               onClick={() => {
+                 void handleCheckAts();
+               }}
+               disabled={isSavingToVault || isRunningAts}
+               className="w-full rounded-[12px] bg-[var(--primary)] text-black hover:bg-[var(--primary)]/90"
+             >
+               {isRunningAts ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+               {isRunningAts ? "Checking ATS..." : "Check ATS Score"}
+             </Button>
+           </div>
+
+           {(savedResumeId || atsScore !== null) && (
+             <div className="mt-3 rounded-lg border border-[var(--border)] bg-black/20 p-3 space-y-2">
+               {atsScore !== null && (
+                 <p className="text-xs text-[var(--primary-light)]">
+                   ATS score: <span className="font-semibold">{atsScore}%</span>
+                 </p>
+               )}
+               {atsSuggestions.length > 0 && (
+                 <p className="text-xs text-[var(--text-muted)] line-clamp-3">{atsSuggestions[0]}</p>
+               )}
+
+               <div className="grid grid-cols-2 gap-2">
+                 {savedResumeId ? (
+                   <Link href={`/dashboard/resumes/${savedResumeId}`}>
+                     <Button className="w-full rounded-[10px] bg-white/5 border border-[var(--border)] text-[var(--text)] hover:bg-white/10 text-xs h-8">
+                       Open Resume
+                     </Button>
+                   </Link>
+                 ) : (
+                   <div />
+                 )}
+                 <Link href="/dashboard/jobs">
+                   <Button className="w-full rounded-[10px] bg-white/5 border border-[var(--border)] text-[var(--text)] hover:bg-white/10 text-xs h-8">
+                     Go to Jobs
+                   </Button>
+                 </Link>
+               </div>
+             </div>
+           )}
          </div>
          
          {/* Miniature Document Preview Container */}

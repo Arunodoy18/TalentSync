@@ -19,6 +19,12 @@ const LoginAuth = () => {
     setError(null);
     setMessage(null);
 
+    // Using explicitly the live production URL for the email redirect
+    // to fix the "localhost refused to connect" issue when clicking from a phone
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL 
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : 'https://talentsync.buildc3.tech/auth/callback';
+
     try {
       if (isLogin) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -27,12 +33,13 @@ const LoginAuth = () => {
         });
         if (signInError) throw signInError;
         setMessage("Logged in successfully!");
+        window.location.href = "/dashboard"; // Automatically navigate after login
       } else {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: redirectUrl,
           },
         });
         if (signUpError) throw signUpError;
@@ -41,23 +48,6 @@ const LoginAuth = () => {
     } catch (err: any) {
       setError(err.message || "An error occurred during authentication.");
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { error: googleError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (googleError) throw googleError;
-    } catch (err: any) {
-      setError(err.message || "An error occurred with Google login.");
       setLoading(false);
     }
   };
@@ -169,41 +159,6 @@ const LoginAuth = () => {
               {isLogin ? "Create One" : "Log In"}
             </button>
           </p>
-
-          <div className="relative my-[24px] flex items-center">
-            <div className="flex-grow border-t border-[#d1d5db33]"></div>
-            <span className="flex-shrink mx-4 text-[13px] font-bold text-[#6b7280] uppercase tracking-wider">
-              OR
-            </span>
-            <div className="flex-grow border-t border-[#d1d5db33]"></div>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="w-full h-[50px] bg-[#d8dee9] border border-[#d1d5db] text-[#212529] rounded-[50px] text-[15px] font-semibold flex items-center justify-center hover:bg-[#ccd4df] active:scale-[0.98] transition-all disabled:opacity-50"
-          >
-            <svg className="mr-3" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M21.805 10.023h-9.81v3.955h5.62c-.242 1.271-.967 2.348-2.06 3.07v2.55h3.335c1.953-1.798 3.08-4.45 3.08-7.598 0-.646-.057-1.27-.165-1.877z"
-                fill="#4285F4"
-              />
-              <path
-                d="M11.995 22c2.79 0 5.13-.924 6.84-2.502l-3.335-2.55c-.926.62-2.112.987-3.505.987-2.695 0-4.978-1.82-5.792-4.27h-3.45v2.684A10.005 10.005 0 0 0 11.995 22z"
-                fill="#34A853"
-              />
-              <path
-                d="M6.203 13.666A5.989 5.989 0 0 1 5.88 11.99c0-.581.116-1.143.323-1.676V7.63h-3.45A10.004 10.004 0 0 0 2 11.99c0 1.615.387 3.145 1.073 4.36l3.13-2.684z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M11.995 6.045c1.516 0 2.878.521 3.95 1.544l2.964-2.964C17.12 2.958 14.78 2 11.995 2A10.005 10.005 0 0 0 3.073 7.63l3.45 2.684c.814-2.45 3.097-4.27 5.792-4.27z"
-                fill="#EA4335"
-              />
-            </svg>
-            Continue with Google
-          </button>
 
           <div className="mt-5 flex items-center justify-center gap-4 text-sm">
             <Link href="/ats-checker" className="text-[#003893] font-semibold hover:underline">

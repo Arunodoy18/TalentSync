@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
+import { calculateATSScore } from "@/lib/openai";
 
-// Calls our Python AI service to generate deeply analytical ATS score breakdown
+// Calls our AI service to generate deeply analytical ATS score breakdown
 export async function POST(req: NextRequest) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
@@ -40,25 +41,16 @@ export async function POST(req: NextRequest) {
     const jobDescription = `${job.title} at ${job.company}\n\nLocation: ${job.location}\nType: ${job.job_type}\n\nRequired Skills: ${job.skills_required?.join(", ") || "None specified"}\n\n${job.description}`;
     const resumeJson = resume.content || {};
 
-    const response = await fetch("http://ai-service:8000/ai/resume/ats-score", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        resume_json: resumeJson,
-        job_description: jobDescription
-      }),
+    const result = await calculateATSScore(resumeJson, jobDescription);
+
+    return NextResponse.json({
+      overall: result.score,
+      keywords: result.breakdown.keywordMatch,
+      formatting: result.breakdown.formatting,
+      experience: result.breakdown.experienceMatch,
+      skills: result.breakdown.skillsMatch,
+      suggestions: result.suggestions
     });
-
-    if (!response.ok) {
-      const txt = await response.text();
-      console.error("AI Service Error:", txt);
-      return NextResponse.json({ error: "Failed to generate AI ATS Score" }, { status: response.status });
-    }
-
-    const data = await response.json();
-    return NextResponse.json(data);
   } catch (error: unknown) {
     console.error("ATS Score error:", error);
     const message = error instanceof Error ? error.message : "Failed to calculate ATS score";

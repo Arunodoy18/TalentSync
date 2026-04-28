@@ -58,6 +58,12 @@ interface ResumeEditorProps {
   };
 }
 
+const BULLET = "\u2022";
+
+const normalizeUnicode = (value: string): string => {
+  return value.replace(/â€¢/g, BULLET);
+};
+
 const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
   const supabase = createClient();
   const [resume, setResume] = useState(initialResume);
@@ -71,6 +77,15 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
       content: initialResume.content,
     })
   );
+
+  const contactItems = [
+    resume.content.personal.email,
+    resume.content.personal.phone,
+    resume.content.personal.location,
+    resume.content.personal.website,
+  ]
+    .filter((item): item is string => Boolean(item))
+    .map((item) => normalizeUnicode(item));
 
   const calculateATS = async () => {
     setIsAnalyzing(true);
@@ -291,7 +306,7 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
 
           {activeTab === "score" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="flex flex-col items-center justify-center p-6 bg-[#00389305] rounded-2xl border border-[#00389320]">
+              <div className="flex flex-col items-center justify-center p-6 rounded-2xl border bg-[var(--surface)] border-[var(--border)]">
                 {resume.ats_score !== undefined ? (
                   <>
                     <div className="relative h-24 w-24 mb-4">
@@ -301,7 +316,7 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
                           cy="48"
                           r="40"
                           fill="transparent"
-                          stroke="#e5e7eb"
+                          stroke="var(--surface-elevated)"
                           strokeWidth="8"
                         />
                         <circle
@@ -309,63 +324,105 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
                           cy="48"
                           r="40"
                           fill="transparent"
-                          stroke="#003893"
+                          stroke={
+                            resume.ats_score > 75 ? "var(--success)" : 
+                            resume.ats_score >= 50 ? "var(--warning)" : "var(--error)"
+                          }
                           strokeWidth="8"
                           strokeDasharray={2 * Math.PI * 40}
                           strokeDashoffset={2 * Math.PI * 40 * (1 - (resume.ats_score || 0) / 100)}
                           strokeLinecap="round"
+                          className="transition-all duration-1000 ease-out"
                         />
                       </svg>
-                      <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl text-[#003893]">
+                      <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl text-[var(--text-primary)]">
                         {resume.ats_score}%
                       </div>
                     </div>
-                    <h3 className="font-bold text-[#212529]">ATS Compatibility Score</h3>
-                    <p className="text-center text-sm text-[#6b7280] mt-1">{resume.feedback?.match_explanation}</p>
-                    <Button onClick={calculateATS} disabled={isAnalyzing} variant="outline" size="sm" className="mt-4 rounded-full">
+                    <h3 className="font-bold text-[var(--text-primary)] mb-1">ATS Compatibility Score</h3>
+                    <p className="text-center text-sm text-[var(--text-secondary)] mb-6 mt-1">{resume.feedback?.match_explanation}</p>
+
+                    <div className="w-full space-y-4 mb-6">
+                      {[
+                        { label: "Keywords Match", score: resume.feedback?.ats_breakdown?.keywords || 0 },
+                        { label: "Formatting & Structure", score: resume.feedback?.ats_breakdown?.formatting || 0 },
+                        { label: "Experience & Impact", score: resume.feedback?.ats_breakdown?.experience || 0 },
+                        { label: "Skills Coverage", score: resume.feedback?.ats_breakdown?.skills || 0 },
+                      ].map((cat, idx) => {
+                        const barColor = cat.score > 75 ? "var(--success)" : cat.score >= 50 ? "var(--warning)" : "var(--error)";
+                        return (
+                          <div key={idx} className="flex items-center gap-4 text-sm">
+                            <div className="w-1/3 font-medium text-[var(--text-primary)]">{cat.label}</div>
+                            <div className="w-1/2 h-2 rounded-full overflow-hidden bg-[var(--surface-elevated)]">
+                              <div 
+                                className="h-full rounded-full transition-all duration-1000 ease-out" 
+                                style={{ width: `${cat.score}%`, backgroundColor: barColor }} 
+                              />
+                            </div>
+                            <div className="w-1/6 text-right font-bold" style={{ color: barColor }}>{cat.score}/100</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <Button onClick={calculateATS} disabled={isAnalyzing} variant="outline" size="sm" className="w-full rounded-full border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]">
                       {isAnalyzing ? "Recalculating..." : "Recalculate Score"}
                     </Button>
                   </>
                 ) : (
                   <div className="text-center py-4">
-                    <Sparkles className="h-10 w-10 text-[#003893] mx-auto mb-4 opacity-20" />
-                    <p className="text-sm text-[#6b7280] mb-4">Calculate your ATS score to see how well this resume matches industry standards.</p>
-                    <Button onClick={calculateATS} disabled={isAnalyzing} className="bg-[#003893] text-white rounded-full">
+                    <Sparkles className="h-10 w-10 mx-auto mb-4 opacity-20 text-[var(--primary)]" />
+                    <p className="text-sm mb-4 text-[var(--text-secondary)]">Calculate your ATS score to see how well this resume matches industry standards.</p>
+                    <Button onClick={calculateATS} disabled={isAnalyzing} className="rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]">
                       {isAnalyzing ? "Calculating..." : "Calculate ATS Score"}
                     </Button>
                   </div>
                 )}
               </div>
 
-
-                {resume.feedback?.missing_skills?.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-xs font-bold text-[#6b7280] uppercase tracking-wider">Missing Skills</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {resume.feedback.missing_skills.map((skill: string, i: number) => (
-                        <span key={i} className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+              {resume.feedback?.missing_skills?.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Missing Skills</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {resume.feedback.missing_skills.map((skill: string, i: number) => (
+                      <span key={i} className="px-3 py-1 text-xs font-bold rounded-full bg-[var(--error)]/10 text-[var(--error)] border border-[var(--error)]/30">
+                        {skill}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {resume.feedback?.suggestions?.length > 0 && (
+              {resume.feedback?.suggestions?.length > 0 && (
+                <div className="space-y-3">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Suggestions</Label>
                   <div className="space-y-3">
-                    <Label className="text-xs font-bold text-[#6b7280] uppercase tracking-wider">Suggestions</Label>
-                    <div className="space-y-2">
-                      {resume.feedback.suggestions.map((suggestion: string, i: number) => (
-                        <div key={i} className="flex gap-3 p-3 bg-white border border-[#e5e7eb] rounded-xl text-sm text-[#4b5563]">
-                          <Sparkles className="h-4 w-4 text-[#003893] flex-shrink-0 mt-0.5" />
-                          <span>{suggestion}</span>
+                    {resume.feedback.suggestions.map((suggestion: any, i: number) => (
+                      <div key={i} className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm">
+                        <div className="flex gap-3">
+                          <Sparkles className="h-5 w-5 flex-shrink-0 mt-0.5 text-[var(--primary)]" />
+                          <div className="flex-1">
+                            <h4 className="font-bold text-[var(--text-primary)]">
+                              {typeof suggestion === "string" ? "Optimization tip" : suggestion.title}
+                            </h4>
+                            <p className="text-[var(--text-secondary)] mt-1">
+                              {typeof suggestion === "string" ? suggestion : suggestion.description}
+                            </p>
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                        <div className="flex justify-end border-t border-[var(--border)] pt-3">
+                          <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs h-8 bg-transparent text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface-elevated)]" onClick={() => {/* Rewrite logic to implement later */}}>
+                            <Sparkles className="h-3 w-3 text-[var(--primary)]" />
+                            Fix with AI
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
+          )}
 
 
           {activeTab === "personal" && (
@@ -513,18 +570,21 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
         <div className="app-surface w-full max-w-[900px] min-h-[1100px] p-8 sm:p-12 lg:p-[60px] font-serif transition-all duration-300 origin-top">
           <div className="text-center border-b-2 border-[#1a1a1a] pb-6 mb-8">
             <h1 className="text-4xl font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">{resume.content.personal.fullName || "Your Name"}</h1>
-            <div className="flex items-center justify-center gap-4 text-sm text-[#4b5563]">
-              {resume.content.personal.email && <span>{resume.content.personal.email}</span>}
-              {resume.content.personal.phone && <span>â€¢ {resume.content.personal.phone}</span>}
-              {resume.content.personal.location && <span>â€¢ {resume.content.personal.location}</span>}
-              {resume.content.personal.website && <span>â€¢ {resume.content.personal.website}</span>}
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[#4b5563]">
+              {contactItems.map((item, index) => (
+                <span key={`${item}-${index}`}>
+                  {index > 0 ? `${BULLET} ${item}` : item}
+                </span>
+              ))}
             </div>
           </div>
 
           {resume.content.personal.summary && (
             <div className="mb-10">
               <h2 className="text-lg font-bold uppercase border-b border-[#e5e7eb] pb-1 mb-3">Professional Summary</h2>
-              <p className="text-sm leading-relaxed text-[#374151]">{resume.content.personal.summary}</p>
+              <p className="text-sm leading-relaxed text-[#374151]">
+                {normalizeUnicode(resume.content.personal.summary)}
+              </p>
             </div>
           )}
 
@@ -538,8 +598,12 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
                       <h3 className="font-bold text-md text-[#1a1a1a]">{exp.company}</h3>
                       <span className="text-sm font-medium italic text-[#4b5563]">{exp.startDate} - {exp.endDate}</span>
                     </div>
-                    <div className="text-sm font-bold text-[#374151] italic mb-2">{exp.role}</div>
-                    <p className="text-sm leading-relaxed text-[#374151] whitespace-pre-line">{exp.description}</p>
+                    <div className="text-sm font-bold text-[#374151] italic mb-2">
+                      {normalizeUnicode(exp.role)}
+                    </div>
+                    <p className="text-sm leading-relaxed text-[#374151] whitespace-pre-line">
+                      {normalizeUnicode(exp.description)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -553,10 +617,16 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
                 {resume.content.education.map((edu, i) => (
                   <div key={i} className="flex justify-between items-baseline">
                     <div>
-                      <h3 className="font-bold text-md text-[#1a1a1a]">{edu.school}</h3>
-                      <div className="text-sm text-[#374151]">{edu.degree}</div>
+                      <h3 className="font-bold text-md text-[#1a1a1a]">
+                        {normalizeUnicode(edu.school)}
+                      </h3>
+                      <div className="text-sm text-[#374151]">
+                        {normalizeUnicode(edu.degree)}
+                      </div>
                     </div>
-                    <span className="text-sm font-medium italic text-[#4b5563]">{edu.startDate} - {edu.endDate}</span>
+                    <span className="text-sm font-medium italic text-[#4b5563]">
+                      {`${normalizeUnicode(edu.startDate)} - ${normalizeUnicode(edu.endDate)}`}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -568,7 +638,9 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
               <h2 className="text-lg font-bold uppercase border-b border-[#e5e7eb] pb-1 mb-3">Skills</h2>
               <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-[#374151]">
                 {resume.content.skills.map((skill, i) => (
-                  <span key={i}>{skill}{i < resume.content.skills.length - 1 ? "," : ""}</span>
+                  <span key={i}>
+                    {`${normalizeUnicode(skill)}${i < resume.content.skills.length - 1 ? "," : ""}`}
+                  </span>
                 ))}
               </div>
             </div>

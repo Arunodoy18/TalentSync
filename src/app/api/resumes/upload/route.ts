@@ -27,14 +27,12 @@ export async function POST(req: Request) {
     console.log(`[Storage Pipeline] Uploading ${fileName} for user ${user.id}...`)
     
     // Attempt standard Supabase upload (will fail silently and fall back if bucket 'resumes' doesn't exist yet)
-    let fileUrl = 'mock-bucket-url/resume.pdf'
-    
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('resumes')
       .upload(fileName, file, { cacheControl: '3600', upsert: false })
 
     if (uploadData) {
-      fileUrl = uploadData.path
+      console.log(`Uploaded to ${uploadData.path}`)
     } else {
       console.warn('Storage bucket misconfigured or missing - using fallback url. Error was:', uploadError)
     }

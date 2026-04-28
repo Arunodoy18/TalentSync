@@ -47,7 +47,7 @@ export async function POST(
       .update({
         ats_score: result.score,
         feedback: {
-           match_explanation: result.suggestions[0] || "Your resume matches the core requirements.",
+           match_explanation: typeof result.suggestions[0] === 'string' ? result.suggestions[0] : (result.suggestions[0] as any)?.description || "Your resume matches the core requirements.",
            missing_skills: result.missingSkills,
            suggestions: result.suggestions,
            ats_breakdown: result.breakdown,

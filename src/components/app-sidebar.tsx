@@ -4,8 +4,6 @@ import * as React from "react"
 import {
   FileText,
   LayoutDashboard,
-  ChartNoAxesColumn,
-
   Settings,
   LogOut,
   Briefcase,
@@ -74,9 +72,9 @@ const items = [
     icon: FileSignature,
   },
   {
-    title: "Insights",
-    url: "/dashboard/analytics",
-    icon: ChartNoAxesColumn,
+    title: "Roadmap",
+    url: "/dashboard/roadmap",
+    icon: Map,
   },
   {
     title: "Billing & Pricing",

@@ -4,7 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  BarChart3,
   Bot,
   Briefcase,
   ClipboardList,
@@ -35,7 +34,6 @@ const navItems: NavItem[] = [
   { label: "Applications", href: "/dashboard/applications", icon: ClipboardList },
   { label: "Your Assistant", href: "/dashboard/assistant", icon: Bot },
   { label: "Cover Letters", href: "/dashboard/cover-letters", icon: FilePenLine },
-  { label: "Insights", href: "/dashboard/analytics", icon: BarChart3 },
   { label: "Roadmap", href: "/dashboard/roadmap", icon: Map },
   { label: "Billing & Pricing", href: "/dashboard/billing", icon: CreditCard },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },

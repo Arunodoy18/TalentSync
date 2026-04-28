@@ -131,7 +131,7 @@ export function PortfolioBuilder({ resumeId }: PortfolioProps) {
                 <div className="flex flex-wrap gap-1 mt-2">
                   {project.tech?.map((t: string, i: number) => (
                     <span key={i} className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
-                      {t}{i < project.tech.length - 1 ? " â€¢ " : ""}
+                      {t}{i < project.tech.length - 1 ? " • " : ""}
                     </span>
                   ))}
                 </div>

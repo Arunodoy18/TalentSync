@@ -131,30 +131,22 @@ export async function calculateATSScore(
         content: `You are an ATS optimization engine.
 Analyze the resume against the job description and return strict JSON.
 
-Use this weighted formula for final score:
-- 30% keywordMatch
-- 25% experienceMatch
-- 15% skillsMatch
-- 10% educationMatch
-- 10% formatting
-- 10% metricsImpact
-
-Each component must be 0-100.
+Each component must be a score from 0-100.
 Return EXACT fields:
 {
   "score": number,
   "matchingSkills": string[],
   "missingSkills": string[],
-  "suggestions": string[],
+  "suggestions": ["string"],
   "breakdown": {
     "keywordMatch": number,
+    "formatting": number,
     "experienceMatch": number,
     "skillsMatch": number,
     "educationMatch": number,
-    "formatting": number,
     "metricsImpact": number
   }
-}`,
+} `,
       },
       {
         role: 'user',

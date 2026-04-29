@@ -35,15 +35,14 @@ const LoginAuth = () => {
         setMessage("Logged in successfully!");
         window.location.href = "/dashboard"; // Automatically navigate after login
       } else {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: redirectUrl,
           },
         });
-        if (signUpError) throw signUpError;
-        setMessage("Signup successful! Check your email for confirmation.");
+        if (signUpError) throw signUpError; if (data?.session) { setMessage("Signup successful! Redirecting..."); window.location.href = "/dashboard"; } else { setMessage("Signup successful! Check your email for confirmation."); }
       }
     } catch (err: any) {
       setError(err.message || "An error occurred during authentication.");
@@ -176,6 +175,7 @@ const LoginAuth = () => {
 };
 
 export default LoginAuth;
+
 
 
 

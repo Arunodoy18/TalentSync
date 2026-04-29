@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Map, Briefcase, Code, Loader2, ArrowRight, Target, Sparkles } from "lucide-react";
@@ -76,16 +76,16 @@ export default function CareerRoadmapPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button
                 onClick={() => setType("role")}
-                className={\`relative overflow-hidden group rounded-2xl p-6 border transition-all duration-300 flex flex-col items-start text-left \${
+                className={`relative overflow-hidden group rounded-2xl p-6 border transition-all duration-300 flex flex-col items-start text-left ${
                   type === "role" 
                     ? "bg-[#d4af37]/10 border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.15)]" 
                     : "bg-[#111827]/60 border-[#1f2937] hover:border-neutral-600 hover:bg-[#111827]"
-                }\`}
+                }`}
               >
-                <div className={\`h-12 w-12 rounded-full flex items-center justify-center mb-4 transition-colors \${type === 'role' ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-neutral-800 text-neutral-400'}\`}>
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 transition-colors ${type === 'role' ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-neutral-800 text-neutral-400'}`}>
                   <Briefcase className="h-6 w-6" />
                 </div>
-                <h3 className={\`text-lg font-semibold mb-2 \${type === 'role' ? 'text-white' : 'text-neutral-300'}\`}>Role-Based Path</h3>
+                <h3 className={`text-lg font-semibold mb-2 ${type === 'role' ? 'text-white' : 'text-neutral-300'}`}>Role-Based Path</h3>
                 <p className="text-sm text-neutral-500">I want to become a Software Engineer, Product Manager, Data Scientist, etc.</p>
                 {type === "role" && (
                     <motion.div layoutId="activeType" className="absolute inset-0 border-2 border-[#d4af37] rounded-2xl pointer-events-none" />
@@ -94,16 +94,16 @@ export default function CareerRoadmapPage() {
 
               <button
                 onClick={() => setType("skill")}
-                className={\`relative overflow-hidden group rounded-2xl p-6 border transition-all duration-300 flex flex-col items-start text-left \${
+                className={`relative overflow-hidden group rounded-2xl p-6 border transition-all duration-300 flex flex-col items-start text-left ${
                   type === "skill" 
                     ? "bg-[#d4af37]/10 border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.15)]" 
                     : "bg-[#111827]/60 border-[#1f2937] hover:border-neutral-600 hover:bg-[#111827]"
-                }\`}
+                }`}
               >
-                <div className={\`h-12 w-12 rounded-full flex items-center justify-center mb-4 transition-colors \${type === 'skill' ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-neutral-800 text-neutral-400'}\`}>
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 transition-colors ${type === 'skill' ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-neutral-800 text-neutral-400'}`}>
                   <Code className="h-6 w-6" />
                 </div>
-                <h3 className={\`text-lg font-semibold mb-2 \${type === 'skill' ? 'text-white' : 'text-neutral-300'}\`}>Skill-Based Path</h3>
+                <h3 className={`text-lg font-semibold mb-2 ${type === 'skill' ? 'text-white' : 'text-neutral-300'}`}>Skill-Based Path</h3>
                 <p className="text-sm text-neutral-500">I want to master React, Data Structures, Machine Learning, Python, etc.</p>
                 {type === "skill" && (
                     <motion.div layoutId="activeType" className="absolute inset-0 border-2 border-[#d4af37] rounded-2xl pointer-events-none" />

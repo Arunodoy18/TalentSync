@@ -23,22 +23,22 @@ export async function POST(req: NextRequest) {
     }
 
     const promptText = type === "role" 
-      ? \`Generate a highly structured, professional career roadmap for the role of "\${query}". Break it down into sequential, easy-to-follow chronological steps that the user must take, starting from the absolute basics up to an advanced level. For each step, provide a clear title, a brief actionable description, an estimated timeline, and a list of essential skills to learn.\`
-      : \`Generate a very detailed, structured learning roadmap to master the skill/technology "\${query}". Break the learning process into logical, sequential progressive steps, from fundamental concepts to advanced mastery. For each step, provide a concise title, an actionable straightforward description, an estimated timeline, and sub-topics/skills required for that phase.\`;
+      ? `Generate a highly structured, professional career roadmap for the role of "${query}". Break it down into sequential, easy-to-follow chronological steps that the user must take, starting from the absolute basics up to an advanced level. For each step, provide a clear title, a brief actionable description, an estimated timeline, and a list of essential skills to learn.`
+      : `Generate a very detailed, structured learning roadmap to master the skill/technology "${query}". Break the learning process into logical, sequential progressive steps, from fundamental concepts to advanced mastery. For each step, provide a concise title, an actionable straightforward description, an estimated timeline, and sub-topics/skills required for that phase.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: \`You are an expert career and technology strategist. You output beautiful structured JSON data for learning roadmaps.
+          content: `You are an expert career and technology strategist. You output beautiful structured JSON data for learning roadmaps.
           Format the output strictly as a JSON object containing a "roadmap" array.
           Each object in the array MUST have:
           - id (string, unique like 'step-1')
           - title (string, e.g., "Learn Basics of JS")
           - description (string, 1-2 short sentences)
           - skills (array of strings, e.g. ["Variables", "Functions", "ES6"])
-          - timeline (string, e.g. "Week 1-2")\`
+          - timeline (string, e.g. "Week 1-2")`
         },
         {
           role: "user",

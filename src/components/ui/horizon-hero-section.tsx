@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Orbit } from "lucide-react";
+import { motion } from "framer-motion";
 import * as THREE from "three";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -616,14 +617,58 @@ export const Component = () => {
       </div>
 
       <div className="horizon-sections">
+        {/* Animated Glassmorphism Interstitial between TALENT and SYNC */}
+        <motion.div
+           initial={{ opacity: 0, y: 100, scale: 0.95 }}
+           whileInView={{ opacity: 1, y: 0, scale: 1 }}
+           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+           viewport={{ once: false, amount: 0.5 }}
+           className="relative z-10 w-[90%] max-w-4xl mx-auto rounded-[32px] p-10 md:p-16 lg:p-20 mb-[20vh] border border-[#d4af37]/30 shadow-[0_30px_70px_-15px_rgba(212,175,55,0.15)] overflow-hidden"
+           style={{
+             background: 'radial-gradient(130% 130% at 50% 0%, rgba(212,175,55,0.06) 0%, rgba(15,23,42,0.4) 100%)',
+             backdropFilter: 'blur(24px)',
+             WebkitBackdropFilter: 'blur(24px)',
+           }}
+        >
+          {/* Animated shimmering gradient reflection */}
+          <div 
+             className="absolute inset-0 block w-[200%] h-full pointer-events-none animate-[slideRight_6s_infinite]" 
+             style={{ 
+               background: 'linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.04) 50%, transparent 80%)',
+               transformOrigin: 'left',
+               animation: 'slideRight 6s infinite cubic-bezier(0.4, 0, 0.2, 1)'
+             }} 
+          />
+          
+          <h2 className="text-center text-3xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-[#d4af37] via-[#f3e3a4] to-white leading-tight">
+            Connecting Brilliance
+          </h2>
+          <p className="text-center text-gray-300 text-lg md:text-2xl leading-relaxed max-w-2xl mx-auto font-light">
+            A flawlessly designed ecosystem where <strong className="text-white font-medium">elite talent</strong> finds <strong className="text-[#d4af37] font-medium">industry leaders</strong> with zero friction.
+          </p>
+        </motion.div>
+
         {sections.slice(1).map((section) => (
           <section className="horizon-section" key={section.title}>
-            <h2>{section.title}</h2>
-            <p>{section.line1}</p>
-            <p>{section.line2}</p>
-            <p className="mt-6 max-w-xl mx-auto text-center text-gray-300 text-sm md:text-base leading-relaxed tracking-wide">
-              {section.description}
-            </p>
+            <motion.div
+               initial={{ opacity: 0, y: 80, scale: 0.98 }}
+               whileInView={{ opacity: 1, y: 0, scale: 1 }}
+               transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+               viewport={{ once: false, amount: 0.4 }}
+               className="relative z-10 w-[90%] max-w-4xl mx-auto rounded-[32px] p-8 sm:p-12 md:p-16 border border-white/5 shadow-2xl hover:border-[#d4af37]/20 transition-colors duration-500"
+               style={{
+                 background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%)',
+                 backdropFilter: 'blur(16px)',
+                 WebkitBackdropFilter: 'blur(16px)',
+               }}
+            >
+              <h2>{section.title}</h2>
+              <p>{section.line1}</p>
+              <p>{section.line2}</p>
+              <p className="mt-6 max-w-xl mx-auto text-center text-gray-300 text-sm md:text-base leading-relaxed tracking-wide">
+                {section.description}
+              </p>
+            </motion.div>
           </section>
         ))}
       </div>
@@ -789,6 +834,11 @@ export const Component = () => {
           color: rgba(223, 231, 255, 0.9);
         }
 
+        @keyframes slideRight {
+          0% { transform: translateX(-150%) skewX(-12deg); }
+          100% { transform: translateX(100%) skewX(-12deg); }
+        }
+
         @media (max-width: 768px) {
           .horizon-hero {
             min-height: 250vh;
@@ -818,6 +868,7 @@ export const Component = () => {
     </div>
   );
 };
+
 
 
 

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createRouteHandlerClient } from "@/lib/supabase-auth-helpers";
 import OpenAI from "openai";
-import { hasPlanAccess } from "@/lib/entitlements";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,48 +16,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const canUseRoadmap = await hasPlanAccess(user.id, "pro");
-    if (!canUseRoadmap) {
-      return NextResponse.json(
-        { error: "Career Roadmap is available on Pro and above plans." },
-        { status: 402 }
-      );
+    const { type, query } = await req.json();
+
+    if (!type || !query) {
+      return NextResponse.json({ error: "Type and query are required" }, { status: 400 });
     }
 
-    const { resumeId } = await req.json();
-
-    const { data: resume, error } = await supabase
-      .from("resumes")
-      .select("*")
-      .eq("id", resumeId)
-      .eq("user_id", user.id)
-      .single();
-
-    if (error || !resume) {
-      return NextResponse.json({ error: "Resume not found" }, { status: 404 });
-    }
+    const promptText = type === "role" 
+      ? \`Generate a highly structured, professional career roadmap for the role of "\${query}". Break it down into sequential, easy-to-follow chronological steps that the user must take, starting from the absolute basics up to an advanced level. For each step, provide a clear title, a brief actionable description, an estimated timeline, and a list of essential skills to learn.\`
+      : \`Generate a very detailed, structured learning roadmap to master the skill/technology "\${query}". Break the learning process into logical, sequential progressive steps, from fundamental concepts to advanced mastery. For each step, provide a concise title, an actionable straightforward description, an estimated timeline, and sub-topics/skills required for that phase.\`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are an expert career strategist. Analyze the user's resume and generate a detailed 3-step career roadmap. For each step, provide a title, description, key skills to learn, and a realistic timeline."
+          content: \`You are an expert career and technology strategist. You output beautiful structured JSON data for learning roadmaps.
+          Format the output strictly as a JSON object containing a "roadmap" array.
+          Each object in the array MUST have:
+          - id (string, unique like 'step-1')
+          - title (string, e.g., "Learn Basics of JS")
+          - description (string, 1-2 short sentences)
+          - skills (array of strings, e.g. ["Variables", "Functions", "ES6"])
+          - timeline (string, e.g. "Week 1-2")\`
         },
         {
           role: "user",
-          content: `Generate a career roadmap based on this resume: ${JSON.stringify(resume.content)}`
+          content: promptText
         }
       ],
       response_format: { type: "json_object" }
     });
 
-    const roadmapData = JSON.parse(response.choices[0].message.content || "{}");
-    const roadmap = roadmapData.roadmap || [
-        { title: "Skill Up", description: "Enhance your technical skills", skills: ["React", "TypeScript"], timeline: "1-2 months" },
-        { title: "Build Projects", description: "Apply your skills to real-world projects", skills: ["Portfolio Building"], timeline: "3-4 months" },
-        { title: "Apply & Network", description: "Start reaching out to recruiters", skills: ["Networking", "Interview Prep"], timeline: "5-6 months" }
-    ];
+    const parsedContent = response.choices[0].message.content || "{}";
+    const roadmapData = JSON.parse(parsedContent);
+    const roadmap = roadmapData.roadmap || [];
 
     return NextResponse.json({ roadmap });
   } catch (error: unknown) {

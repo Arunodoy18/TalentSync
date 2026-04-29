@@ -4,6 +4,7 @@ import { Settings, ShieldCheck, UserRound, Wallet, Bell, Lock } from "lucide-rea
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { SmokeTestHelper } from "@/components/settings/smoke-test-helper";
+import { ProfileCard } from "@/components/settings/profile-card";
 
 function formatDate(value?: string | null) {
   if (!value) return "-";
@@ -41,28 +42,11 @@ export default async function SettingsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="app-surface p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--primary)]">
-              <UserRound className="h-5 w-5" />
-            </div>
-            <h2 className="text-xl font-semibold text-[var(--text)]">Account</h2>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 space-y-2">
-            <p className="text-sm text-[var(--text-muted)]">Name</p>
-            <p className="text-[var(--text)] font-medium">{user.user_metadata?.full_name || "Not set"}</p>
-            <p className="text-sm text-[var(--text-muted)] pt-2">Email</p>
-            <p className="text-[var(--text)] font-medium break-all">{user.email}</p>
-            <p className="text-sm text-[var(--text-muted)] pt-2">User ID</p>
-            <p className="text-[var(--text)] text-sm break-all">{user.id}</p>
-          </div>
-          <Link
-            href="/dashboard/profile"
-            className="inline-flex items-center rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-sm font-semibold text-[var(--text)] hover:border-[var(--primary)]"
-          >
-            Manage Profile
-          </Link>
-        </div>
+        <ProfileCard 
+          initialName={user.user_metadata?.full_name} 
+          email={user.email} 
+          userId={user.id} 
+        />
 
         <div className="app-surface p-6 space-y-4">
           <div className="flex items-center gap-3">

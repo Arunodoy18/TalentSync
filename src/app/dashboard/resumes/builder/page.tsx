@@ -1,1091 +1,222 @@
-﻿"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FileText, Sparkles, Plus, Loader2, UploadCloud, Download, LayoutTemplate, Link2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { ResumePDF } from "@/components/resume/PDFDocument";
-import { IITTemplate } from "@/components/resume/IITBombayTemplate";
-import { JakesTemplate } from "@/components/resume/JakesTemplate";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { FadeIn } from "@/components/ui/fade-in";
-import { toast } from "sonner";
-
-type TemplateMode = "auto" | "iit" | "jake";
-
-type TemplateSkillsState = {
-  iit: {
-    programming: string;
-    frameworks: string;
-    tools: string;
-    coursework: string;
-  };
-  jake: {
-    languages: string;
-    frameworks: string;
-    tools: string;
-    concepts: string;
-  };
-};
-
-type ResumeDraftState = {
-  basics: { name: string; email: string; phone: string; location: string; summary: string; github: string; linkedin: string };
-  experience: any[];
-  projects: any[];
-  education: any[];
-  skills: string;
-  templateSkills: TemplateSkillsState;
-};
-
-const ACTION_VERBS = [
-  "Engineered",
-  "Architected",
-  "Optimized",
-  "Implemented",
-  "Designed",
-  "Led",
-  "Reduced",
-  "Increased",
-  "Developed",
-  "Built",
-  "Automated",
-  "Delivered",
-];
-
-const ensureActionSentence = (value: string): string => {
-  const cleaned = value.replace(/^[\-\u2022\s]+/, "").replace(/\s+/g, " ").trim();
-  if (!cleaned) {
-    return "Implemented improvements that increased measurable outcomes by 20%.";
-  }
-
-  const startsWithVerb = ACTION_VERBS.some((verb) =>
-    new RegExp(`^${verb}\\b`, "i").test(cleaned)
-  );
-
-  const sentence = startsWithVerb
-    ? cleaned
-    : `Implemented ${cleaned.charAt(0).toLowerCase()}${cleaned.slice(1)}`;
-
-  return `${sentence.replace(/[.!?]+$/g, "")}.`;
-};
-
-const normalizeBullets = (raw: string[]): string[] => {
-  return raw
-    .map((item) => ensureActionSentence(item))
-    .filter(Boolean);
-};
-
-const createEmptyTemplateSkills = (): TemplateSkillsState => ({
-  iit: {
-    programming: "",
-    frameworks: "",
-    tools: "",
-    coursework: "",
-  },
-  jake: {
-    languages: "",
-    frameworks: "",
-    tools: "",
-    concepts: "",
-  },
-});
-
-const createEmptyDraft = (): ResumeDraftState => ({
-  basics: { name: "", email: "", phone: "", location: "", summary: "", github: "", linkedin: "" },
-  experience: [],
-  projects: [],
-  education: [],
-  skills: "",
-  templateSkills: createEmptyTemplateSkills(),
-});
-
-const getDraftStorageKey = (mode: TemplateMode) => `resume-builder-draft-${mode}`;
+import React, { useState } from 'react';
+import { TemplatePreview, DownloadPDFButton } from '@/components/resume/templates/TemplatePreview';
+import { IITResumeData, sampleData } from '@/components/resume/templates/IITTemplate';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 export default function ResumeBuilderPage() {
-  const searchParams = useSearchParams();
-  const entryMode = searchParams.get("entry") === "ai" ? "ai" : "template";
-  const requestedTemplate = searchParams.get("template") === "jake" ? "jake" : "iit";
+  const [resumeData, setResumeData] = useState<IITResumeData>(sampleData);
+  const [templateType, setTemplateType] = useState<'iit' | 'jakes'>('iit');
 
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => { setIsClient(true); }, []);
-
-  const [basics, setBasics] = useState({ name: "", email: "", phone: "", location: "", summary: "", github: "", linkedin: "" });
-  const [experience, setExperience] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
-  const [education, setEducation] = useState<any[]>([]);
-  const [skills, setSkills] = useState("");
-  const [templateSkills, setTemplateSkills] = useState<TemplateSkillsState>(createEmptyTemplateSkills());
-  const [templateFormat, setTemplateFormat] = useState<"auto" | "iit" | "jake">("auto");
-
-  const effectiveTemplate = entryMode === "ai" ? "auto" : templateFormat;
-  const isIIT = effectiveTemplate === "iit";
-  const isJake = effectiveTemplate === "jake";
-
-  const basicsOrderClass = "order-1";
-  const educationOrderClass = isIIT || isJake ? "order-2" : "order-4";
-  const experienceOrderClass = isIIT ? "order-3" : "order-2";
-  const projectsOrderClass = isIIT ? "hidden" : isJake ? "order-4" : "order-3";
-  const skillsOrderClass = isIIT ? "order-4" : "order-5";
-
-  useEffect(() => {
-    if (entryMode === "ai") {
-      setTemplateFormat("auto");
-    } else {
-      setTemplateFormat(requestedTemplate);
-    }
-  }, [entryMode, requestedTemplate]);
-
-  const [generating, setGenerating] = useState(false);
-  const [parsingResume, setParsingResume] = useState(false);
-  const [validationTouched, setValidationTouched] = useState(false);
-  const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
-  const [isSavingToVault, setIsSavingToVault] = useState(false);
-  const [isRunningAts, setIsRunningAts] = useState(false);
-  const [atsScore, setAtsScore] = useState<number | null>(null);
-  const [atsSuggestions, setAtsSuggestions] = useState<string[]>([]);
-
-  const downloadFileName = `${
-    basics.name?.trim().toLowerCase().replace(/\s+/g, "-") || "resume"
-  }-${effectiveTemplate}.pdf`;
-
-  const selectedProjects = projects.filter((p) => p.selected);
-  const iitProjects = selectedProjects.length > 0 ? selectedProjects : projects;
-
-  const resolvedSkills = useMemo(() => {
-    if (effectiveTemplate === "iit") {
-      const lines = [
-        templateSkills.iit.programming ? `Programming: ${templateSkills.iit.programming}` : "",
-        templateSkills.iit.frameworks ? `Frameworks: ${templateSkills.iit.frameworks}` : "",
-        templateSkills.iit.tools ? `Tools: ${templateSkills.iit.tools}` : "",
-        templateSkills.iit.coursework ? `Coursework: ${templateSkills.iit.coursework}` : "",
-      ].filter(Boolean);
-      return lines.join(" | ");
-    }
-
-    if (effectiveTemplate === "jake") {
-      const lines = [
-        templateSkills.jake.languages ? `Languages: ${templateSkills.jake.languages}` : "",
-        templateSkills.jake.frameworks ? `Frameworks: ${templateSkills.jake.frameworks}` : "",
-        templateSkills.jake.tools ? `Tools: ${templateSkills.jake.tools}` : "",
-        templateSkills.jake.concepts ? `Concepts: ${templateSkills.jake.concepts}` : "",
-      ].filter(Boolean);
-      return lines.join(" | ");
-    }
-
-    return skills.trim();
-  }, [effectiveTemplate, skills, templateSkills]);
-
-  const validationErrors = useMemo(() => {
-    const errors: string[] = [];
-    if (!basics.name.trim()) errors.push("Full name is required.");
-    if (!basics.email.trim()) errors.push("Email is required.");
-    if (experience.length === 0) errors.push("Add at least one experience entry.");
-
-    if (effectiveTemplate === "auto") {
-      if (!skills.trim()) errors.push("Add skills for AI resume format.");
-      return errors;
-    }
-
-    if (effectiveTemplate === "iit") {
-      if (education.length === 0) errors.push("IIT template needs at least one education entry.");
-      if (!resolvedSkills.trim()) errors.push("IIT template needs categorized technical skills.");
-      return errors;
-    }
-
-    if (effectiveTemplate === "jake") {
-      if (education.length === 0) errors.push("Jake template needs at least one education entry.");
-      if (selectedProjects.length === 0) errors.push("Select at least one project for Jake template.");
-      if (!resolvedSkills.trim()) errors.push("Jake template needs categorized skills.");
-    }
-
-    return errors;
-  }, [basics.email, basics.name, education.length, effectiveTemplate, experience.length, resolvedSkills, selectedProjects.length, skills]);
-
-  const canExport = validationErrors.length === 0;
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    const key = getDraftStorageKey(effectiveTemplate as TemplateMode);
-    const raw = window.localStorage.getItem(key);
-    if (!raw) {
-      const empty = createEmptyDraft();
-      setBasics(empty.basics);
-      setExperience(empty.experience);
-      setProjects(empty.projects);
-      setEducation(empty.education);
-      setSkills(empty.skills);
-      setTemplateSkills(empty.templateSkills);
-      setValidationTouched(false);
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(raw) as Partial<ResumeDraftState>;
-      const empty = createEmptyDraft();
-
-      setBasics(parsed.basics ?? empty.basics);
-      setExperience(Array.isArray(parsed.experience) ? parsed.experience : empty.experience);
-      setProjects(Array.isArray(parsed.projects) ? parsed.projects : empty.projects);
-      setEducation(Array.isArray(parsed.education) ? parsed.education : empty.education);
-      setSkills(typeof parsed.skills === "string" ? parsed.skills : empty.skills);
-
-      const incomingTemplateSkills = parsed.templateSkills ?? empty.templateSkills;
-      setTemplateSkills({
-        iit: {
-          programming: incomingTemplateSkills.iit?.programming ?? "",
-          frameworks: incomingTemplateSkills.iit?.frameworks ?? "",
-          tools: incomingTemplateSkills.iit?.tools ?? "",
-          coursework: incomingTemplateSkills.iit?.coursework ?? "",
-        },
-        jake: {
-          languages: incomingTemplateSkills.jake?.languages ?? "",
-          frameworks: incomingTemplateSkills.jake?.frameworks ?? "",
-          tools: incomingTemplateSkills.jake?.tools ?? "",
-          concepts: incomingTemplateSkills.jake?.concepts ?? "",
-        },
-      });
-      setValidationTouched(false);
-    } catch {
-      const empty = createEmptyDraft();
-      setBasics(empty.basics);
-      setExperience(empty.experience);
-      setProjects(empty.projects);
-      setEducation(empty.education);
-      setSkills(empty.skills);
-      setTemplateSkills(empty.templateSkills);
-      setValidationTouched(false);
-    }
-  }, [effectiveTemplate, isClient]);
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    const key = getDraftStorageKey(effectiveTemplate as TemplateMode);
-    const payload: ResumeDraftState = {
-      basics,
-      experience,
-      projects,
-      education,
-      skills,
-      templateSkills,
-    };
-
-    const id = window.setTimeout(() => {
-      window.localStorage.setItem(key, JSON.stringify(payload));
-    }, 250);
-
-    return () => window.clearTimeout(id);
-  }, [basics, education, effectiveTemplate, experience, isClient, projects, skills, templateSkills]);
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setParsingResume(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/resume/parse", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data?.resume?.id) {
-          setSavedResumeId(data.resume.id);
-          setAtsScore(typeof data.resume.ats_score === "number" ? data.resume.ats_score : null);
-          setAtsSuggestions(
-            Array.isArray(data.resume.feedback?.suggestions) ? data.resume.feedback.suggestions : []
-          );
-        }
-        const parsed = data?.resume?.content ?? data;
-        const personal = parsed?.personal ?? {};
-
-        setBasics({
-          name: personal.fullName ?? "",
-          email: personal.email ?? "",
-          phone: personal.phone ?? "",
-          location: personal.location ?? "",
-          summary: personal.summary ?? "",
-          github: "",
-          linkedin: personal.website ?? "",
-        });
-
-        const normalizedExperience = Array.isArray(parsed?.experience)
-          ? parsed.experience.map((entry: any) => ({
-              company: entry?.company ?? "",
-              role: entry?.role ?? "",
-              start: entry?.startDate ?? "",
-              end: entry?.endDate ?? "",
-              bullets: typeof entry?.description === "string"
-                ? normalizeBullets(
-                    entry.description.split("\n").map((line: string) => line.trim()).filter(Boolean)
-                  )
-                : [],
-            }))
-          : [];
-
-        const normalizedProjects = Array.isArray(parsed?.projects)
-          ? parsed.projects.map((project: any) => ({
-              name: project?.name ?? "",
-              technologies: project?.technologies ?? "",
-              github: project?.github ?? "",
-              link: project?.link ?? "",
-              bullets: Array.isArray(project?.bullets) ? normalizeBullets(project.bullets) : [],
-              selected: true,
-            }))
-          : [];
-
-        const normalizedEducation = Array.isArray(parsed?.education)
-          ? parsed.education.map((entry: any) => ({
-              school: entry?.school ?? "",
-              degree: entry?.degree ?? "",
-              year: `${entry?.startDate ?? ""}${entry?.endDate ? ` - ${entry.endDate}` : ""}`.trim(),
-              grade: entry?.description ?? "",
-            }))
-          : [];
-
-        const normalizedSkills = Array.isArray(parsed?.skills)
-          ? parsed.skills.join(", ")
-          : typeof parsed?.skills === "string"
-            ? parsed.skills
-            : "";
-
-        setExperience(normalizedExperience);
-        setProjects(normalizedProjects);
-        setEducation(normalizedEducation);
-        setSkills(normalizedSkills);
-        setTemplateSkills((prev) => ({
-          iit: {
-            ...prev.iit,
-            programming: prev.iit.programming || normalizedSkills,
-          },
-          jake: {
-            ...prev.jake,
-            languages: prev.jake.languages || normalizedSkills,
-          },
-        }));
-        toast.success("Resume imported and saved to your vault.");
-      } else {
-        const errorData = await response.json().catch(() => null);
-        toast.error(errorData?.error || "Failed to parse resume.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error parsing resume.");
-    } finally {
-      setParsingResume(false);
-    }
+  const handleChange = (field: keyof IITResumeData, value: any) => {
+    setResumeData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const generateBullet = async (index: number) => {
-    setGenerating(true);
-    try {
-      const resp = await fetch("/api/ats/bullet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action_verb: "Developed",
-          task: "a new microservice architecture",
-          tools: ["Node.js", "Docker", "AWS"],
-          impact: "improving system uptime by 99%"
-        })
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        const updated = [...experience];
-        updated[index].bullets = updated[index].bullets || [];
-        updated[index].bullets.push(ensureActionSentence(data.bullet_point || "Delivered measurable impact with strong execution"));
-        setExperience(updated);
-      }
-    } catch(err) {
-      console.error(err);
-    } finally {
-      setGenerating(false);
-    }
+  const handleNestedChange = (field: keyof IITResumeData, index: number, key: string, value: any) => {
+    setResumeData((prev) => {
+      const arr = [...(prev[field] as any[])];
+      arr[index] = { ...arr[index], [key]: value };
+      return { ...prev, [field]: arr };
+    });
   };
 
-  const buildResumePayload = () => {
-    const sourceProjects = effectiveTemplate === "jake" ? selectedProjects : projects;
-    const sourceSkills = (resolvedSkills || skills)
-      .split(/[,|]/)
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .join(", ");
-
-    return {
-      resumeId: savedResumeId ?? undefined,
-      mode: effectiveTemplate,
-      title: `${basics.name?.trim() || "Resume"} (${effectiveTemplate.toUpperCase()})`,
-      basics,
-      experience,
-      education,
-      projects: sourceProjects,
-      skills: sourceSkills,
-    };
-  };
-
-  const saveResumeToVault = async (silent = false): Promise<string | null> => {
-    if (!canExport) {
-      setValidationTouched(true);
-      if (!silent) {
-        toast.error("Complete required fields before saving.");
-      }
-      return null;
-    }
-
-    setIsSavingToVault(true);
-    try {
-      const response = await fetch("/api/resume/draft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildResumePayload()),
-      });
-
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.resume?.id) {
-        throw new Error(data?.error || "Failed to save resume to vault.");
-      }
-
-      setSavedResumeId(data.resume.id);
-      setAtsScore(typeof data.resume.ats_score === "number" ? data.resume.ats_score : null);
-      setAtsSuggestions(
-        Array.isArray(data.resume.feedback?.suggestions) ? data.resume.feedback.suggestions : []
-      );
-
-      if (!silent) {
-        toast.success("Resume saved to your vault.");
-      }
-
-      return data.resume.id as string;
-    } catch (error) {
-      console.error(error);
-      if (!silent) {
-        toast.error(error instanceof Error ? error.message : "Failed to save resume.");
-      }
-      return null;
-    } finally {
-      setIsSavingToVault(false);
-    }
-  };
-
-  const handleCheckAts = async () => {
-    setIsRunningAts(true);
-    try {
-      const resumeId = await saveResumeToVault(true);
-      if (!resumeId) {
-        toast.error("Save your resume first to run ATS check.");
-        return;
-      }
-
-      const response = await fetch(`/api/resume/${resumeId}/ats`, { method: "POST" });
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.resume) {
-        throw new Error(data?.error || "Failed to calculate ATS score.");
-      }
-
-      setSavedResumeId(data.resume.id);
-      setAtsScore(typeof data.resume.ats_score === "number" ? data.resume.ats_score : null);
-      setAtsSuggestions(
-        Array.isArray(data.resume.feedback?.suggestions) ? data.resume.feedback.suggestions : []
-      );
-      toast.success("ATS score updated.");
-    } catch (error) {
-      console.error(error);
-      toast.error(error instanceof Error ? error.message : "Failed to run ATS check.");
-    } finally {
-      setIsRunningAts(false);
-    }
+  const handleArrayStringChange = (
+    field: keyof IITResumeData, 
+    index: number, 
+    key: string, 
+    arrIndex: number, 
+    value: string
+  ) => {
+    setResumeData((prev) => {
+      const arr = [...(prev[field] as any[])];
+      const items = [...arr[index][key]];
+      items[arrIndex] = value;
+      arr[index] = { ...arr[index], [key]: items };
+      return { ...prev, [field]: arr };
+    });
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] gap-8 max-w-[1600px] mx-auto w-full">
-      <div className="flex-1 overflow-y-auto space-y-8 scrollbar-none pb-20 pr-2">
+    <div className="flex h-screen bg-[#0F172A] text-[#F9FAFB]">
+      {/* Left Panel: Form */}
+      <div className="w-1/2 p-6 overflow-y-auto border-r border-[#1F2937] pb-32">
+        <h1 className="text-2xl font-bold mb-6 text-[#D4AF37]">Resume Builder</h1>
         
-        <FadeIn delay={0.1}>
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)]">
-              {entryMode === "ai" ? "AI Resume Builder" : "Template Resume Builder"}
-            </h1>
-            <p className="text-[var(--text-muted)] mt-2">
-              {entryMode === "ai"
-                ? "Use AI-first drafting with a single focused resume output."
-                : "Choose IIT Template or Jake template and export your final resume."}
-            </p>
-            <p className="text-xs text-[var(--primary-light)] mt-2">
-              Active structure: {effectiveTemplate === "auto" ? "AI" : effectiveTemplate === "iit" ? "IIT Template" : "Jake"}
-              {" "}template flow is applied to this form.
-            </p>
-            <p className="text-xs text-[var(--text-muted)] mt-2">
-              Workflow: Fill details -&gt; Save to Vault -&gt; Check ATS -&gt; Move to Jobs.
-            </p>
+        <div className="flex gap-4 mb-6">
+          <Button 
+            onClick={() => setTemplateType('iit')}
+            variant={templateType === 'iit' ? 'default' : 'outline'}
+            className={templateType === 'iit' ? 'bg-[#D4AF37] text-black' : ''}
+          >
+            IIT Template
+          </Button>
+          <Button 
+            onClick={() => setTemplateType('jakes')}
+            variant={templateType === 'jakes' ? 'default' : 'outline'}
+            className={templateType === 'jakes' ? 'bg-[#D4AF37] text-black' : ''}
+          >
+            Jake's Template
+          </Button>
+        </div>
+
+        {/* Basic Info */}
+        <section className="space-y-4 mb-8 bg-[#111827] p-4 rounded-xl border border-[#1F2937]">
+          <h2 className="text-xl font-semibold">Basic Info</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm mb-1">Full Name</label>
+              <Input 
+                value={resumeData.fullName} 
+                onChange={(e) => handleChange('fullName', e.target.value)} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Roll Number</label>
+              <Input 
+                value={resumeData.rollNumber} 
+                onChange={(e) => handleChange('rollNumber', e.target.value)} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Department</label>
+              <Input 
+                value={resumeData.department} 
+                onChange={(e) => handleChange('department', e.target.value)} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Degree</label>
+              <Input 
+                value={resumeData.degree} 
+                onChange={(e) => handleChange('degree', e.target.value)} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Institute</label>
+              <Input 
+                value={resumeData.institute} 
+                onChange={(e) => handleChange('institute', e.target.value)} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Gender</label>
+              <Input 
+                value={resumeData.gender} 
+                onChange={(e) => handleChange('gender', e.target.value)} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
           </div>
-        </FadeIn>
+        </section>
 
-        {basics.name === "" && experience.length === 0 && (
-           <FadeIn delay={0.2} className="w-full relative group rounded-2xl border-2 border-dashed border-[var(--primary)]/50 bg-[var(--primary)]/5 hover:bg-[var(--primary)]/10 transition-colors p-8 text-center flex flex-col items-center justify-center cursor-pointer">
-             <input
-               type="file"
-               accept=".pdf"
-               title="Upload resume PDF"
-               aria-label="Upload resume PDF"
-               onChange={handleFileUpload}
-               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-             />
-             {parsingResume ? (
-                <>
-                  <Loader2 className="h-8 w-8 text-[var(--primary)] animate-spin mb-3" />
-                  <h3 className="text-lg font-semibold text-[var(--text)] mb-1">AI is reading your resume...</h3>
-                  <p className="text-sm text-[var(--text-muted)]">Extracting projects, skills, and experience into your Master Vault.</p>
-                </>
-             ) : (
-                <>
-                  <UploadCloud className="h-10 w-10 text-[var(--primary)] mb-3 group-hover:scale-110 transition-transform" />
-                  <h3 className="text-xl font-semibold text-[var(--text)] mb-2">Magic Import (Highly Recommended)</h3>
-                  <p className="text-sm text-[var(--text-muted)] max-w-md mx-auto">Skip typing. Drag and drop your old PDF resume right here. Our LLM will instantly parse it perfectly into your Master Vault.</p>
-                </>
-             )}
-          </FadeIn>
-        )}
+        {/* Technical Skills */}
+        <section className="space-y-4 mb-8 bg-[#111827] p-4 rounded-xl border border-[#1F2937]">
+          <h2 className="text-xl font-semibold">Technical Skills</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm mb-1">Programming Languages</label>
+              <Input 
+                value={resumeData.skills.programmingLanguages} 
+                onChange={(e) => setResumeData(prev => ({...prev, skills: {...prev.skills, programmingLanguages: e.target.value}}))} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Tools and Libraries</label>
+              <Input 
+                value={resumeData.skills.toolsAndLibraries} 
+                onChange={(e) => setResumeData(prev => ({...prev, skills: {...prev.skills, toolsAndLibraries: e.target.value}}))} 
+                className="bg-[#0F172A] border-[#1F2937]"
+              />
+            </div>
+          </div>
+        </section>
 
-        <FadeIn delay={0.3}>
-          <Accordion type="single" collapsible defaultValue="basics" className="flex flex-col gap-4">
-            {/* BASICS */}
-            <AccordionItem value="basics" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", basicsOrderClass)}>
-              <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                Basic Information
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-muted)]">Full Name</label>
-                    <Input value={basics.name} onChange={e => setBasics({...basics, name: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="Jane Doe" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-muted)]">Email</label>
-                    <Input value={basics.email} onChange={e => setBasics({...basics, email: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="jane@example.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-muted)]">Phone</label>
-                    <Input value={basics.phone} onChange={e => setBasics({...basics, phone: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="+1 (555) 123-4567" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-muted)]">Location</label>
-                    <Input value={basics.location} onChange={e => setBasics({...basics, location: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="San Francisco, CA" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-muted)]">LinkedIn</label>
-                    <Input value={basics.linkedin} onChange={e => setBasics({...basics, linkedin: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="linkedin.com/in/your-handle" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-muted)]">GitHub</label>
-                    <Input value={basics.github} onChange={e => setBasics({...basics, github: e.target.value})} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="github.com/your-handle" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-[var(--text-muted)]">{isIIT ? "Profile / Positions of Responsibility" : "Professional Summary"}</label>
+        {/* Education */}
+        <section className="space-y-4 mb-8 bg-[#111827] p-4 rounded-xl border border-[#1F2937]">
+          <h2 className="text-xl font-semibold">Education</h2>
+          {resumeData.education.map((edu, idx) => (
+            <div key={idx} className="p-4 border border-[#1F2937] rounded-lg space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Input placeholder="Examination" value={edu.examination} onChange={(e) => handleNestedChange('education', idx, 'examination', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="University" value={edu.university} onChange={(e) => handleNestedChange('education', idx, 'university', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="Institute" value={edu.institute} onChange={(e) => handleNestedChange('education', idx, 'institute', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="Year" value={edu.year} onChange={(e) => handleNestedChange('education', idx, 'year', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="CPI / %" value={edu.cpi} onChange={(e) => handleNestedChange('education', idx, 'cpi', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* Projects */}
+        <section className="space-y-4 mb-8 bg-[#111827] p-4 rounded-xl border border-[#1F2937]">
+          <h2 className="text-xl font-semibold">Course Projects</h2>
+          {resumeData.projects.map((proj, idx) => (
+            <div key={idx} className="p-4 border border-[#1F2937] rounded-lg space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Input placeholder="Project Title" value={proj.title} onChange={(e) => handleNestedChange('projects', idx, 'title', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="Course Code" value={proj.courseCode} onChange={(e) => handleNestedChange('projects', idx, 'courseCode', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="Date" value={proj.date} onChange={(e) => handleNestedChange('projects', idx, 'date', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400">Descriptions</label>
+                {proj.descriptions.map((desc, dIdx) => (
                   <Textarea 
-                    value={basics.summary} 
-                    onChange={e => setBasics({...basics, summary: e.target.value})}
-                    className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)] min-h-[120px]" 
-                    placeholder={isIIT ? "Leadership roles, profile highlights, and key responsibilities..." : "Software engineer with 5+ years..."}
+                    key={dIdx} 
+                    value={desc} 
+                    onChange={(e) => handleArrayStringChange('projects', idx, 'descriptions', dIdx, e.target.value)}
+                    className="bg-[#0F172A] border-[#1F2937]"
                   />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
 
-            {/* EXPERIENCE */}
-            <AccordionItem value="experience" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", experienceOrderClass)}>
-              <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                {isIIT ? "Work Experience & Internships" : "Experience"}
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-6 space-y-6">
-                {experience.length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-[var(--border)] bg-white/5 rounded-xl">
-                      <p className="text-[var(--text-muted)] text-sm">No experience added yet.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {experience.map((exp, i) => (
-                      <div key={i} className="p-6 rounded-xl border border-[var(--border)] bg-white/5 space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium text-[var(--text-muted)]">Company</label>
-                              <Input value={exp.company} onChange={e => {const n=[...experience]; n[i].company=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="Acme Inc."/>
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium text-[var(--text-muted)]">Role</label>
-                              <Input value={exp.role} onChange={e => {const n=[...experience]; n[i].role=e.target.value; setExperience(n);}} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="Senior Engineer"/>
-                            </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5">
-                              <label className="text-sm font-semibold text-[var(--primary)] flex items-center">
-                                <Sparkles className="h-4 w-4 mr-2" /> FAANG Structure Bullets
-                              </label>
-                              <Button size="sm" variant="secondary" className="h-8 bg-white/10 hover:bg-white/20 text-white border-0" onClick={() => generateBullet(i)} disabled={generating}>
-                                {generating ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin"/> : <FileText className="mr-2 h-3.5 w-3.5"/>}
-                                Auto-Generate
-                              </Button>
-                            </div>
-                            <ul className="list-disc pl-5 space-y-2 text-sm text-[var(--text)] mt-2">
-                              {(exp.bullets || []).map((b: string, idx: number) => (
-                                <li key={idx} className="bg-white/5 p-3 rounded-md border border-white/5 leading-relaxed">{b}</li>
-                              ))}
-                            </ul>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <Button variant="outline" className="w-full border-dashed border-[var(--border)] bg-transparent hover:bg-white/5 text-[var(--text-muted)] hover:text-white" onClick={() => setExperience([...experience, { company:"", role:"", start:"", end:"", bullets: [] }])}>
-                  <Plus className="mr-2 h-4 w-4"/> Add Experience
-                </Button>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* PROJECTS */}
-            <AccordionItem value="projects" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", projectsOrderClass)}>
-              <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                Projects
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-6 space-y-6">
-                {projects.length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-[var(--border)] bg-white/5 rounded-xl">
-                      <p className="text-[var(--text-muted)] text-sm">No projects added yet.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {projects.map((proj, i) => (
-                      <div key={i} className={cn("p-6 rounded-xl border transition-all duration-300 space-y-5", proj.selected ? "border-[var(--primary)]/50 bg-[var(--primary)]/5 shadow-[0_0_15px_rgba(142,182,155,0.05)]" : "border-[var(--border)] bg-white/5")}>
-                        <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-                          <label className="flex items-center space-x-3 cursor-pointer group">
-                            <input 
-                              type="checkbox" 
-                              className="w-5 h-5 rounded border-gray-600 bg-black/20 text-[var(--primary)] focus:ring-[var(--primary)]" 
-                              checked={proj.selected} 
-                              onChange={(e) => {const n=[...projects]; n[i].selected=e.target.checked; setProjects(n);}} 
-                            />
-                            <span className={cn("font-bold text-sm transition-colors uppercase tracking-wider", proj.selected ? "text-[var(--primary)]" : "text-[var(--text-muted)] group-hover:text-[var(--text)]")}>
-                              {proj.selected ? "Included in active PDF" : "Excluded from active PDF"}
-                            </span>
-                          </label>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium text-[var(--text-muted)]">Project Name</label>
-                              <Input value={proj.name} onChange={e => {const n=[...projects]; n[i].name=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="AI Platform"/>
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium text-[var(--text-muted)]">Technologies</label>
-                              <Input value={proj.technologies} onChange={e => {const n=[...projects]; n[i].technologies=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="React, Python"/>
-                            </div>
-                            {isJake && (
-                              <>
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium text-[var(--text-muted)]">Project Date</label>
-                                  <Input value={proj.date || ""} onChange={e => {const n=[...projects]; n[i].date=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Jan 2024 - Mar 2024"/>
-                                </div>
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium text-[var(--text-muted)]">Project Link</label>
-                                  <Input value={proj.link || ""} onChange={e => {const n=[...projects]; n[i].link=e.target.value; setProjects(n);}} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="https://project-demo.com"/>
-                                </div>
-                              </>
-                            )}
-                        </div>
-                        
-                        <div className="space-y-2 mt-2">
-                            <label className="text-sm font-medium text-[var(--text-muted)]">Impact Bullets</label>
-                            <Textarea 
-                              className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)] min-h-[80px] leading-relaxed" 
-                              placeholder="• Built x using y resulting in z"
-                              value={(proj.bullets || []).join('\n')}
-                              onChange={e => {
-                                  const n=[...projects]; 
-                                  n[i].bullets=normalizeBullets(e.target.value.split('\n').filter(Boolean)); 
-                                  setProjects(n);
-                              }}
-                            />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <Button variant="outline" className="w-full border-dashed border-[var(--border)] bg-transparent hover:bg-white/5 text-[var(--text-muted)] hover:text-white" onClick={() => setProjects([...projects, { name:"", technologies:"", date:"", link:"", github:"", bullets: [], selected: false }])}>
-                  <Plus className="mr-2 h-4 w-4"/> Add Project Vault Entry
-                </Button>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* EDUCATION */}
-            <AccordionItem value="education" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", educationOrderClass)}>
-              <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                Education
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-6 space-y-6">
-                {education.length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-[var(--border)] bg-white/5 rounded-xl">
-                    <p className="text-[var(--text-muted)] text-sm">No education added yet.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {education.map((edu, i) => (
-                      <div key={i} className="p-6 rounded-xl border border-[var(--border)] bg-white/5 space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-[var(--text-muted)]">School / Institute</label>
-                            <Input value={edu.school || ""} onChange={e => { const n=[...education]; n[i].school=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="IIT" />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-[var(--text-muted)]">Degree</label>
-                            <Input value={edu.degree || ""} onChange={e => { const n=[...education]; n[i].degree=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="B.Tech in Computer Science" />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-[var(--text-muted)]">Year</label>
-                            <Input value={edu.year || ""} onChange={e => { const n=[...education]; n[i].year=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="2024" />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-[var(--text-muted)]">CPI/GPA/%</label>
-                            <Input value={edu.grade || ""} onChange={e => { const n=[...education]; n[i].grade=e.target.value; setEducation(n); }} className="bg-transparent border-[var(--border)] text-[var(--text)] focus:border-[var(--primary)]" placeholder="8.7/10" />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <Button variant="outline" className="w-full border-dashed border-[var(--border)] bg-transparent hover:bg-white/5 text-[var(--text-muted)] hover:text-white" onClick={() => setEducation([...education, { school: "", degree: "", year: "", grade: "", location: "" }])}>
-                  <Plus className="mr-2 h-4 w-4"/> Add Education
-                </Button>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* SKILLS */}
-            <AccordionItem value="skills" className={cn("border border-[var(--border)] bg-[var(--card)] rounded-[12px] px-6", skillsOrderClass)}>
-              <AccordionTrigger className="hover:no-underline py-5 text-lg font-semibold text-[var(--text)]">
-                {isIIT ? "Technical Skills" : "Skills"}
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-6 space-y-6">
-                {isIIT ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Programming</label>
-                      <Input value={templateSkills.iit.programming} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, programming: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="C++, Java, Python"/>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Frameworks/Libraries</label>
-                      <Input value={templateSkills.iit.frameworks} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, frameworks: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="React, FastAPI, Spring"/>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Tools/Platforms</label>
-                      <Input value={templateSkills.iit.tools} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, tools: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Docker, AWS, Git"/>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Relevant Coursework</label>
-                      <Input value={templateSkills.iit.coursework} onChange={e => setTemplateSkills(prev => ({ ...prev, iit: { ...prev.iit, coursework: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="OS, DBMS, DSA"/>
-                    </div>
-                  </div>
-                ) : isJake ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Languages</label>
-                      <Input value={templateSkills.jake.languages} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, languages: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="TypeScript, Python, Go"/>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Frameworks</label>
-                      <Input value={templateSkills.jake.frameworks} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, frameworks: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Next.js, Node.js, Express"/>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Tools</label>
-                      <Input value={templateSkills.jake.tools} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, tools: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="Docker, Postgres, AWS"/>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--text-muted)]">Concepts</label>
-                      <Input value={templateSkills.jake.concepts} onChange={e => setTemplateSkills(prev => ({ ...prev, jake: { ...prev.jake, concepts: e.target.value } }))} className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)]" placeholder="System Design, Testing, CI/CD"/>
-                    </div>
-                  </div>
-                ) : (
+        {/* Experience */}
+        <section className="space-y-4 mb-8 bg-[#111827] p-4 rounded-xl border border-[#1F2937]">
+          <h2 className="text-xl font-semibold">Experience & Internships</h2>
+          {resumeData.experience.map((exp, idx) => (
+            <div key={idx} className="p-4 border border-[#1F2937] rounded-lg space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Input placeholder="Position" value={exp.position} onChange={(e) => handleNestedChange('experience', idx, 'position', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="Company" value={exp.company} onChange={(e) => handleNestedChange('experience', idx, 'company', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+                <Input placeholder="Date" value={exp.date} onChange={(e) => handleNestedChange('experience', idx, 'date', e.target.value)} className="bg-[#0F172A] border-[#1F2937]" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400">Descriptions</label>
+                {exp.descriptions.map((desc, dIdx) => (
                   <Textarea 
-                    value={skills} 
-                    onChange={e => setSkills(e.target.value)}
-                    className="bg-transparent border-[var(--border)] focus:border-[var(--primary)] text-[var(--text)] min-h-[120px] leading-relaxed" 
-                    placeholder="React, Node.js, Python, System Design..." 
+                    key={dIdx} 
+                    value={desc} 
+                    onChange={(e) => handleArrayStringChange('experience', idx, 'descriptions', dIdx, e.target.value)}
+                    className="bg-[#0F172A] border-[#1F2937]"
                   />
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </FadeIn>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+
       </div>
 
-      {/* Live ATS Preview */}
-      <FadeIn delay={0.4} className="hidden lg:flex flex-col w-[420px] flex-shrink-0 bg-[var(--card)] border border-[var(--border)] rounded-[24px] p-6 overflow-hidden">
-         <div className="mb-6">
-           <h3 className="font-semibold text-[var(--text)] mb-4 flex items-center">
-              <LayoutTemplate className="mr-2 h-5 w-5 text-[var(--primary)]" />
-              Template Layout ({effectiveTemplate === "auto" ? "AI Resume" : effectiveTemplate === "iit" ? "IIT Template" : "Jake"})
-           </h3>
-           <div className="flex bg-black/30 p-1.5 rounded-lg border border-[var(--border)] mb-6">
-             {(entryMode === "ai" ? ["auto"] : ["iit", "jake"]).map((mode) => (
-                <button 
-                  key={mode}
-                  onClick={() => setTemplateFormat(mode as "auto" | "iit" | "jake")} 
-                  className={cn(
-                    "flex-1 text-xs font-semibold py-2 px-2 rounded-md transition-all capitalize", 
-                    templateFormat === mode ? "bg-[var(--primary)] text-black shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5"
-                  )}
-                >
-                  {mode === "auto" ? "AI Resume" : mode === "iit" ? "IIT Template" : "Jake's Resume"}
-                </button>
-             ))}
-           </div>
-           
-           <div className="flex justify-end">
-             {isClient && canExport ? (
-               <PDFDownloadLink
-                  document={
-                    effectiveTemplate === "auto" ? <ResumePDF basics={basics} experience={experience} education={education} skills={resolvedSkills} /> :
-                    effectiveTemplate === "iit" ? <IITTemplate basics={basics} experience={experience} education={education} projects={iitProjects} skills={resolvedSkills} /> :
-                    <JakesTemplate basics={basics} experience={experience} education={education} projects={selectedProjects} skills={resolvedSkills} />
-                  }
-                  fileName={downloadFileName}
-               >
-                 
-                 {({ loading }) => (
-                   <Button
-                     onClick={() => {
-                       void saveResumeToVault(true);
-                     }}
-                     className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black font-semibold rounded-[12px] w-full shadow-[0_0_20px_rgba(142,182,155,0.15)] hover:scale-[1.02] transition-transform"
-                   >
-                     {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-                     {loading ? "Rendering..." : "Export PDF"}
-                   </Button>
-                 )}
-               </PDFDownloadLink>
-             ) : (
-               <Button
-                 onClick={() => setValidationTouched(true)}
-                 className="bg-white/5 text-[var(--text-muted)] rounded-[12px] w-full border border-[var(--border)]"
-               >
-                 {!isClient ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-                 {!isClient ? "Starting Engine" : "Complete Required Fields"}
-               </Button>
-             )}
-           </div>
-
-           <div className="mt-3 rounded-lg border border-[var(--border)] bg-black/20 p-3">
-             {validationErrors.length === 0 ? (
-               <p className="text-xs text-[var(--primary-light)]">All required sections are complete for {effectiveTemplate.toUpperCase()} export.</p>
-             ) : (
-               <>
-                 <p className="text-xs font-medium text-[var(--text)]">Export Checklist ({effectiveTemplate.toUpperCase()})</p>
-                 {(validationTouched || !isClient) && (
-                   <ul className="mt-2 space-y-1 text-xs text-[var(--text-muted)]">
-                     {validationErrors.map((item) => (
-                       <li key={item}>- {item}</li>
-                     ))}
-                   </ul>
-                 )}
-                 {!validationTouched && isClient && (
-                   <p className="mt-2 text-xs text-[var(--text-muted)]">Click export to view required items.</p>
-                 )}
-               </>
-             )}
-           </div>
-
-           <div className="mt-3 grid gap-2">
-             <Button
-               onClick={() => {
-                 void saveResumeToVault();
-               }}
-               disabled={isSavingToVault || isRunningAts}
-               className="w-full rounded-[12px] bg-white/5 border border-[var(--border)] text-[var(--text)] hover:bg-white/10"
-             >
-               {isSavingToVault ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-               {isSavingToVault ? "Saving to Vault..." : "Save to Vault"}
-             </Button>
-
-             <Button
-               onClick={() => {
-                 void handleCheckAts();
-               }}
-               disabled={isSavingToVault || isRunningAts}
-               className="w-full rounded-[12px] bg-[var(--primary)] text-black hover:bg-[var(--primary)]/90"
-             >
-               {isRunningAts ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-               {isRunningAts ? "Checking ATS..." : "Check ATS Score"}
-             </Button>
-           </div>
-
-           {(savedResumeId || atsScore !== null) && (
-             <div className="mt-3 rounded-lg border border-[var(--border)] bg-black/20 p-3 space-y-2">
-               {atsScore !== null && (
-                 <p className="text-xs text-[var(--primary-light)]">
-                   ATS score: <span className="font-semibold">{atsScore}%</span>
-                 </p>
-               )}
-               {atsSuggestions.length > 0 && (
-                 <p className="text-xs text-[var(--text-muted)] line-clamp-3">{atsSuggestions[0]}</p>
-               )}
-
-               <div className="grid grid-cols-2 gap-2">
-                 {savedResumeId ? (
-                   <Link href={`/dashboard/resumes/${savedResumeId}`}>
-                     <Button className="w-full rounded-[10px] bg-white/5 border border-[var(--border)] text-[var(--text)] hover:bg-white/10 text-xs h-8">
-                       Open Resume
-                     </Button>
-                   </Link>
-                 ) : (
-                   <div />
-                 )}
-                 <Link href="/dashboard/jobs">
-                   <Button className="w-full rounded-[10px] bg-white/5 border border-[var(--border)] text-[var(--text)] hover:bg-white/10 text-xs h-8">
-                     Go to Jobs
-                   </Button>
-                 </Link>
-               </div>
-             </div>
-           )}
-         </div>
-         
-         {/* Miniature Document Preview Container */}
-         <div className="relative flex-1 bg-white rounded-lg shadow-inner overflow-hidden border-4 border-black/20">
-           <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50 p-6 overflow-y-auto text-gray-900 text-[9px] scrollbar-none">
-              {effectiveTemplate === "iit" && (
-                <>
-                  <div className="text-center font-bold text-lg uppercase mb-1 tracking-tight">{basics.name || "YOUR NAME"}</div>
-                  <div className="text-center text-[8px] text-gray-600 mb-3">{basics.email || "email@address.com"} | {basics.phone || "Phone"} | {basics.location || "City, State"}</div>
-
-                  <div className="uppercase text-[10px] font-bold bg-gray-200 px-2 py-1 mb-2">Education</div>
-                  <div className="border-y border-black mb-4 text-[8px]">
-                    <div className="grid grid-cols-4 font-bold py-1 px-1 border-b border-gray-300">
-                      <span>Degree</span><span className="text-center">Institute</span><span className="text-center">Year</span><span className="text-right">CPI/%</span>
-                    </div>
-                    {(education.length > 0 ? education : [{ degree: "Degree", school: "Institute", year: "20xx", grade: "N/A" }]).slice(0, 2).map((edu, i) => (
-                      <div key={i} className="grid grid-cols-4 py-1 px-1 border-b border-gray-200 last:border-b-0">
-                        <span>{edu.degree || "Degree"}</span>
-                        <span className="text-center">{edu.school || "Institute"}</span>
-                        <span className="text-center">{edu.year || "20xx"}</span>
-                        <span className="text-right">{edu.grade || "N/A"}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="uppercase text-[10px] font-bold bg-gray-200 px-2 py-1 mb-2">Work Experience & Internships</div>
-                  <div className="space-y-3 text-[8.5px]">
-                    {(experience.length > 0 ? experience : [{ role: "Role", company: "Company", bullets: ["Impact bullet"] }]).slice(0, 3).map((exp, i) => (
-                      <div key={i}>
-                        <div className="font-bold">* {exp.role || "Role"} | <span className="font-normal">{exp.company || "Company"}</span></div>
-                        <ul className="pl-3 mt-1 space-y-0.5">
-                          {(exp.bullets?.length ? exp.bullets : ["Impact bullet with measurable result"]).slice(0, 2).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {effectiveTemplate === "jake" && (
-                <>
-                  <div className="text-center font-serif text-[18px] mb-1">{basics.name || "Your Name"}</div>
-                  <div className="text-center text-[8px] text-gray-700 mb-4">{[basics.phone, basics.email, basics.linkedin, basics.github, basics.location].filter(Boolean).join(" | ") || "Phone | email | linkedin | github | location"}</div>
-
-                  <div className="uppercase text-[10px] font-semibold border-b border-black pb-1 mb-2">Education</div>
-                  <div className="space-y-2 text-[8.5px] mb-4">
-                    {(education.length > 0 ? education : [{ school: "University", degree: "Degree", year: "2024", grade: "3.8" }]).slice(0, 2).map((edu, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between font-semibold"><span>{edu.school || "University"}</span><span>{edu.year || "2024"}</span></div>
-                        <div className="flex justify-between italic"><span>{edu.degree || "Degree"}</span><span>{edu.grade ? `GPA: ${edu.grade}` : ""}</span></div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="uppercase text-[10px] font-semibold border-b border-black pb-1 mb-2">Experience</div>
-                  <div className="space-y-3 text-[8.5px] mb-4">
-                    {(experience.length > 0 ? experience : [{ role: "Software Engineer", company: "Company", bullets: ["Delivered measurable impact"] }]).slice(0, 3).map((exp, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between font-semibold"><span>{exp.role || "Role"}</span><span>{exp.date || "Present"}</span></div>
-                        <div className="italic">{exp.company || "Company"}</div>
-                        <ul className="pl-3 mt-1 space-y-0.5">
-                          {(exp.bullets?.length ? exp.bullets : ["Impact bullet with quantifiable result"]).slice(0, 2).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="uppercase text-[10px] font-semibold border-b border-black pb-1 mb-2">Projects</div>
-                  <div className="space-y-2 text-[8.5px] mb-4">
-                    {(projects.filter(p => p.selected).length > 0 ? projects.filter(p => p.selected) : [{ name: "Project", technologies: "React, Node", bullets: ["Built end-to-end feature"] }]).slice(0, 2).map((proj, i) => (
-                      <div key={i}>
-                        <div className="font-semibold">{proj.name || "Project"} | <span className="italic">{proj.technologies || "Tech"}</span></div>
-                        <ul className="pl-3 mt-1 space-y-0.5">
-                          {(proj.bullets?.length ? proj.bullets : ["Project impact bullet"]).slice(0, 2).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {effectiveTemplate === "auto" && (
-                <>
-                  <div className="text-center font-bold text-lg uppercase mb-1 tracking-tight">{basics.name || "YOUR NAME"}</div>
-                  <div className="text-center text-[8px] text-gray-600 mb-5 pb-4 border-b-2 border-gray-900">
-                    {[basics.email || "email@address.com", basics.phone || "Phone", basics.location || "City, State"].join(" | ")}
-                  </div>
-
-                  <div className="uppercase text-[10px] font-bold text-gray-900 mb-2">Summary</div>
-                  <p className="text-[9px] mb-5 text-gray-700 leading-relaxed font-serif">{basics.summary || "Professional summary goes here..."}</p>
-
-                  <div className="uppercase text-[10px] font-bold text-gray-900 border-b border-gray-300 pb-1 mb-3">Experience</div>
-                  <div className="space-y-4">
-                    {experience.length > 0 ? experience.map((exp, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between text-[9px] font-bold text-gray-900">
-                          <span>{exp.role || "Role"}</span>
-                          <span>{exp.company || "Company"}</span>
-                        </div>
-                        <ul className="pl-4 text-[9px] mt-1.5 space-y-1 text-gray-700 font-serif">
-                          {(exp.bullets || []).map((b: string, idx: number) => <li key={idx}>- {b}</li>)}
-                          {!(exp.bullets?.length) && <li>- Resume bullet one</li>}
-                        </ul>
-                      </div>
-                    )) : (
-                      <div>
-                        <div className="flex justify-between text-[9px] font-bold text-gray-900">
-                          <span>Software Engineer</span>
-                          <span>Tech Corp</span>
-                        </div>
-                        <ul className="pl-4 text-[9px] mt-1.5 space-y-1 text-gray-700 font-serif">
-                          <li>- Designed and developed scalable microservices</li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-
-              <div className="mt-5 rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-[8px] text-gray-600 flex items-center gap-1">
-                <Link2 className="h-3 w-3" />
-                Structure synced with selected template ({effectiveTemplate.toUpperCase()}).
-              </div>
-           </div>
-         </div>
-      </FadeIn>
+      {/* Right Panel: Preview */}
+      <div className="w-1/2 p-6 flex flex-col items-center justify-center bg-[#0F172A]">
+        <div className="mb-4">
+          <DownloadPDFButton templateType={templateType} data={resumeData} />
+        </div>
+        <div className="shadow-2xl border border-gray-800 rounded bg-white">
+          <TemplatePreview templateType={templateType} data={resumeData} />
+        </div>
+      </div>
     </div>
   );
 }
-
-
-
-

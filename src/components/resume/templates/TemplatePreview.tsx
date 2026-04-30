@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import IITTemplate from './IITTemplate';
 import JakesTemplate from './JakesTemplate';
+import { Loader2 } from 'lucide-react';
 
 interface TemplatePreviewProps {
   templateType: 'iit' | 'jakes';
@@ -52,20 +53,28 @@ export function TemplatePreview({ templateType, data }: TemplatePreviewProps) {
 interface DownloadPDFProps {
   templateType: 'iit' | 'jakes';
   data: any;
-  filename?: string;
 }
 
-export function DownloadPDFButton({ templateType, data, filename = 'resume.pdf' }: DownloadPDFProps) {
+export function DownloadPDFButton({ templateType, data }: DownloadPDFProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleDownload = async () => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || isGenerating) return;
+    setIsGenerating(true);
 
     // The element to capture is the inner template div
     const targetElement = containerRef.current.firstElementChild as HTMLElement;
-    if (!targetElement) return;
+    if (!targetElement) {
+      setIsGenerating(false);
+      return;
+    }
 
     try {
+      const filename = data?.fullName 
+        ? \\-resume.pdf\
+        : 'resume.pdf';
+
       const canvas = await html2canvas(targetElement, {
         scale: 2, // High resolution
         useCORS: true,
@@ -85,6 +94,8 @@ export function DownloadPDFButton({ templateType, data, filename = 'resume.pdf' 
       pdf.save(filename);
     } catch (error) {
       console.error('Error generating PDF:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -102,6 +113,7 @@ export function DownloadPDFButton({ templateType, data, filename = 'resume.pdf' 
     <div>
       <button
         onClick={handleDownload}
+        disabled={isGenerating}
         style={{
           padding: '10px 20px',
           backgroundColor: '#D4AF37', // Primary Gold from UI constraints
@@ -109,11 +121,15 @@ export function DownloadPDFButton({ templateType, data, filename = 'resume.pdf' 
           border: 'none',
           borderRadius: '12px',
           fontWeight: '500',
-          cursor: 'pointer',
+          cursor: isGenerating ? 'not-allowed' : 'pointer',
           fontFamily: 'Inter, sans-serif',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}
       >
-        Download PDF
+        {isGenerating && <Loader2 className="h-4 w-4 animate-spin" />}
+        {isGenerating ? 'Generating...' : 'Download PDF'}
       </button>
 
       {/* Hidden container to render the full scale template for PDF capture */}

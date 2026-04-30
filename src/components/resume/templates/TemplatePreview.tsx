@@ -72,7 +72,7 @@ export function DownloadPDFButton({ templateType, data }: DownloadPDFProps) {
 
     try {
       const filename = data?.fullName 
-        ? \\-resume.pdf\
+        ? `${data.fullName.replace(/\\s+/g, '-')}-resume.pdf`
         : 'resume.pdf';
 
       const canvas = await html2canvas(targetElement, {

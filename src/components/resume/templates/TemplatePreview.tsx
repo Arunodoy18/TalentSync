@@ -53,9 +53,10 @@ export function TemplatePreview({ templateType, data }: TemplatePreviewProps) {
 interface DownloadPDFProps {
   templateType: 'iit' | 'jakes';
   data: any;
+  className?: string;
 }
 
-export function DownloadPDFButton({ templateType, data }: DownloadPDFProps) {
+export function DownloadPDFButton({ templateType, data, className }: DownloadPDFProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -110,11 +111,12 @@ export function DownloadPDFButton({ templateType, data }: DownloadPDFProps) {
   };
 
   return (
-    <div>
+    <div className={className ? "flex-1" : ""}>
       <button
         onClick={handleDownload}
         disabled={isGenerating}
-        style={{
+        className={className || ""}
+        style={className ? undefined : {
           padding: '10px 20px',
           backgroundColor: '#D4AF37', // Primary Gold from UI constraints
           color: '#0F172A',

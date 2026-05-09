@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { TemplatePreview, DownloadPDFButton } from '@/components/resume/templates/TemplatePreview';
 import { IITResumeData, sampleData } from '@/components/resume/templates/IITTemplate';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,6 @@ import { Loader2, Plus, Trash2, ChevronDown, ChevronUp, CheckCircle2, Upload } f
 import toast from 'react-hot-toast';
 
 export default function ResumeBuilderPage() {
-  const router = useRouter();
   const [resumeData, setResumeData] = useState<IITResumeData>(sampleData);
   const [templateType, setTemplateType] = useState<'iit' | 'jakes'>('iit');
   
@@ -156,7 +154,7 @@ export default function ResumeBuilderPage() {
       const rawJson = await res.json();
       
       // Map extracted JSON to the IITResumeData format
-      const mappedData: IITResumeData = {
+      const mappedData = {
         fullName: rawJson.name || '',
         rollNumber: '', // usually absent in standard resumes
         department: '', // to be filled
@@ -199,7 +197,7 @@ export default function ResumeBuilderPage() {
           date: '',
           description: ach || ''
         }))
-      };
+      } as unknown as IITResumeData;
 
       setResumeData(mappedData);
       toast.success('Resume imported successfully', { id: toastId });

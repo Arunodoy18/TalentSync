@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import pdfParse from "pdf-parse";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require("pdf-parse");
 import { OpenAI } from "openai";
 
 export const runtime = "nodejs";

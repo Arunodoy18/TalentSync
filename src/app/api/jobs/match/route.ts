@@ -195,26 +195,18 @@ async function fetchAdzunaJobs(what: string, where: string) {
     throw new Error("Adzuna API keys not configured");
   }
 
-  const params = new URLSearchParams({
-    app_id: appId,
-    app_key: appKey,
-    results_per_page: "20",
-    what,
-    where,
-    "content-type": "application/json",
-  });
-
-  const url = `https://api.adzuna.com/v1/api/jobs/gb/search/1?${params.toString()}`;
-  console.log(`[Adzuna] GET ${url}`);
+  const url = `https://api.adzuna.com/v1/api/jobs/in/search/1?app_id=${appId}&app_key=${appKey}&results_per_page=20&what=${encodeURIComponent(what)}&where=${encodeURIComponent(where)}&content-type=application/json`;
+  console.log("Fetching Adzuna:", url);
   const res = await fetch(url, { cache: "no-store" });
-  console.log(`[Adzuna] Status ${res.status} ${res.statusText}`);
-  if (!res.ok) {
+  console.log("Adzuna status:", res.status);
+  if (res.status !== 200) {
     const errorText = await res.text();
-    console.log(`[Adzuna] Error response: ${errorText}`);
-    throw new Error(`Adzuna request failed (${res.status}): ${errorText}`);
+    console.log("Adzuna error:", errorText);
+    throw new Error(errorText || `Adzuna request failed with status ${res.status}`);
   }
 
   const data = await res.json();
+  console.log("Jobs found:", Array.isArray(data?.results) ? data.results.length : 0);
   return Array.isArray(data?.results) ? data.results : [];
 }
 
@@ -252,7 +244,7 @@ function mapJobToResponse(
     ? `₹${salaryMin.toLocaleString()} - ₹${salaryMax.toLocaleString()}`
     : "Not disclosed";
 
-  const location = job.location?.display_name || job.location?.area?.join(", ") || "";
+  const location = job.location?.display_name || "";
   const company = job.company?.display_name || "";
   const jobType = job.contract_time || job.contract_type || job.job_type || "Not specified";
 
@@ -264,7 +256,7 @@ function mapJobToResponse(
     description: cleanDescription.slice(0, 300),
     salary,
     jobType,
-    applyUrl: job.redirect_url || job.url || "",
+    applyUrl: job.redirect_url || "",
     source,
     matchScore,
     matchedSkills: Array.from(new Set(matchedSkills)),
@@ -278,16 +270,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Adzuna API keys not configured", jobs: [] }, { status: 500 });
     }
 
-    const body = (await request.json()) as JobMatchRequest;
-    const role = body?.role?.trim();
-    const city = body?.city?.trim();
-    const resumeSkills = Array.isArray(body?.resumeSkills) ? body.resumeSkills : null;
+    const { role, city, resumeSkills } = (await request.json()) as JobMatchRequest;
+    const normalizedRole = role?.trim();
+    const normalizedCity = city?.trim();
+    const normalizedSkills = Array.isArray(resumeSkills) ? resumeSkills : null;
 
-    if (!role || !city || !resumeSkills) {
+    if (!normalizedRole || !normalizedCity || !normalizedSkills) {
       return NextResponse.json({ error: "role, city, and resumeSkills are required", jobs: [] }, { status: 400 });
     }
 
-    const cacheKey = buildCacheKey(role, city);
+    const cacheKey = buildCacheKey(normalizedRole, normalizedCity);
     try {
       const cached = await redisGet(cacheKey);
       if (cached) {
@@ -301,8 +293,8 @@ export async function POST(request: Request) {
     }
 
     const results = await Promise.allSettled([
-      fetchAdzunaJobs(role, city),
-      fetchAdzunaJobs("software engineer intern", city),
+      fetchAdzunaJobs(normalizedRole, normalizedCity),
+      fetchAdzunaJobs("software engineer intern", normalizedCity),
     ]);
 
     const rejectedResults = results.filter(
@@ -323,11 +315,11 @@ export async function POST(request: Request) {
     }
 
     const mappedPrimary = primaryJobs.map((job: any) =>
-      mapJobToResponse(job, "Adzuna", resumeSkills)
+      mapJobToResponse(job, "Adzuna", normalizedSkills)
     );
 
     const mappedIntern = internJobs.map((job: any) =>
-      mapJobToResponse(job, "Internshala", resumeSkills)
+      mapJobToResponse(job, "Internshala", normalizedSkills)
     );
 
     const mergedMap = new Map<string, JobMatchResponse>();
@@ -349,6 +341,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ jobs: mergedJobs });
   } catch (error) {
     console.error("Job match error:", error);
-    return NextResponse.json({ jobs: [], error: "Failed to match jobs." });
+    const message = error instanceof Error ? error.message : "Failed to match jobs.";
+    return NextResponse.json({ jobs: [], error: message }, { status: 500 });
   }
 }

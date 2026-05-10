@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "postinstall": "npx @tailwindcss/oxide install",
     "smoke:resume-upload": "node tools/resume-upload-smoke.mjs"
   },
   "dependencies": {

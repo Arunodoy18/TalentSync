@@ -59,6 +59,7 @@ function getMatchBadge(score: number) {
 
 export default function JobsPage() {
   const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
   const [role, setRole] = useState("");
   const [city, setCity] = useState("");
   const [resumeSkills, setResumeSkills] = useState<string[]>([]);
@@ -68,6 +69,8 @@ export default function JobsPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [expandedJobs, setExpandedJobs] = useState<Record<string, boolean>>({});
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [appliedJobKeys, setAppliedJobKeys] = useState<Set<string>>(new Set());
 
   const [jobTypeFilter, setJobTypeFilter] = useState({
     fullTime: false,
@@ -86,12 +89,13 @@ export default function JobsPage() {
   useEffect(() => {
     let isMounted = true;
     const loadResumeSkills = async () => {
-      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push("/");
         return;
       }
+
+      setUserId(user.id);
 
       const { data: resume } = await supabase
         .from("resumes")
@@ -106,8 +110,20 @@ export default function JobsPage() {
         .map((skill: any) => (typeof skill === "string" ? skill : skill?.name))
         .filter((skill: string | undefined) => Boolean(skill));
 
+      const { data: applications } = await supabase
+        .from("applications")
+        .select("apply_url")
+        .eq("user_id", user.id);
+
+      const appliedKeys = new Set(
+        (applications || [])
+          .map((app) => app.apply_url)
+          .filter((value) => typeof value === "string" && value.trim().length > 0)
+      );
+
       if (isMounted) {
         setResumeSkills(normalizedSkills);
+        setAppliedJobKeys(appliedKeys);
       }
     };
 
@@ -115,7 +131,7 @@ export default function JobsPage() {
     return () => {
       isMounted = false;
     };
-  }, [router]);
+  }, [router, supabase]);
 
   const handleSearch = useCallback(
     async (nextRole?: string, nextCity?: string) => {
@@ -197,9 +213,35 @@ export default function JobsPage() {
     setExpandedJobs((prev) => ({ ...prev, [jobId]: !prev[jobId] }));
   };
 
-  const handleApply = (job: JobMatch) => {
+  const handleApply = async (job: JobMatch) => {
     if (job.applyUrl) {
       window.open(job.applyUrl, "_blank", "noopener,noreferrer");
+    }
+
+    if (!userId) return;
+
+    const key = job.applyUrl || job.id;
+    if (appliedJobKeys.has(key)) return;
+
+    try {
+      const payload = {
+        user_id: userId,
+        job_title: job.title,
+        company: job.company,
+        location: job.location,
+        apply_url: job.applyUrl,
+        status: "applied",
+        source: job.source,
+        match_score: job.matchScore,
+        applied_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase.from("applications").insert(payload);
+      if (error) throw error;
+
+      setAppliedJobKeys((prev) => new Set([...prev, key]));
+    } catch (err) {
+      console.error("Failed to save application", err);
     }
   };
 
@@ -381,6 +423,8 @@ export default function JobsPage() {
                   const initials = job.company?.trim()?.[0] || job.title?.trim()?.[0] || "?";
                   const matchedSkills = (job.matchedSkills || []).slice(0, 4);
                   const isExpanded = expandedJobs[job.id];
+                  const appliedKey = job.applyUrl || job.id;
+                  const isApplied = appliedJobKeys.has(appliedKey);
 
                   return (
                     <div key={job.id} className="p-5 rounded-2xl bg-[#111827] border border-[#1F2937] space-y-4">
@@ -437,10 +481,11 @@ export default function JobsPage() {
                             View Details
                           </Button>
                           <Button
-                            className="h-9 bg-[#D4AF37] text-black hover:bg-[#B89A32]"
+                            className={isApplied ? "h-9 bg-emerald-500/80 text-white" : "h-9 bg-[#D4AF37] text-black hover:bg-[#B89A32]"}
                             onClick={() => handleApply(job)}
+                            disabled={isApplied}
                           >
-                            Apply Now <ExternalLink className="ml-1 h-4 w-4" />
+                            {isApplied ? "Applied ✓" : "Apply Now"} {!isApplied && <ExternalLink className="ml-1 h-4 w-4" />}
                           </Button>
                         </div>
                       </div>

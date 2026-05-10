@@ -192,7 +192,7 @@ async function fetchAdzunaJobs(what: string, where: string) {
   const appKey = process.env.ADZUNA_APP_KEY;
 
   if (!appId || !appKey) {
-    throw new Error("Missing Adzuna credentials");
+    throw new Error("Adzuna API keys not configured");
   }
 
   const params = new URLSearchParams({
@@ -204,11 +204,14 @@ async function fetchAdzunaJobs(what: string, where: string) {
     "content-type": "application/json",
   });
 
-  const url = `https://api.adzuna.com/v1/api/jobs/in/search/1?${params.toString()}`;
+  const url = `https://api.adzuna.com/v1/api/jobs/gb/search/1?${params.toString()}`;
+  console.log(`[Adzuna] GET ${url}`);
   const res = await fetch(url, { cache: "no-store" });
+  console.log(`[Adzuna] Status ${res.status} ${res.statusText}`);
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`Adzuna request failed: ${errorText}`);
+    console.log(`[Adzuna] Error response: ${errorText}`);
+    throw new Error(`Adzuna request failed (${res.status}): ${errorText}`);
   }
 
   const data = await res.json();
@@ -271,6 +274,10 @@ function mapJobToResponse(
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) {
+      return NextResponse.json({ error: "Adzuna API keys not configured", jobs: [] }, { status: 500 });
+    }
+
     const body = (await request.json()) as JobMatchRequest;
     const role = body?.role?.trim();
     const city = body?.city?.trim();
@@ -298,13 +305,20 @@ export async function POST(request: Request) {
       fetchAdzunaJobs("software engineer intern", city),
     ]);
 
+    const rejectedResults = results.filter(
+      (result): result is PromiseRejectedResult => result.status === "rejected"
+    );
+    const adzunaErrorMessage = rejectedResults.length
+      ? (rejectedResults[0].reason instanceof Error
+        ? rejectedResults[0].reason.message
+        : String(rejectedResults[0].reason))
+      : null;
+
     const primaryJobs = results[0].status === "fulfilled" ? results[0].value : [];
     const internJobs = results[1].status === "fulfilled" ? results[1].value : [];
 
     if (primaryJobs.length === 0 && internJobs.length === 0) {
-      const errorMessage = results.some((result) => result.status === "rejected")
-        ? "Failed to fetch jobs from Adzuna."
-        : "No jobs found.";
+      const errorMessage = adzunaErrorMessage || "No jobs found.";
       return NextResponse.json({ jobs: [], error: errorMessage });
     }
 

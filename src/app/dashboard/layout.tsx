@@ -61,6 +61,10 @@ export default function DashboardLayout({
     setIsSigningOut(true)
 
     try {
+      if (!supabase) {
+        console.error("Missing Supabase env vars")
+        return
+      }
       await supabase.auth.signOut()
       router.push("/")
       router.refresh()

@@ -20,6 +20,12 @@ const LoginAuth = () => {
     setError(null);
     setMessage(null);
 
+    if (!supabase) {
+      setError("Supabase is not configured. Check your environment variables.");
+      setLoading(false);
+      return;
+    }
+
     const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL 
       ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
       : 'https://talentsync.buildc3.tech/auth/callback';

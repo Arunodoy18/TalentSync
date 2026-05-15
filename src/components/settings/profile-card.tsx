@@ -22,6 +22,10 @@ export function ProfileCard({ initialName, email, userId }: ProfileCardProps) {
     try {
       setIsLoading(true);
       const supabase = createClient();
+      if (!supabase) {
+        console.error("Missing Supabase env vars");
+        return;
+      }
       
       const { error } = await supabase.auth.updateUser({
         data: { full_name: inputValue }

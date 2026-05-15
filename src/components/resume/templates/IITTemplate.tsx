@@ -147,7 +147,13 @@ const ResHeading = ({ title }: { title: string }) => (
   </div>
 );
 
-export default function IITTemplate({ data = sampleData }: { data?: IITResumeData }) {
+export default function IITTemplate({
+  data = sampleData,
+  logoUrl,
+}: {
+  data?: IITResumeData;
+  logoUrl?: string;
+}) {
   const listStyle: React.CSSProperties = {
     margin: '0',
     padding: '0 0 0 20px',
@@ -182,17 +188,33 @@ export default function IITTemplate({ data = sampleData }: { data?: IITResumeDat
       {/* HEADER SECTION */}
       <div style={{ display: 'flex', marginBottom: '16px' }}>
         <div style={{ width: '15%', display: 'flex', alignItems: 'center' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/iit_logo.png"
-            alt="IIT Logo"
-            style={{ height: '58px', objectFit: 'contain' }}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = '<div style="height: 58px; width: 58px; background: #eee;"></div>';
-            }}
-          />
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoUrl}
+              alt="Institute Logo"
+              style={{ height: '58px', objectFit: 'contain' }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 58,
+                height: 58,
+                borderRadius: '50%',
+                border: '2px solid #333',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 9,
+                fontWeight: 'bold',
+                textAlign: 'center',
+                color: '#333',
+                padding: 4,
+              }}
+            >
+              SMIT LOGO
+            </div>
+          )}
         </div>
         <div style={{ width: '85%' }}>
           <table

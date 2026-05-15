@@ -105,6 +105,10 @@ const ResumeEditor = ({ resume: initialResume }: ResumeEditorProps) => {
   };
 
   useEffect(() => {
+    if (!supabase) {
+      setSaveError("Supabase is not configured. Check your environment variables.");
+      return;
+    }
     const currentSignature = JSON.stringify({
       title: resume.title,
       content: resume.content,

@@ -78,6 +78,10 @@ export function AutoApplyClient({
     setError("");
 
     try {
+      if (!supabase) {
+        setError("Supabase is not configured. Check your environment variables.");
+        return;
+      }
       const payload = {
         user_id: userId,
         job_titles: prefs.job_titles,
@@ -111,6 +115,10 @@ export function AutoApplyClient({
   const handleToggleState = async () => {
     const newState = !prefs.is_active;
     try {
+      if (!supabase) {
+        setError("Supabase is not configured. Check your environment variables.");
+        return;
+      }
       const { error: updErr } = await supabase
         .from("user_preferences")
         .update({ is_active: newState })

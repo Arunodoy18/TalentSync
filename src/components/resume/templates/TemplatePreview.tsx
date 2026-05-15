@@ -13,13 +13,15 @@ interface TemplatePreviewProps {
 }
 
 export function TemplatePreview({ templateType, data }: TemplatePreviewProps) {
+  const iitLogoUrl = "/logos/smit-seal.svg";
+
   const renderTemplate = () => {
     switch (templateType) {
       case 'jakes':
         return <JakesTemplate data={data} />;
       case 'iit':
       default:
-        return <IITTemplate data={data} />;
+        return <IITTemplate data={data} logoUrl={iitLogoUrl} />;
     }
   };
 
@@ -106,7 +108,7 @@ export function DownloadPDFButton({ templateType, data, className }: DownloadPDF
         return <JakesTemplate data={data} />;
       case 'iit':
       default:
-        return <IITTemplate data={data} />;
+        return <IITTemplate data={data} logoUrl={iitLogoUrl} />;
     }
   };
 

@@ -56,6 +56,10 @@ export default function DashboardPage() {
         setError(null);
 
         const supabase = createClient();
+        if (!supabase) {
+          setError("Supabase is not configured. Check your environment variables and try again.");
+          return;
+        }
         const {
           data: { user: authUser },
           error: authError,
@@ -141,6 +145,9 @@ export default function DashboardPage() {
           fetchError instanceof Error
             ? fetchError.message
             : "Failed to load dashboard data.";
+        if (message?.toLowerCase().includes("message channel closed")) {
+          return;
+        }
         setError(message);
       } finally {
         if (mounted) {

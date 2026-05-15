@@ -89,6 +89,10 @@ export default function JobsPage() {
   useEffect(() => {
     let isMounted = true;
     const loadResumeSkills = async () => {
+      if (!supabase) {
+        setErrorMessage("Supabase is not configured. Check your environment variables.");
+        return;
+      }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push("/");
@@ -218,6 +222,10 @@ export default function JobsPage() {
       window.open(job.applyUrl, "_blank", "noopener,noreferrer");
     }
 
+    if (!supabase) {
+      setErrorMessage("Supabase is not configured. Check your environment variables.");
+      return;
+    }
     if (!userId) return;
 
     const key = job.applyUrl || job.id;

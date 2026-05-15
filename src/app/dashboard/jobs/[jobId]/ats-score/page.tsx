@@ -30,6 +30,11 @@ export default function AtsScorePage({
   useEffect(() => {
     async function loadData() {
       const supabase = createClient();
+      if (!supabase) {
+        setData({ error: "Supabase is not configured. Check your environment variables." });
+        setLoading(false);
+        return;
+      }
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
@@ -87,8 +92,8 @@ export default function AtsScorePage({
   if (data.error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-[var(--primary-light)]">
-        <h2 className="text-2xl font-bold mb-4">No Match Found</h2>
-        <p className="text-[var(--primary)]">Score has not been calculated yet for this combination.</p>
+        <h2 className="text-2xl font-bold mb-4">Unable to load ATS score</h2>
+        <p className="text-[var(--primary)]">{data.error}</p>
         <Link href="/dashboard/jobs" className="mt-8 px-6 py-2 bg-[rgba(142,182,155,0.2)] text-[var(--primary)] rounded-full hover:bg-[rgba(142,182,155,0.4)]">
           Return to Jobs
         </Link>

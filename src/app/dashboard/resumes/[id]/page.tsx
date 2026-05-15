@@ -1,6 +1,6 @@
 ﻿import { createClient } from "@/lib/supabase-server";
 import { redirect, notFound } from "next/navigation";
-import ResumeEditor from "@/components/sections/resume-editor";
+import ResumePreviewClient from "./resume-preview-client";
 
 export default async function ResumePage({
   params,
@@ -9,7 +9,9 @@ export default async function ResumePage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/");
@@ -26,11 +28,7 @@ export default async function ResumePage({
     notFound();
   }
 
-  return (
-    <div className="flex-1 min-h-[calc(100vh-80px)] overflow-hidden">
-      <ResumeEditor resume={resume} />
-    </div>
-  );
+  return <ResumePreviewClient resume={resume} />;
 }
 
 

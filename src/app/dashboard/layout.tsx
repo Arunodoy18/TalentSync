@@ -28,7 +28,6 @@ type NavItem = {
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Resumes", href: "/dashboard/resumes", icon: FileText },
-  { label: "ATS Score", href: "/dashboard/ats-score", icon: Target },
   { label: "Jobs", href: "/dashboard/jobs", icon: Briefcase },
   { label: "Auto Apply", href: "/dashboard/auto-apply", icon: Rocket },
   { label: "Applications", href: "/dashboard/applications", icon: ClipboardList },

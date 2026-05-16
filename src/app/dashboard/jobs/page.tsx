@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { usePostHog } from 'posthog-js/react';
 import {
   Briefcase,
   ChevronDown,
@@ -59,6 +60,7 @@ function getMatchBadge(score: number) {
 
 export default function JobsPage() {
   const router = useRouter();
+  const posthog = usePostHog();
   const supabase = useMemo(() => createClient(), []);
   const [role, setRole] = useState("");
   const [city, setCity] = useState("");
@@ -138,9 +140,10 @@ export default function JobsPage() {
   }, [router, supabase]);
 
   const handleSearch = useCallback(
-    async (nextRole?: string, nextCity?: string) => {
+    async (nextRole?: string, nextCity?: string, trackEvent = false) => {
       const roleValue = (nextRole ?? role).trim();
       const cityValue = (nextCity ?? city).trim();
+      let resultsCount = 0;
       setHasSearched(true);
       setErrorMessage(null);
 
@@ -163,7 +166,9 @@ export default function JobsPage() {
           setErrorMessage(data?.error || "Failed to fetch jobs.");
           setJobs([]);
         } else {
-          setJobs(Array.isArray(data?.jobs) ? data.jobs : []);
+          const nextJobs = Array.isArray(data?.jobs) ? data.jobs : [];
+          resultsCount = nextJobs.length;
+          setJobs(nextJobs);
         }
       } catch (error) {
         console.error("Job fetch error:", error);
@@ -171,9 +176,16 @@ export default function JobsPage() {
         setJobs([]);
       } finally {
         setIsLoading(false);
+        if (trackEvent) {
+          posthog.capture('job_searched', {
+            role: roleValue,
+            city: cityValue,
+            results_count: resultsCount,
+          });
+        }
       }
     },
-    [role, city, resumeSkills]
+    [role, city, resumeSkills, posthog]
   );
 
   const handleSuggestion = (suggestion: Suggestion) => {
@@ -218,6 +230,13 @@ export default function JobsPage() {
   };
 
   const handleApply = async (job: JobMatch) => {
+    posthog.capture('job_apply_clicked', {
+      company: job.company,
+      job_title: job.title,
+      match_score: job.matchScore,
+      city: job.location,
+    });
+
     if (job.applyUrl) {
       window.open(job.applyUrl, "_blank", "noopener,noreferrer");
     }
@@ -283,7 +302,7 @@ export default function JobsPage() {
                 />
               </div>
               <Button
-                onClick={() => handleSearch()}
+                onClick={() => handleSearch(undefined, undefined, true)}
                 disabled={isLoading}
                 className="h-[44px] bg-[#D4AF37] text-black font-semibold hover:bg-[#B89A32]"
               >

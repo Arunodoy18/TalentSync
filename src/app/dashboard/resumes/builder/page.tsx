@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Trash2, ChevronDown, ChevronUp, CheckCircle2, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { usePostHog } from 'posthog-js/react';
 
 type BuilderResumeData = JakesResumeData & {
   portfolio?: string;
@@ -28,6 +29,7 @@ const emptySkills = {
 };
 
 export default function ResumeBuilderPage() {
+  const posthog = usePostHog();
   const [resumeData, setResumeData] = useState<BuilderResumeData>(defaultResumeData);
   const [templateType, setTemplateType] = useState<'iit' | 'jakes'>('jakes');
 
@@ -37,6 +39,9 @@ export default function ResumeBuilderPage() {
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectedTemplate = templateType;
+  const experience = resumeData.experience ?? [];
+  const projects = resumeData.projects ?? [];
 
   const [debouncedResumeData, setDebouncedResumeData] = useState<BuilderResumeData>(defaultResumeData);
 
@@ -106,6 +111,18 @@ export default function ResumeBuilderPage() {
         return false;
     }
   }, [resumeData]);
+
+  const filledSectionsCount = useMemo(() => {
+    const sectionKeys: (keyof typeof expanded)[] = [
+      'personal',
+      'education',
+      'experience',
+      'projects',
+      'skills',
+      'achievements',
+    ];
+    return sectionKeys.reduce((count, section) => count + (hasData(section) ? 1 : 0), 0);
+  }, [hasData]);
 
   const handleChange = <K extends keyof BuilderResumeData>(field: K, value: BuilderResumeData[K]) => {
     setResumeData((prev) => ({ ...prev, [field]: value }));
@@ -334,6 +351,26 @@ export default function ResumeBuilderPage() {
     }
   };
 
+  const handleSaveDraftClick = () => {
+    posthog.capture('resume_saved', {
+      template_type: selectedTemplate,
+      has_experience: experience.length > 0,
+      has_projects: projects.length > 0,
+      sections_filled: filledSectionsCount,
+    });
+
+    handleSaveDraft();
+  };
+
+  const handleCheckAtsClick = () => {
+    posthog.capture('ats_score_checked', {
+      score: atsScore,
+      template: selectedTemplate,
+    });
+
+    handleCheckATS();
+  };
+
   const handleMagicImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -396,6 +433,9 @@ export default function ResumeBuilderPage() {
       };
 
       setResumeData(mappedData);
+      posthog.capture('resume_imported', {
+        template: selectedTemplate,
+      });
       toast.success('Resume imported successfully', { id: toastId });
     } catch (err: any) {
       console.error(err);
@@ -743,7 +783,7 @@ export default function ResumeBuilderPage() {
         {/* Bottom Action Bar (Sticky) */}
         <div className="sticky bottom-0 -mx-6 -mb-6 p-4 bg-[#0F172A]/90 backdrop-blur-sm border-t border-[#1F2937] flex gap-4 z-10 w-[calc(100%+48px)]">
           <Button
-            onClick={handleSaveDraft}
+            onClick={handleSaveDraftClick}
             disabled={isSavingDraft}
             className="flex-1 bg-[#1F2937] hover:bg-gray-700 text-white font-medium h-[44px]"
           >
@@ -751,7 +791,7 @@ export default function ResumeBuilderPage() {
             Save Draft
           </Button>
           <Button
-            onClick={handleCheckATS}
+            onClick={handleCheckAtsClick}
             disabled={isCheckingATS}
             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium h-[44px]"
           >

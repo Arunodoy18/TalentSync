@@ -149,10 +149,8 @@ const ResHeading = ({ title }: { title: string }) => (
 
 export default function IITTemplate({
   data = sampleData,
-  logoUrl,
 }: {
   data?: IITResumeData;
-  logoUrl?: string;
 }) {
   const listStyle: React.CSSProperties = {
     margin: '0',
@@ -188,33 +186,25 @@ export default function IITTemplate({
       {/* HEADER SECTION */}
       <div style={{ display: 'flex', marginBottom: '16px' }}>
         <div style={{ width: '15%', display: 'flex', alignItems: 'center' }}>
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt="Institute Logo"
-              style={{ height: '58px', objectFit: 'contain' }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 58,
-                height: 58,
-                borderRadius: '50%',
-                border: '2px solid #333',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 9,
-                fontWeight: 'bold',
-                textAlign: 'center',
-                color: '#333',
-                padding: 4,
-              }}
-            >
-              SMIT LOGO
-            </div>
-          )}
+          <div
+            style={{
+              width: 58,
+              height: 58,
+              borderRadius: '50%',
+              border: '2px solid #555',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 8,
+              fontWeight: 'bold',
+              textAlign: 'center' as const,
+              color: '#555',
+              padding: 4,
+              flexShrink: 0,
+            }}
+          >
+            UNIVERSITY SEAL
+          </div>
         </div>
         <div style={{ width: '85%' }}>
           <table

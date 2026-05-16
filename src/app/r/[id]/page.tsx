@@ -3,8 +3,6 @@ import { createAdminClient } from "@/lib/supabase-admin";
 import IITTemplate from "@/components/resume/templates/IITTemplate";
 import JakesTemplate from "@/components/resume/templates/JakesTemplate";
 
-const IIT_LOGO_URL = "/logos/smit-seal.svg";
-
 export default async function PublicResumePage({
   params,
 }: {
@@ -34,7 +32,7 @@ export default async function PublicResumePage({
             <div className="w-[816px] rounded-[12px] bg-white shadow-[0_25px_60px_rgba(15,23,42,0.15)]">
               <div className="flex justify-center">
                 {templateType === "iit" ? (
-                  <IITTemplate data={templateData} logoUrl={IIT_LOGO_URL} />
+                  <IITTemplate data={templateData} />
                 ) : (
                   <JakesTemplate data={templateData} />
                 )}

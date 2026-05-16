@@ -9,8 +9,6 @@ import IITTemplate, { type IITResumeData, sampleData as iitSampleData } from "@/
 import JakesTemplate, { type JakesResumeData, sampleData as jakesSampleData } from "@/components/resume/templates/JakesTemplate";
 import { createClient } from "@/lib/supabase-browser";
 
-const IIT_LOGO_URL = "/logos/smit-seal.svg";
-
 type ResumeRecord = {
   id: string;
   title?: string | null;
@@ -72,7 +70,7 @@ export default function ResumePreviewClient({ resume }: { resume: ResumeRecord }
 
   const templateNode = useMemo(() => {
     if (templateType === "iit") {
-      return <IITTemplate data={iitData} logoUrl={IIT_LOGO_URL} />;
+      return <IITTemplate data={iitData} />;
     }
     return <JakesTemplate data={jakesData} />;
   }, [iitData, jakesData, templateType]);

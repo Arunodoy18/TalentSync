@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import IITTemplate from '@/components/resume/templates/IITTemplate'
 import JakesTemplate from '@/components/resume/templates/JakesTemplate'
-
-const IIT_LOGO_URL = '/logos/smit-seal.svg'
 const PREVIEW_SCALE = 0.3
 const PREVIEW_WIDTH = 794
 const PREVIEW_HEIGHT = 1123
@@ -18,15 +16,15 @@ export function ResumeCard({ resume }: { resume: any }) {
 
   const templateType = resume?.template_type === 'iit' ? 'iit' : 'jakes'
   const templateLabel = templateType === 'iit' ? 'IIT' : "Jake's"
-  const templateData = resume?.data ?? resume?.content ?? {}
   const atsScore = typeof resume?.ats_score === 'number' ? resume.ats_score : null
 
   const templateNode = useMemo(() => {
+    const templateData = resume?.data ?? resume?.content ?? {}
     if (templateType === 'iit') {
-      return <IITTemplate data={templateData} logoUrl={IIT_LOGO_URL} />
+      return <IITTemplate data={templateData} />
     }
     return <JakesTemplate data={templateData} />
-  }, [templateData, templateType])
+  }, [resume?.content, resume?.data, templateType])
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()

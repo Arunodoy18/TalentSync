@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation"
 import {
   Bot,
   Briefcase,
-  ClipboardList,
   CreditCard,
   FilePenLine,
   FileText,
@@ -30,7 +29,6 @@ const navItems: NavItem[] = [
   { label: "Resumes", href: "/dashboard/resumes", icon: FileText },
   { label: "Jobs", href: "/dashboard/jobs", icon: Briefcase },
   { label: "Auto Apply", href: "/dashboard/auto-apply", icon: Rocket },
-  { label: "Applications", href: "/dashboard/applications", icon: ClipboardList },
   { label: "Your Assistant", href: "/dashboard/assistant", icon: Bot },
   { label: "Cover Letters", href: "/dashboard/cover-letters", icon: FilePenLine },
   { label: "Roadmap", href: "/dashboard/roadmap", icon: Map },

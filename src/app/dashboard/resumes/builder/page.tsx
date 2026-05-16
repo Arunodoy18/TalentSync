@@ -258,6 +258,10 @@ export default function ResumeBuilderPage() {
   }, [debouncedPreviewData, resumeData.name]);
 
   const saveToVault = async () => {
+    if (!supabase) {
+      toast.error('Supabase is not configured.');
+      return;
+    }
     const { data, error: userError } = await supabase.auth.getUser();
     if (userError || !data?.user) {
       toast.error('Please sign in to save your resume.');
@@ -284,6 +288,10 @@ export default function ResumeBuilderPage() {
   };
 
   const saveDraftToVault = async () => {
+    if (!supabase) {
+      toast.error('Supabase is not configured.');
+      return false;
+    }
     const { data, error: userError } = await supabase.auth.getUser();
     if (userError || !data?.user) {
       toast.error('Please sign in to save your resume.');

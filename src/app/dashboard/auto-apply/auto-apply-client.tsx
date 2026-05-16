@@ -24,14 +24,16 @@ export function AutoApplyClient({
 }) {
   const supabase = createClient();
 
-  const initialJobTitles = useMemo(() => {
+  const initialJobTitles = useMemo<string>(() => {
     if (Array.isArray(initialPreferences?.job_titles)) {
       return initialPreferences.job_titles.join(", ");
     }
-    return initialPreferences?.job_titles || "";
+    return typeof initialPreferences?.job_titles === "string"
+      ? initialPreferences.job_titles
+      : "";
   }, [initialPreferences]);
 
-  const initialJobTypes = useMemo(() => {
+  const initialJobTypes = useMemo<string[]>(() => {
     if (Array.isArray(initialPreferences?.job_types)) {
       return initialPreferences.job_types;
     }
@@ -102,7 +104,7 @@ export function AutoApplyClient({
       }
       const jobTitles = prefs.job_titles
         .split(",")
-        .map((title) => title.trim())
+        .map((title: string) => title.trim())
         .filter(Boolean);
 
       const payload = {

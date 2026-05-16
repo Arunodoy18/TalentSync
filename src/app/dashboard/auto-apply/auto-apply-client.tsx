@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import { Badge } from "@/components/ui/badge";
 import { Rocket, Pause, CircleCheck, CircleDot, Activity, Settings2, Play, AlertCircle } from "lucide-react";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+import toast from "react-hot-toast";
 
 const LOCATIONS = ["Remote", "Bangalore", "Mumbai", "Delhi", "Hyderabad", "Any"];
 const JOB_TYPES = ["Full-time", "Internship", "Contract"];
@@ -22,11 +23,28 @@ export function AutoApplyClient({
   userId: string 
 }) {
   const supabase = createClient();
+
+  const initialJobTitles = useMemo(() => {
+    if (Array.isArray(initialPreferences?.job_titles)) {
+      return initialPreferences.job_titles.join(", ");
+    }
+    return initialPreferences?.job_titles || "";
+  }, [initialPreferences]);
+
+  const initialJobTypes = useMemo(() => {
+    if (Array.isArray(initialPreferences?.job_types)) {
+      return initialPreferences.job_types;
+    }
+    if (Array.isArray(initialPreferences?.job_type)) {
+      return initialPreferences.job_type;
+    }
+    return ["Full-time"];
+  }, [initialPreferences]);
   
   const [prefs, setPrefs] = useState({
-    job_titles: initialPreferences?.job_titles || "",
+    job_titles: initialJobTitles,
     preferred_locations: initialPreferences?.preferred_locations || ["Remote"],
-    job_types: initialPreferences?.job_types || ["Full-time"],
+    job_types: initialJobTypes,
     experience_level: initialPreferences?.experience_level || "Fresher",
     min_match_score: initialPreferences?.min_match_score || 75,
     daily_apply_limit: initialPreferences?.daily_apply_limit || 5,
@@ -82,11 +100,16 @@ export function AutoApplyClient({
         setError("Supabase is not configured. Check your environment variables.");
         return;
       }
+      const jobTitles = prefs.job_titles
+        .split(",")
+        .map((title) => title.trim())
+        .filter(Boolean);
+
       const payload = {
         user_id: userId,
-        job_titles: prefs.job_titles,
+        job_titles: jobTitles,
         preferred_locations: prefs.preferred_locations,
-        job_types: prefs.job_types,
+        job_type: prefs.job_types,
         experience_level: prefs.experience_level,
         min_match_score: prefs.min_match_score,
         daily_apply_limit: prefs.daily_apply_limit,
@@ -104,6 +127,9 @@ export function AutoApplyClient({
 
       setPrefs({ ...prefs, is_active: activate });
       setIsEditing(false);
+      if (activate) {
+        toast.success("Auto Apply activated!");
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to save preferences.");

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Trash2, ChevronDown, ChevronUp, CheckCircle2, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { usePostHog } from 'posthog-js/react';
+import { createClient } from '@/lib/supabase-browser';
 
 type BuilderResumeData = JakesResumeData & {
   portfolio?: string;
@@ -30,6 +31,7 @@ const emptySkills = {
 
 export default function ResumeBuilderPage() {
   const posthog = usePostHog();
+  const supabase = useMemo(() => createClient(), []);
   const [resumeData, setResumeData] = useState<BuilderResumeData>(defaultResumeData);
   const [templateType, setTemplateType] = useState<'iit' | 'jakes'>('jakes');
 
@@ -255,6 +257,59 @@ export default function ResumeBuilderPage() {
     };
   }, [debouncedPreviewData, resumeData.name]);
 
+  const saveToVault = async () => {
+    const { data, error: userError } = await supabase.auth.getUser();
+    if (userError || !data?.user) {
+      toast.error('Please sign in to save your resume.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('resumes')
+      .upsert({
+        user_id: data.user.id,
+        title: `${resumeData.name} Resume`,
+        template_type: selectedTemplate,
+        data: resumeData,
+        status: 'completed',
+        updated_at: new Date().toISOString(),
+      });
+
+    if (!error) {
+      toast.success('Resume saved to vault!');
+      return;
+    }
+
+    toast.error('Failed to save resume to vault.');
+  };
+
+  const saveDraftToVault = async () => {
+    const { data, error: userError } = await supabase.auth.getUser();
+    if (userError || !data?.user) {
+      toast.error('Please sign in to save your resume.');
+      return false;
+    }
+
+    const { error } = await supabase
+      .from('resumes')
+      .upsert({
+        user_id: data.user.id,
+        title: `Draft - ${resumeData.name}`,
+        template_type: selectedTemplate,
+        data: resumeData,
+        status: 'draft',
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      toast.error('Failed to save draft to vault.');
+      return false;
+    }
+
+    toast.success('Draft saved to vault');
+    return true;
+  };
+
   const handleCheckATS = async () => {
     setIsCheckingATS(true);
     try {
@@ -290,58 +345,11 @@ export default function ResumeBuilderPage() {
     const toastId = toast.loading('Saving draft...');
 
     try {
-      const payload = {
-        mode: templateType === 'jakes' ? 'jake' : 'iit',
-        title: `${resumeData.name} Resume`,
-        basics: {
-          name: resumeData.name,
-          email: resumeData.email,
-          phone: resumeData.phone,
-          github: resumeData.github,
-          linkedin: resumeData.linkedin,
-        },
-        experience: (resumeData.experience || []).map((exp) => ({
-          company: exp.company,
-          role: exp.position,
-          start: exp.dates,
-          end: '',
-          bullets: exp.bullets || [],
-        })),
-        education: (resumeData.education || []).map((edu) => ({
-          school: edu.institution,
-          degree: edu.degree,
-          year: edu.dates,
-          grade: '',
-        })),
-        projects: (resumeData.projects || []).map((proj) => ({
-          name: proj.name,
-          technologies: proj.techStack,
-          github: proj.codeUrl,
-          link: proj.liveUrl,
-          bullets: proj.bullets || [],
-        })),
-        skills: [
-          resumeData.skills?.languages,
-          resumeData.skills?.frameworks,
-          resumeData.skills?.databases,
-          resumeData.skills?.tools,
-        ]
-          .filter(Boolean)
-          .join(', '),
-      };
-
-      const res = await fetch('/api/resume/draft', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.error || 'Failed to save draft.');
+      const saved = await saveDraftToVault();
+      if (!saved) {
+        throw new Error('Failed to save draft.');
       }
-
-      toast.success('Draft saved!', { id: toastId });
+      toast.dismiss(toastId);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save draft.';
       console.error('Save draft failed', err);
@@ -802,6 +810,7 @@ export default function ResumeBuilderPage() {
             className="flex-1 bg-[#D4AF37] hover:bg-[#B89A32] text-[#0F172A] font-medium h-[44px] rounded-md text-sm transition-colors flex items-center justify-center cursor-pointer"
             templateType={templateType}
             data={pdfData}
+            onDownloadComplete={saveToVault}
           />
         </div>
       </div>

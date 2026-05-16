@@ -131,13 +131,31 @@ export default function JakesTemplate({ data = sampleData }: { data?: JakesResum
   if (!data) return null;
 
   const sectionHeaderStyle: React.CSSProperties = {
+    marginTop: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  };
+
+  const sectionTitleStyle: React.CSSProperties = {
     textTransform: 'uppercase',
-    borderBottom: '1px solid black',
     fontSize: '14px',
     fontWeight: 'bold',
-    marginBottom: '8px',
-    marginTop: '16px',
-    paddingBottom: '2px',
+  };
+
+  const sectionDividerStyle: React.CSSProperties = {
+    width: '100%',
+    borderTop: '1px solid black',
+    margin: '2px 0 6px 0',
+    display: 'block',
+  };
+
+  const projectHeaderRowStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    width: '100%',
+    fontWeight: 'bold',
   };
 
   const listStyle: React.CSSProperties = {
@@ -176,7 +194,10 @@ export default function JakesTemplate({ data = sampleData }: { data?: JakesResum
       {/* EDUCATION */}
       {data.education && data.education.length > 0 && (
         <section>
-          <div style={sectionHeaderStyle}>Education</div>
+          <div style={sectionHeaderStyle}>
+            <div style={sectionTitleStyle}>Education</div>
+            <hr style={sectionDividerStyle} />
+          </div>
           {data.education.map((edu, idx) => (
             <div key={idx} style={{ marginBottom: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
@@ -195,7 +216,10 @@ export default function JakesTemplate({ data = sampleData }: { data?: JakesResum
       {/* EXPERIENCE */}
       {data.experience && data.experience.length > 0 && (
         <section>
-          <div style={sectionHeaderStyle}>Experience</div>
+          <div style={sectionHeaderStyle}>
+            <div style={sectionTitleStyle}>Experience</div>
+            <hr style={sectionDividerStyle} />
+          </div>
           {data.experience.map((exp, idx) => (
             <div key={idx} style={{ marginBottom: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
@@ -219,11 +243,19 @@ export default function JakesTemplate({ data = sampleData }: { data?: JakesResum
       {/* PROJECTS */}
       {data.projects && data.projects.length > 0 && (
         <section>
-          <div style={sectionHeaderStyle}>Projects</div>
+          <div style={sectionHeaderStyle}>
+            <div style={sectionTitleStyle}>Projects</div>
+            <hr style={sectionDividerStyle} />
+          </div>
           {data.projects.map((proj, idx) => (
             <div key={idx} style={{ marginBottom: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                <span>{proj.name} <span style={{ fontWeight: 'normal', fontStyle: 'italic', marginLeft: '4px' }}>| {proj.techStack}</span></span>
+              <div style={projectHeaderRowStyle}>
+                <span>
+                  {proj.name}
+                  {proj.techStack && (
+                    <span style={{ fontWeight: 'normal', fontStyle: 'italic' }}> | {proj.techStack}</span>
+                  )}
+                </span>
                 <span>{proj.dates}</span>
               </div>
               <ul style={{ ...listStyle, marginTop: '4px' }}>
@@ -239,7 +271,10 @@ export default function JakesTemplate({ data = sampleData }: { data?: JakesResum
       {/* TECHNICAL SKILLS */}
       {data.skills && (Object.keys(data.skills).length > 0) && (
         <section>
-          <div style={sectionHeaderStyle}>Technical Skills</div>
+          <div style={sectionHeaderStyle}>
+            <div style={sectionTitleStyle}>Technical Skills</div>
+            <hr style={sectionDividerStyle} />
+          </div>
           <ul style={{ ...listStyle, listStyleType: 'none', paddingLeft: 0, marginBottom: '8px' }}>
             {data.skills.languages && (
               <li style={{ marginBottom: '4px' }}>
@@ -278,7 +313,10 @@ export default function JakesTemplate({ data = sampleData }: { data?: JakesResum
       {/* ACHIEVEMENTS & ACTIVITIES */}
       {data.achievements && data.achievements.length > 0 && (
         <section>
-          <div style={sectionHeaderStyle}>Achievements & Activities</div>
+          <div style={sectionHeaderStyle}>
+            <div style={sectionTitleStyle}>Achievements & Activities</div>
+            <hr style={sectionDividerStyle} />
+          </div>
           <ul style={{ ...listStyle, marginTop: '4px' }}>
             {data.achievements.map((act, idx) => {
               const colonIndex = act.indexOf(':');

@@ -19,11 +19,25 @@ export default async function AutoApplyPage() {
     .order("created_at", { ascending: false });
 
   // Fetch preferences
-  const { data: preferences } = await supabase
-    .from("user_preferences")
-    .select("*")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  let preferences = null;
+  try {
+    const { data, error } = await supabase
+      .from("user_preferences")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
+    if (error && error.code === "PGRST116") {
+      preferences = null;
+    } else if (error) {
+      console.error("Preferences error:", error);
+      preferences = null;
+    } else {
+      preferences = data;
+    }
+  } catch (e) {
+    console.error("Auto apply setup needed:", e);
+  }
 
   // Fetch resumes
   const { data: resumes } = await supabase

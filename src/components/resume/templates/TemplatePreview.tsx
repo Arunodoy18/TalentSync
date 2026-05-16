@@ -54,9 +54,10 @@ interface DownloadPDFProps {
   templateType: 'iit' | 'jakes';
   data: any;
   className?: string;
+  onDownloadComplete?: () => void | Promise<void>;
 }
 
-export function DownloadPDFButton({ templateType, data, className }: DownloadPDFProps) {
+export function DownloadPDFButton({ templateType, data, className, onDownloadComplete }: DownloadPDFProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -93,6 +94,7 @@ export function DownloadPDFButton({ templateType, data, className }: DownloadPDF
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(filename);
+      await onDownloadComplete?.();
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Map, Briefcase, Code, Loader2, ArrowRight, Target, Sparkles } from "lucide-react";
+import { Map, Briefcase, Code, Loader2, Target, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface RoadmapStep {

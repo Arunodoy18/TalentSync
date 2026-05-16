@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
-import { Settings, ShieldCheck, UserRound, Wallet, Bell, Lock } from "lucide-react";
+import { Settings, ShieldCheck, Wallet, Bell, Lock } from "lucide-react";
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { SmokeTestHelper } from "@/components/settings/smoke-test-helper";

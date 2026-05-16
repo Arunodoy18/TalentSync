@@ -5,8 +5,8 @@ import Link from "next/link";
 import { ArrowLeft, Download, Edit3, Loader2, Share2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import IITTemplate from "@/components/resume/templates/IITTemplate";
-import JakesTemplate from "@/components/resume/templates/JakesTemplate";
+import IITTemplate, { type IITResumeData } from "@/components/resume/templates/IITTemplate";
+import JakesTemplate, { type JakesResumeData } from "@/components/resume/templates/JakesTemplate";
 import { createClient } from "@/lib/supabase-browser";
 
 const IIT_LOGO_URL = "/logos/smit-seal.svg";
@@ -21,16 +21,18 @@ type ResumeRecord = {
   target_job_id?: string | null;
 };
 
+type ResumeTemplateData = IITResumeData | JakesResumeData;
+
 export default function ResumePreviewClient({ resume }: { resume: ResumeRecord }) {
   const supabase = React.useMemo(() => createClient(), []);
   const resumeRef = useRef<HTMLDivElement>(null);
 
   const templateType = resume.template_type === "iit" ? "iit" : "jakes";
-  const resumeData = resume.data ?? resume.content ?? {};
+  const resumeData = (resume.data ?? resume.content ?? {}) as ResumeTemplateData;
   const nameFromData =
     templateType === "iit"
-      ? (resumeData as { fullName?: string }).fullName
-      : (resumeData as { name?: string }).name;
+      ? (resumeData as IITResumeData).fullName
+      : (resumeData as JakesResumeData).name;
 
   const [title, setTitle] = useState(resume.title || "Untitled Resume");
   const [draftTitle, setDraftTitle] = useState(resume.title || "Untitled Resume");
@@ -43,9 +45,9 @@ export default function ResumePreviewClient({ resume }: { resume: ResumeRecord }
 
   const templateNode = useMemo(() => {
     if (templateType === "iit") {
-      return <IITTemplate data={resumeData} logoUrl={IIT_LOGO_URL} />;
+      return <IITTemplate data={resumeData as IITResumeData} logoUrl={IIT_LOGO_URL} />;
     }
-    return <JakesTemplate data={resumeData} />;
+    return <JakesTemplate data={resumeData as JakesResumeData} />;
   }, [resumeData, templateType]);
 
   const handleSaveTitle = async () => {

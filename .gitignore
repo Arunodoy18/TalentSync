@@ -55,3 +55,4 @@ script-add-upload.js
 script-api.js
 script-frontend-upload.js
 script-jobs.js
+.env.local

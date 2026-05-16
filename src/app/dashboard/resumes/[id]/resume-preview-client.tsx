@@ -5,8 +5,8 @@ import Link from "next/link";
 import { ArrowLeft, Download, Edit3, Loader2, Share2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import IITTemplate, { type IITResumeData } from "@/components/resume/templates/IITTemplate";
-import JakesTemplate, { type JakesResumeData } from "@/components/resume/templates/JakesTemplate";
+import IITTemplate, { type IITResumeData, sampleData as iitSampleData } from "@/components/resume/templates/IITTemplate";
+import JakesTemplate, { type JakesResumeData, sampleData as jakesSampleData } from "@/components/resume/templates/JakesTemplate";
 import { createClient } from "@/lib/supabase-browser";
 
 const IIT_LOGO_URL = "/logos/smit-seal.svg";
@@ -23,16 +23,43 @@ type ResumeRecord = {
 
 type ResumeTemplateData = IITResumeData | JakesResumeData;
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isIITResumeData = (value: unknown): value is IITResumeData => {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.fullName === "string" &&
+    typeof value.rollNumber === "string" &&
+    typeof value.department === "string" &&
+    typeof value.degree === "string" &&
+    Array.isArray(value.education) &&
+    Array.isArray(value.projects) &&
+    Array.isArray(value.experience)
+  );
+};
+
+const isJakesResumeData = (value: unknown): value is JakesResumeData => {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.name === "string" &&
+    typeof value.email === "string" &&
+    Array.isArray(value.education) &&
+    Array.isArray(value.experience) &&
+    Array.isArray(value.projects) &&
+    isRecord(value.skills)
+  );
+};
+
 export default function ResumePreviewClient({ resume }: { resume: ResumeRecord }) {
   const supabase = React.useMemo(() => createClient(), []);
   const resumeRef = useRef<HTMLDivElement>(null);
 
   const templateType = resume.template_type === "iit" ? "iit" : "jakes";
-  const resumeData = (resume.data ?? resume.content ?? {}) as ResumeTemplateData;
-  const nameFromData =
-    templateType === "iit"
-      ? (resumeData as IITResumeData).fullName
-      : (resumeData as JakesResumeData).name;
+  const rawData = (resume.data ?? resume.content ?? null) as ResumeTemplateData | null;
+  const iitData = templateType === "iit" && isIITResumeData(rawData) ? rawData : iitSampleData;
+  const jakesData = templateType === "jakes" && isJakesResumeData(rawData) ? rawData : jakesSampleData;
+  const nameFromData = templateType === "iit" ? iitData.fullName : jakesData.name;
 
   const [title, setTitle] = useState(resume.title || "Untitled Resume");
   const [draftTitle, setDraftTitle] = useState(resume.title || "Untitled Resume");
@@ -45,10 +72,10 @@ export default function ResumePreviewClient({ resume }: { resume: ResumeRecord }
 
   const templateNode = useMemo(() => {
     if (templateType === "iit") {
-      return <IITTemplate data={resumeData as IITResumeData} logoUrl={IIT_LOGO_URL} />;
+      return <IITTemplate data={iitData} logoUrl={IIT_LOGO_URL} />;
     }
-    return <JakesTemplate data={resumeData as JakesResumeData} />;
-  }, [resumeData, templateType]);
+    return <JakesTemplate data={jakesData} />;
+  }, [iitData, jakesData, templateType]);
 
   const handleSaveTitle = async () => {
     const trimmed = draftTitle.trim();
